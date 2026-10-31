@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Gmail test page</title>
+<link rel="stylesheet" href="dev.css">
+</head>
+<body>
+  <!-- Dev-only page (python -m src.pipeline.demo --dev). It copies the parts of Gmail's
+       markup the extension reads (h2.hP, div.adn, span.gD[email], div.a3s) and loads the
+       real content scripts, which call the API on this origin instead of via the extension. -->
+  <div class="devbar">
+    <strong>Gmail test page</strong>
+    <span>Open a sample:</span>
+    <span id="samples"></span>
+    <label><input type="checkbox" id="offline"> Simulate server offline</label>
+  </div>
+
+  <div class="gmail">
+    <h2 class="hP" id="subject"></h2>
+    <div id="thread"></div>
+  </div>
+
+  <script src="gmail-samples.js"></script>
+  <script src="../shared/verdict.js"></script>
+  <script src="../content/ui.js"></script>
+  <script src="../content/gmail.js"></script>
+</body>
+</html>

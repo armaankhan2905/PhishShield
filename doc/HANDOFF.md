@@ -197,3 +197,62 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
 - **Spam vs phishing.** The text model partly learned "spam". Marketing SMS may score high, but scoring keeps them safe unless they contain a link, number or payment request.
 - **Rebuilding the models** (`fetch_data → prepare → train_url → train_text → phish_bench --tune → phish_bench`) needs ~180 MB of downloads and ~8 minutes. Re-run `--tune` after retraining and copy the chosen values into `fuse.py`.
 - `src/model/train.py`, `train_v2.py`, `accuracy_loop.py` and `corpus/` are the old PrivacyLens PII model. The pipeline/training pages still read them; they're reworked in P5.
+
+---
+
+## P4 Browser extension → P5 Integration and deployment
+
+**From:** Atharvva · **To:** Ryan
+
+### What works
+- **Chrome extension (Manifest V3)** in `extension/`; install steps in [extension/README.md](../extension/README.md).
+  - **Gmail:** a banner above each opened email.
+    - red / amber / green / grey, up to 3 reasons, and **Details** with the explanation and the checks that ran;
+    - on non-safe emails, flagged phrases are highlighted and risky links outlined;
+    - a MutationObserver picks up emails Gmail swaps in without reloading.
+  - **Other sites:** risky outgoing links are outlined, with the reason on hover and a badge count. *Automatic* mode only scans when the server is local.
+  - **Popup:** server status, plus paste-and-check with highlighted phrases.
+  - **Settings:** server address (a non-local address asks Chrome for permission), Gmail on/off, link checking auto/on/off.
+- **Safety rules from API.md:**
+  - the extension only shows what the API returns;
+  - all text is inserted with `textContent` inside a closed Shadow DOM;
+  - low confidence → grey "Low risk: limited checks";
+  - request failed → grey "Couldn't check this message" (never green);
+  - hosted mode shows a disclosure;
+  - safe emails get no highlights; minor notes are labelled "Noted, but not enough to flag".
+- **Only the background worker calls the API** (Gmail's origin would be blocked by CORS). It has a 15 s timeout and an in-memory cache of 50 results.
+- **Dev test pages:** `python -m src.pipeline.demo --dev` serves `extension/dev/gmail.html` (Gmail look-alike with 5 samples and an offline switch), `extension/dev/links.html` and the popup. They run the real content scripts against the API.
+- **Tests:** 5 Node unit tests for `shared/verdict.js` (`node --test extension/test/*.test.js`); 100 Python tests still pass.
+
+### Checked on the dev pages (real scripts, real API, both models loaded)
+
+| Sample | Result |
+|---|---|
+| SBI KYC phishing | **phishing 100**, 3 reasons, fake `onlinesbi.sbi` link outlined, phrases highlighted |
+| HDFC statement (legit) | **green 2/100**, "Noted, but not enough to flag: generic greeting", no highlights |
+| Lottery, no link, with emoji | **phishing 85**; payment, OTP/details request and "reply with your bank details" highlighted and aligned despite the emoji |
+| Meeting note (legit) | **green 0/100** |
+| `<script>` / `<img onerror>` as email text | shown as plain text, nothing executed; `paypa1.com` link caught (**phishing 100**) |
+| Server offline | grey **"Couldn't check this message"**, email not marked safe |
+| Link page (10 links) | the 4 risky ones outlined (amaz0n-refund.in, sbi-kyc.xyz, paypal.com.login-verify.ru, raw IP); Amazon, Flipkart, SBI, HDFC, Python docs, Wikipedia untouched |
+| Popup | Paytm KYC scam → **phishing 100**, 5 reasons, phrases highlighted with emoji |
+
+### Not verified
+- **The extension hasn't been loaded into real Chrome or run against real Gmail yet.** The Claude app's browser can't load extensions, so the checks above used the Gmail look-alike page, which copies Gmail's class names (`div.a3s`, `div.adn`, `span.gD[email]`, `h2.hP`). Before the demo, someone must:
+  1. load it unpacked (`chrome://extensions` → Developer mode → Load unpacked → `extension/`);
+  2. send the 20 demo samples to the test inbox;
+  3. confirm each banner.
+
+  If Gmail's markup differs, fix the selectors in `SEL` at the top of `content/gmail.js`.
+- **Real Chrome-only paths:** the badge, options-page permission requests and the service worker's message passing only run inside real Chrome.
+
+### Acceptance test for your handover to Atharvva (P5 → P6, revised plan §10)
+- **Fallback matrix passes:** rules-only, no URL model, no text model, Ollama down, API down, unsupported file, malformed URL, empty / oversized input, HTML email.
+- Hosted disclosure visible; logs contain no message text.
+- Metrics shown in the UI match `data/eval.json`.
+
+### Known gaps / notes
+- **Reply-To:** Gmail doesn't show it in the page, so the extension can't send it. That check only works for `.eml` uploads (P5).
+- **Feedback buttons:** not built (Could Have).
+- **Hosted use:** the API's CORS allows any `chrome-extension://` origin. For a hosted deploy, consider pinning the published extension ID.
+- **Web app:** the main web page is still the PrivacyLens demo. The PhishShield result screen is part of P5. The popup's result card (`popup/`) and `shared/verdict.js` can be reused for it.

@@ -227,6 +227,10 @@ def main() -> None:
 
     host = os.environ.get("HOST", "127.0.0.1")
     port = int(os.environ.get("PORT", "8000"))
+    if "--dev" in sys.argv:
+        # Extension test pages (extension/dev/*.html) run the real content scripts against this API.
+        app.mount("/dev/extension", StaticFiles(directory=ROOT / "extension"), name="extension-dev")
+        logger.info("dev: Gmail test page at http://localhost:%d/dev/extension/dev/gmail.html", port)
     logger.info("PhishShield on http://localhost:%d", port)
     uvicorn.run(app, host=host, port=port, log_level="warning")
 

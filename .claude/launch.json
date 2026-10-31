@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "src.pipeline.demo"],
       "port": 8000
+    },
+    {
+      "name": "demo-dev",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "src.pipeline.demo", "--dev"],
+      "port": 8000
     }
   ]
 }

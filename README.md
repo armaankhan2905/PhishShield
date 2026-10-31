@@ -76,7 +76,7 @@ src/model/       URL + text models: fetch_data · prepare · train_url · train_
 src/eval/        phish_bench.py (every reported number comes from here)
 src/pipeline/    demo.py (server) · analyze.py · sanitize.py · rag.py · documents.py
 demo/            web app pages
-extension/       Chrome extension (Phase 1 side task)
+extension/       Chrome extension (Manifest V3): Gmail banner, risky-link outlines, popup; see extension/README.md
 data/            eval.json · calibration.json · curated/ (raw/ and processed/ are rebuilt, not in git)
 models/          url_model.joblib · text_model.joblib (~4 MB, committed)
 doc/             API.md · HANDOFF.md · MODEL_CARD.md · privacylens/ (old project docs)
@@ -90,6 +90,6 @@ tests/           API contract tests
 | P1 Foundation | Ryan | Done: API contract v1.1, stub detection live, 13 contract tests passing |
 | P2 Detection engine | Armaan | Done: rules, domain and sender checks, evidence-gated scoring, 81 tests passing |
 | P3 ML models | Govind | Done: URL + text models, calibrated scoring, held-out evaluation ([MODEL_CARD](doc/MODEL_CARD.md)) |
-| P4 Extension live | Atharvva | Next |
-| P5 Integrate + deploy | Ryan | Pending |
+| P4 Extension live | Atharvva | Done: Gmail banner, link outlines, popup, settings (checked on dev pages; real-Gmail check pending) |
+| P5 Integrate + deploy | Ryan | Next |
 | P6 Demo + submit | Atharvva | Pending |

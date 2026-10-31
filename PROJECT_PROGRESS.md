@@ -1,14 +1,14 @@
 # PhishShield project progress
 
-**Updated:** 2026-10-31, after Phase 3 was completed.
+**Updated:** 2026-10-31, after Phase 4 was completed.
 
 | Phase | Lead | Status |
 |---|---|---|
 | P1 Foundation | Ryan | ✅ Done |
 | P2 Core detection | Armaan | ✅ Done |
 | P3 Machine learning | Govind | ✅ Done: see [doc/MODEL_CARD.md](doc/MODEL_CARD.md) and the P3 section of [doc/HANDOFF.md](doc/HANDOFF.md) |
-| P4 Browser extension | Atharvva | ⏳ Next |
-| P5 Integration + deployment | Ryan | ⏳ |
+| P4 Browser extension | Atharvva | ✅ Done: see [extension/README.md](extension/README.md). Real-Gmail check still to do |
+| P5 Integration + deployment | Ryan | ⏳ Next |
 | P6 Demo + submission | Atharvva | ⏳ |
 
 ## Phase 3 summary
@@ -32,7 +32,8 @@
 - The first evaluation pair was interrupted by the user. It was restarted once, then stopped again by me after the hand-written test set was found to overlap synthetic training templates. It was re-run after the fix and the reproducibility check passed.
 
 ## Next
-P4 (extension): see "For the extension" in doc/HANDOFF.md.
+P5 (integration + deployment): see the P4 → P5 section of doc/HANDOFF.md.
+Before the demo: load the extension in real Chrome and check it against real Gmail.
 
 ## Commands
 
@@ -40,4 +41,6 @@ P4 (extension): see "For the extension" in doc/HANDOFF.md.
 python -m src.pipeline.demo                    # server on http://localhost:8000
 python -m pytest tests -q                      # 100 tests
 python -m src.eval.phish_bench                 # re-measure (about 2.5 min), writes data/eval.json
+python -m src.pipeline.demo --dev              # + extension test pages at /dev/extension/dev/gmail.html
+node --test extension/test/*.test.js           # extension unit tests
 ```

@@ -1,0 +1,16 @@
+/* Dev test pages only. A plain Gmail-ish look so the banner can be judged in context. */
+:root { --bg: #f6f8fc; --card: #ffffff; --fg: #1f1f1f; --muted: #5f6368; --line: #dadce0; color-scheme: light; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #111418; --card: #1b1f25; --fg: #e3e3e3; --muted: #9aa0a6; --line: #3c4043; color-scheme: dark; }
+}
+body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.5 Roboto, "Segoe UI", Arial, sans-serif; }
+.devbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 16px; background: var(--card);
+          border-bottom: 1px solid var(--line); font-size: 13px; }
+.devbar button { font: inherit; font-size: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--fg);
+                 border-radius: 14px; padding: 3px 10px; cursor: pointer; }
+.gmail, .page { max-width: 860px; margin: 16px auto; background: var(--card); border-radius: 12px; padding: 16px 20px;
+                border: 1px solid var(--line); }
+.hP { font-size: 20px; font-weight: 400; margin: 0 0 12px; }
+.sender { margin-bottom: 8px; } .gD { font-weight: 600; } .addr { color: var(--muted); font-size: 12px; }
+.a3s div { margin: 0 0 8px; }
+a { color: #1a73e8; }

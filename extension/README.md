@@ -1,0 +1,66 @@
+# PhishShield Chrome extension
+
+Checks emails you open in Gmail and outlines risky links on other websites,
+using your local PhishShield server. Nothing is analysed inside the extension
+itself: it sends the message to the server you choose (by default
+`http://localhost:8000`, on your own computer) and shows the result.
+
+## Install (unpacked)
+
+1. Start the server from the repo root:
+   ```bash
+   python -m src.pipeline.demo
+   ```
+2. In Chrome, open `chrome://extensions`, switch on **Developer mode**, click **Load unpacked**, and pick this `extension/` folder.
+3. Click the PhishShield icon. It should say **Server ready**.
+4. Open Gmail and open an email. A banner appears above it within a second or two.
+
+## What it does
+
+| Where | What you see |
+|---|---|
+| **Gmail** (open email) | A banner above the email. **Red** phishing likely · **amber** suspicious · **green** no phishing signs · **grey** "Low risk: limited checks" (some checks unavailable) or "Couldn't check this message" (server not reachable). Up to 3 reasons; **Details** shows the rest, the explanation and which checks ran. On non-safe emails, flagged phrases are highlighted and risky links outlined. |
+| **Other websites** | Links to other sites that look risky are outlined in red (risky) or amber (be careful). Hover for the reason. The icon badge counts them. |
+| **Toolbar popup** | Server status and a box to paste any message or link and check it. |
+| **Settings** | Server address, Gmail on/off, and link checking: *Automatic* (only when the server is on this computer), *On*, or *Off*. |
+
+## Privacy
+
+- **Local server (default):** messages and links go to `localhost` only.
+- **Any other server address:** Chrome asks you to allow it, and results show "This message was sent to the PhishShield server" when the server runs in hosted mode.
+- Link checking on ordinary websites sends that page's outgoing links to the server. *Automatic* only does this with a local server.
+- The extension stores only its settings. It doesn't keep messages or results; the background worker caches the last 50 results in memory to avoid re-checking the same email.
+
+## How it's built
+
+| File | Job |
+|---|---|
+| `manifest.json` | Manifest V3. Host permission only for `localhost:8000` / `127.0.0.1:8000`; other servers are optional permissions |
+| `background.js` | The only part that calls the API (Gmail's origin would be blocked by CORS). Timeout, cache, badge |
+| `shared/verdict.js` | Turns an API response into headline, reasons, highlights and link risks. Shared by everything; unit-tested in Node |
+| `content/ui.js` | Banner in a closed Shadow DOM. All API text inserted with `textContent`, never HTML |
+| `content/gmail.js` | Finds opened emails (Gmail selectors in one `SEL` object), extracts sender, subject, text and links (unwrapping `google.com/url?q=`), shows the banner |
+| `content/links.js` | Outlines risky outgoing links on other sites |
+| `popup/`, `options/` | Toolbar popup and settings page |
+
+Reply-To isn't visible in Gmail's page, so it isn't sent; the server's reply-to check only applies to `.eml` uploads.
+
+## Test without installing
+
+Chrome extensions can't run in every browser (for example, the Claude app's built-in one), so the same scripts can run on test pages served by the PhishShield server:
+
+```bash
+python -m src.pipeline.demo --dev
+```
+
+- **Gmail look-alike:** <http://localhost:8000/dev/extension/dev/gmail.html>. Sample buttons swap emails the way Gmail does; **Simulate server offline** shows the error state.
+- **Ordinary page with mixed links:** <http://localhost:8000/dev/extension/dev/links.html>
+- **Popup:** <http://localhost:8000/dev/extension/popup/popup.html>
+
+On these pages the scripts call the API on the same origin instead of going through the background worker. `--dev` only adds these static pages; the normal server doesn't serve them.
+
+Unit tests for the shared logic:
+
+```bash
+node --test extension/test/*.test.js
+```

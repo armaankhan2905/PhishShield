@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · link test page</title>
+<link rel="stylesheet" href="dev.css">
+</head>
+<body>
+  <!-- Dev-only page: an ordinary web page with a mix of links. The link content script
+       should outline only the risky ones and explain them on hover. -->
+  <div class="devbar"><strong>Link test page</strong><span>Hover an outlined link to see why it was flagged.</span></div>
+  <article class="page">
+    <h1>Weekly deals and account news</h1>
+    <p>Read the <a href="https://www.amazon.in/deals">Amazon deals page</a> or the
+       <a href="https://www.flipkart.com/offers-store">Flipkart offers</a>.</p>
+    <p>Your bank: <a href="https://www.onlinesbi.sbi/">SBI online banking</a> ·
+       <a href="https://www.hdfcbank.com/">HDFC Bank</a>.</p>
+    <p>Claim your refund: <a href="http://amaz0n-refund.in/claim">amazon.in/refund</a></p>
+    <p>Update KYC: <a href="http://sbi-kyc.xyz/login">onlinesbi.sbi/kyc</a></p>
+    <p>Unlock account: <a href="https://paypal.com.login-verify.ru/a">PayPal secure login</a></p>
+    <p>Router admin: <a href="http://192.168.1.5/login">192.168.1.5</a></p>
+    <p>Docs: <a href="https://docs.python.org/3/library/re.html">Python re module</a> ·
+       <a href="https://en.wikipedia.org/wiki/Phishing">Wikipedia: Phishing</a></p>
+  </article>
+  <script>
+    // Test page: never follow the sample links.
+    document.addEventListener("click", (e) => { if (e.target.closest("a")) e.preventDefault(); });
+  </script>
+  <script src="../shared/verdict.js"></script>
+  <script src="../content/ui.js"></script>
+  <script src="../content/links.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PhishShield</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="../icons/icon32.png" alt="" width="20" height="20">
+    <h1>PhishShield</h1>
+    <span id="status" class="status" role="status">Checking server…</span>
+  </header>
+
+  <main>
+    <label for="msg">Paste a message, email text or link</label>
+    <textarea id="msg" rows="6" placeholder="e.g. URGENT: your SBI KYC is pending, verify at http://sbi-kyc.xyz/login"></textarea>
+    <div class="row">
+      <button id="check" type="button">Check message</button>
+      <a id="opts" href="../options/options.html" target="_blank">Settings</a>
+    </div>
+
+    <section id="result" hidden>
+      <div id="headline" class="headline"><span class="dot"></span><strong id="title"></strong></div>
+      <p id="subtitle" class="sub"></p>
+      <ul id="reasons"></ul>
+      <p class="label" id="textLabel" hidden>Flagged in the message</p>
+      <div id="text" class="text" hidden></div>
+      <p id="explanation" class="meta"></p>
+      <p id="meta" class="meta"></p>
+    </section>
+  </main>
+
+  <script src="../shared/verdict.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
