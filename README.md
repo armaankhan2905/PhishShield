@@ -76,7 +76,7 @@ tests/           API contract tests
 
 | Phase | Lead | Status |
 |---|---|---|
-| P1 Foundation | Ryan | Done: stub API live, contract agreed |
+| P1 Foundation | Ryan | Done: API contract v1.1, stub detection live, 13 contract tests passing |
 | P2 Detection engine | Armaan | Next |
 | P3 ML models | Govind | Pending |
 | P4 Extension live | Atharvva | Pending |

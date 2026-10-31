@@ -14,7 +14,8 @@ from .rules import Finding
 
 
 def check_email(email: Optional[dict], links: List[dict]) -> List[Finding]:
-    """Findings with source="anomaly" and start/end None.
+    """Findings with source="anomaly", family "sender" or "link", field "from" /
+    "reply_to" / "link", and start/end None (they are not positions in the body).
 
     email: {"from", "reply_to", "subject"} or None; links: [{"text", "href"}].
     """

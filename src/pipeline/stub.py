@@ -7,7 +7,7 @@ starts with "[stub]". Delete this module once src/detection/rules.READY is True.
 from __future__ import annotations
 
 import re
-from typing import List
+from typing import List, Tuple
 from urllib.parse import urlparse
 
 from src.detection.main import URL_RX
@@ -31,11 +31,13 @@ def findings(text: str) -> List[Finding]:
         for m in re.finditer(pattern, text, re.I):
             if any(s <= m.start() < e for s, e in url_spans):
                 continue  # words inside a link are the URL checks' job
-            out.append(Finding(label, m.group(0), m.start(), m.end(), f"[stub] {reason}", "rule", weight, category))
+            out.append(Finding(label, m.group(0), m.start(), m.end(), f"[stub] {reason}", "rule", weight, category,
+                               tier="heuristic", family="content", field="body", severity="medium"))
     return out
 
 
-def url_flags(url: str) -> List[str]:
+def url_finding(text: str, url: str) -> Tuple[Finding, List[str]]:
+    """Stands in for the URL model: one ml-tier finding per URL, located in the body when it appears there."""
     host = urlparse(url if "://" in url else "http://" + url).hostname or ""
     flags = []
     if not url.lower().startswith("https://"):
@@ -44,8 +46,10 @@ def url_flags(url: str) -> List[str]:
         flags.append("risky_tld")
     if re.fullmatch(r"[\d.]+", host):
         flags.append("ip_host")
-    return flags
-
-
-def url_score(flags: List[str]) -> float:
-    return min(0.95, 0.1 + 0.3 * len(flags))
+    p = round(min(0.95, 0.1 + 0.3 * len(flags)), 2)
+    at = text.find(url)
+    reason = f"[stub] Link looks risky ({', '.join(flags)})" if flags else "[stub] No obvious link red flags"
+    return Finding("URL_MODEL", url, at if at >= 0 else None, at + len(url) if at >= 0 else None, reason,
+                   "url-model", 0, "suspicious_link" if flags else None, tier="ml", family="ml",
+                   field="body" if at >= 0 else "link", severity="high" if p >= 0.7 else "medium" if p >= 0.4 else "low",
+                   confidence=p), flags

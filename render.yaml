@@ -8,5 +8,7 @@ services:
     envVars:
       - key: HOST
         value: 0.0.0.0
+      - key: PHISHSHIELD_MODE
+        value: hosted
       - key: PYTHON_VERSION
         value: 3.12.7
