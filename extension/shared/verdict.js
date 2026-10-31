@@ -10,7 +10,7 @@
 (function (root) {
   "use strict";
 
-  const DEFAULTS = { apiBase: "http://localhost:8000", gmail: true, linkScan: "auto" };
+  const DEFAULTS = { apiBase: "http://localhost:8000", gmail: true, linkScan: "auto", stopPage: true };
   const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
 
   function isLocalApi(apiBase) {

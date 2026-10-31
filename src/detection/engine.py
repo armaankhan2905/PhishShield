@@ -14,7 +14,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from . import anomaly, brands as B, domains as D, fuse as FU, rules
+from . import anomaly, brands as B, domains as D, fuse as FU, rules, upi
 from .fuse import FAILED, RAN, UNAVAILABLE, Context
 from .main import PHONE_RX
 from .rules import Finding
@@ -56,7 +56,8 @@ _CONTACT_RX = re.compile(
 _SEND_RX = re.compile(r"(?:share|send|tell|give|forward|reply|read\s+out)\b", re.I)
 # Anything that asks you to hand over details, pay, log in, call or install. An email that does any of
 # these never gets the first-party model discount, whoever sent it.
-_ASK_LABELS = rules.REQUEST_LABELS | {"REMOTE_ACCESS", "CALLBACK_REQUEST", "REQUEST_WITH_LINK"}
+_ASK_LABELS = rules.REQUEST_LABELS | {"REMOTE_ACCESS", "CALLBACK_REQUEST", "REQUEST_WITH_LINK", "SCAN_TO_RECEIVE",
+                                      "UPI_ID_IMPERSONATION", "UPI_PAYEE_CLAIMS_BRAND", "UPI_QR"}
 
 
 def _ml_severity(p: float) -> str:
@@ -95,9 +96,16 @@ def _text_model(text: str, kind: str) -> Optional[List[Finding]]:
                     "ml", "ml", "body", _ml_severity(p), round(p, 4))]
 
 
-def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls: int = 50) -> Detection:
+def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls: int = 50,
+        qr: Optional[List[str]] = None) -> Detection:
+    """qr: payloads of QR codes found in an uploaded image. A link QR code is checked like any
+    other link; a UPI QR code is checked by src/detection/upi.py."""
     coverage = {"rules": UNAVAILABLE, "anomaly": UNAVAILABLE, "url_model": UNAVAILABLE, "text_model": UNAVAILABLE}
+    qr = [p for p in (qr or []) if p and p.strip()]
     links = [{"text": l.get("text", ""), "href": D.unwrap_redirect(l.get("href", ""))} for l in links if l.get("href")]
+    for p in qr:
+        if D.find_urls(p) and not upi.parse_upi(p):
+            links.append({"text": "QR code", "href": D.unwrap_redirect(D.find_urls(p)[0][0])})
 
     body_urls = D.find_urls(text)
     if kind == "url" and not body_urls and text.strip():
@@ -116,6 +124,7 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
 
     def rule_layer():
         out = rules.content_findings(text, skip=[(s, e) for _, s, e in body_urls])
+        out += upi.text_findings(text) + upi.qr_findings(qr, text)
         for u, s, e, fld in spots:
             out += rules.url_findings(u, s, e, fld)
         return out
@@ -153,8 +162,9 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
     # An email can always be answered, and "reply with your details" scams need nothing else.
     # Asking you to send or share an OTP / PIN with someone is itself the thing to act on (you reply);
     # "update your KYC on our website" is not.
-    actionable = kind == "email" or bool(spots) or bool(PHONE_RX.search(text)) or bool(_CONTACT_RX.search(text)) or \
-        any(f.label in ("REMOTE_ACCESS", "CALLBACK_REQUEST", "PAYMENT_REQUEST") for f in findings) or \
+    actionable = kind == "email" or bool(spots) or bool(qr) or bool(PHONE_RX.search(text)) or bool(_CONTACT_RX.search(text)) or \
+        any(f.label in ("REMOTE_ACCESS", "CALLBACK_REQUEST", "PAYMENT_REQUEST", "SCAN_TO_RECEIVE", "UPI_ID_IMPERSONATION")
+            for f in findings) or \
         any(f.label == "CREDENTIAL_REQUEST" and _SEND_RX.match(f.text) for f in findings)
     # First-party email: the sender is clean and every link goes to the sender's own organisation (or to
     # mail trackers and footer links), no proven trick was found, and it asks for nothing.

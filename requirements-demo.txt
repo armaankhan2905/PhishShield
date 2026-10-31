@@ -5,6 +5,9 @@ uvicorn>=0.29.0
 pydantic>=2.8.0
 pypdf>=4.0.0
 python-multipart>=0.0.9
+# Screenshots: QR codes (OpenCV) and text (RapidOCR, ONNX models bundled, runs offline)
+opencv-python-headless>=4.8
+rapidocr_onnxruntime>=1.2
 requests>=2.31.0
 tldextract>=5.1.0  # registered domains from the bundled Public Suffix List (offline)
 # Models: joblib files must be loaded with the scikit-learn version they were trained with.

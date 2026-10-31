@@ -7,7 +7,7 @@ Endpoints:
   GET  /static/*              page assets
   GET  /shared/*              extension/shared: result logic shared by the web app and the extension
   POST /api/analyze           message / URL / email -> score, verdict, findings (doc/API.md)
-  POST /api/analyze/file      .eml / .pdf / .txt upload -> the same, plus the text that was analysed
+  POST /api/analyze/file      .eml / .pdf / .txt / image upload -> the same, plus the text that was analysed
   POST /api/explain           same body as /api/analyze -> explanation from the local AI model, or the template
   POST /api/sanitize          {"text"} -> personal data redacted
   GET  /api/eval              data/eval.json and calibration summary, for the results page
@@ -92,6 +92,7 @@ class AnalyzeRequest(BaseModel):
     kind: Literal["auto", "email", "sms", "url"] = "auto"
     email: Optional[EmailMeta] = None
     links: List[Link] = Field(default_factory=list, max_length=500)
+    qr: List[str] = Field(default_factory=list, max_length=10)  # QR payloads read from an uploaded image
 
 
 def _extension_origins() -> str:
@@ -138,10 +139,10 @@ def _warm_up() -> None:
 
 
 def _request(req: AnalyzeRequest) -> tuple:
-    if not req.text.strip() and not req.links:
+    if not req.text.strip() and not req.links and not req.qr:
         raise HTTPException(status_code=422, detail="Send some text or links to analyse.")
     email = req.email.model_dump(by_alias=True) if req.email else None
-    return req.text, req.kind, email, [link.model_dump() for link in req.links]
+    return req.text, req.kind, email, [link.model_dump() for link in req.links], [q[:2000] for q in req.qr]
 
 
 @app.post("/api/analyze")
@@ -156,9 +157,10 @@ def api_analyze_file(file: UploadFile = File(...)) -> dict:
         req = files.from_upload(file.filename or "upload", data)
     except files.FileError as exc:
         raise HTTPException(status_code=exc.status, detail=str(exc))
-    result = analyze(req["text"], req["kind"], req["email"], req["links"])
+    result = analyze(req["text"], req["kind"], req["email"], req["links"], req.get("qr"))
     # The uploader gets back the text that was analysed (for highlighting); it isn't stored.
-    return {**result, "file": req["file"], "text": req["text"], "email": req["email"], "links": req["links"]}
+    return {**result, "file": req["file"], "text": req["text"], "email": req["email"], "links": req["links"],
+            "qr": req.get("qr", [])}
 
 
 @app.post("/api/explain")

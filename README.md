@@ -42,6 +42,8 @@ The full comparison, data sources, limitations and disclosures are in the **[mod
 |---|---|
 | **Who really owns each link:** Public Suffix List, 37 commonly impersonated brands | `sbi-kyc.xyz`, `paypal.com.login.ru`, `paypa1.com`, `amaz0n-refund.in`, Cyrillic look-alikes |
 | **Sender vs claim** | "HDFC Bank" sending from a look-alike domain or Gmail; replies going elsewhere; link text showing hdfcbank.com but going somewhere else |
+| **Screenshots and QR codes:** local OCR (RapidOCR) and OpenCV, nothing leaves the computer | A WhatsApp screenshot saying "scan to receive your refund" whose QR code actually *pays* `amazon.refund@ybl`; a parcel QR code that opens `dhl-parcel-release.top` |
+| **UPI scams** | "Enter your UPI PIN / approve the collect request to receive money"; brand-borrowing UPI IDs like `sbi.kyc.support@okaxis`; a QR payee name claiming a bank on a personal UPI handle |
 | **Requests, not mentions** | "share the OTP", "pay Rs 5,000 fee", "install AnyDesk" are flagged; "never share your OTP" isn't |
 | **URL model:** gradient-boosted trees on 54 spelling features, never visits the link | Throwaway-looking links with no brand name |
 | **Text model:** TF-IDF + logistic regression, calibrated | Scam wording with no link at all |

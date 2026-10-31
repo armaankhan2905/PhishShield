@@ -81,6 +81,7 @@
 
   PS.settings().then((s) => {
     if (!s.gmail) return;
+    if (s.stopPage) PSUI.guardClicks();  // the whole email is checked on open, so only marked links are stopped
     let timer = null;
     new MutationObserver(() => {
       clearTimeout(timer);

@@ -19,6 +19,14 @@ const SAMPLES = [
     text: "Dear customer, update your KYC within 24 hours using our official website." },
 ];
 
+// Synthetic screenshots made by the team (demo/samples/make_images.py), served from /static/samples/.
+const IMAGE_SAMPLES = [
+  { name: "QR refund scam", tag: "phishing", file: "qr-refund-scam.png" },
+  { name: "Fake UPI ID", tag: "phishing", file: "upi-id-scam.png" },
+  { name: "Parcel QR link", tag: "phishing", file: "qr-link-scam.png" },
+  { name: "Shop payment QR", tag: "legit", file: "qr-shop-legit.png" },
+];
+
 const $ = (id) => document.getElementById(id);
 let kind = "message";
 let file = null;
@@ -37,7 +45,21 @@ function selectTab(k) {
 
 function setFile(f) {
   file = f || null;
-  $("fileName").textContent = file ? file.name + " · " + Math.ceil(file.size / 1024) + " KB" : "";
+  const label = $("fileName");
+  label.replaceChildren(file ? file.name + " · " + Math.ceil(file.size / 1024) + " KB" : "");
+  if (file && /^image\//.test(file.type)) {
+    const img = h("img", { class: "preview", alt: "The uploaded screenshot" });
+    img.src = URL.createObjectURL(file);
+    img.onload = () => URL.revokeObjectURL(img.src);
+    label.append(img);
+  }
+}
+
+async function loadImageSample(s) {
+  const blob = await fetch("/static/samples/" + s.file).then((r) => r.blob());
+  selectTab("file");
+  setFile(new File([blob], s.file, { type: blob.type || "image/png" }));
+  check();
 }
 
 function loadSample(s) {
@@ -90,7 +112,7 @@ async function check() {
     const text = form ? result.text : req.text;
     render(result, text);
     if (shouldExplain(result)) explain(form ? { text: result.text, kind: result.kind, email: result.email,
-      links: result.links || [] } : req, result);
+      links: result.links || [], qr: result.qr || [] } : req, result);
   } catch (e) {
     showError(e.message === "Failed to fetch" ? "offline" : e.message);
   } finally {
@@ -191,6 +213,22 @@ function render(result, text) {
       h("ul", { class: "reasons" }, items), more)));
   }
 
+  const qrs = (result.file && result.file.qr) || [];
+  if (qrs.length) {
+    secs.push(h("li", null, h("div", null, h("h3", { text: qrs.length > 1 ? "What the QR codes do" : "What the QR code does" }),
+      h("ul", { class: "reasons" }, qrs.map((q) => h("li", { class: "qr" },
+        h("span", { class: "tier", text: q.kind === "upi" ? "UPI" : q.kind === "link" ? "Link" : "Text" }),
+        q.kind === "upi"
+          ? h("span", null, h("b", { text: "Pays " + (q.amount ? "Rs " + q.amount + " " : "") + "to " + (q.payee || "an unknown UPI ID") }),
+              q.name ? " (shown as “" + q.name + "”)" : "", h("div", { class: "small muted",
+                text: "Scanning a UPI QR code always sends money from your account. You never scan to receive money." }))
+          : h("span", { class: q.kind === "link" ? "url" : null, text: q.url || q.text }),
+        h("span", null)))))));
+  }
+  if (result.file && result.file.type === "image" && !(spans.length && text) && text && text.trim()) {
+    secs.push(h("li", null, h("div", null, h("h3", { text: "Text read from the screenshot" }), h("div", { class: "text", text }))));
+  }
+
   if (result.urls && result.urls.length) {
     const risks = PS.linkRisks(result);
     secs.push(h("li", null, h("div", { style: "min-width:0" }, h("h3", { text: "Where the links go" }), h("div", { class: "tablewrap" }, h("table", null,
@@ -229,6 +267,18 @@ document.addEventListener("DOMContentLoaded", () => {
   drop.addEventListener("drop", (e) => { if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
   $("samples").replaceChildren(...SAMPLES.map((s) => h("button", { type: "button", onclick: () => loadSample(s) },
     s.name + " ", h("small", { text: s.tag }))));
+  $("imageSamples").replaceChildren(...IMAGE_SAMPLES.map((s) => h("button", { type: "button", onclick: () => loadImageSample(s) },
+    s.name + " ", h("small", { text: s.tag }))));
+  // Paste a screenshot anywhere on the page (Ctrl + V) to check it.
+  document.addEventListener("paste", (e) => {
+    const item = [...(e.clipboardData ? e.clipboardData.items : [])].find((i) => i.kind === "file" && /^image\//.test(i.type));
+    if (!item) return;
+    e.preventDefault();
+    const blob = item.getAsFile();
+    selectTab("file");
+    setFile(new File([blob], "pasted-screenshot.png", { type: blob.type }));
+    check();
+  });
   // Presenter aid: /?sample=sbi-kyc-sms opens the page with that sample already checked.
   const wanted = new URLSearchParams(location.search).get("sample");
   const sample = SAMPLES.find((s) => slug(s.name) === wanted);

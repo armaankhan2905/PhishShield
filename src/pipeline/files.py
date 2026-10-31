@@ -1,4 +1,4 @@
-"""Uploaded files -> an analyze() request: .eml emails, PDFs and plain text.
+"""Uploaded files -> an analyze() request: .eml emails, PDFs, plain text and screenshots.
 
 Owner: Ryan. Nothing here renders or runs file content:
   - HTML email bodies are reduced to text with the standard-library parser:
@@ -6,6 +6,7 @@ Owner: Ryan. Nothing here renders or runs file content:
     <a href> becomes a {text, href} link so link-text mismatches can be checked.
   - Attachments are listed by name only; they are never opened.
   - PDFs are read with pypdf (text only, first 30 pages).
+  - Images are read for text (local OCR) and QR codes (src/pipeline/images.py).
 Files are processed in memory and not stored.
 """
 from __future__ import annotations
@@ -17,6 +18,9 @@ from email.utils import getaddresses
 from html.parser import HTMLParser
 from typing import List, Optional
 
+from src.detection import upi
+from src.detection.domains import find_urls
+from src.pipeline import images
 from src.pipeline.documents import DocumentError, extract_pages
 
 MAX_BYTES = 10 * 1024 * 1024
@@ -147,6 +151,19 @@ def parse_eml(data: bytes) -> dict:
     }
 
 
+# --- images ------------------------------------------------------------------------------
+
+def _qr_summary(payload: str) -> dict:
+    """What a QR code does, for display: a UPI payment, a link, or other text."""
+    pay = upi.parse_upi(payload)
+    if pay:
+        return {"kind": "upi", "payee": pay["pa"], "name": pay["pn"], "amount": pay["am"], "note": pay["tn"]}
+    urls = find_urls(payload)
+    if urls:
+        return {"kind": "link", "url": urls[0][0]}
+    return {"kind": "text", "text": payload[:200]}
+
+
 # --- entry point ------------------------------------------------------------------------
 
 def from_upload(name: str, data: bytes) -> dict:
@@ -166,13 +183,28 @@ def from_upload(name: str, data: bytes) -> dict:
         text = "\n\n".join(p for p in pages if p)
         req = {"text": text[:MAX_TEXT], "kind": "auto", "email": None, "links": [],
                "file": {"type": "pdf", "pages": len(pages), "truncated": len(text) > MAX_TEXT}}
+    elif lower.endswith(images.IMAGE_TYPES) or data[:8] == b"\x89PNG\r\n\x1a\n" or data[:3] == b"\xff\xd8\xff" or \
+            (data[:4] == b"RIFF" and data[8:12] == b"WEBP"):
+        try:
+            img = images.read_image(data)
+        except images.ImageError as exc:
+            raise FileError(str(exc), 415) from exc
+        text = img["text"]
+        if not text.strip() and not img["qr"]:
+            raise FileError("No text or QR code could be read from the image." +
+                            ("" if img["ocr"] == "ran" else " Reading text from images isn't installed on this server "
+                             "(pip install rapidocr_onnxruntime), so only QR codes can be read."))
+        req = {"text": text[:MAX_TEXT], "kind": "auto", "email": None, "links": [], "qr": img["qr"],
+               "file": {"type": "image", "ocr": img["ocr"], "qr": [_qr_summary(p) for p in img["qr"]],
+                        "truncated": len(text) > MAX_TEXT}}
     elif lower.endswith(TEXT_TYPES):
         text = data.decode("utf-8", errors="replace")
         req = {"text": text[:MAX_TEXT], "kind": "auto", "email": None, "links": [],
                "file": {"type": "txt", "truncated": len(text) > MAX_TEXT}}
     else:
-        raise FileError("Upload an email (.eml), a PDF or a text file (.txt).", 415)
-    if not req["text"].strip() and not req["links"]:
+        raise FileError("Upload an email (.eml), a PDF, a text file (.txt) or a screenshot (.png, .jpg).", 415)
+    req.setdefault("qr", [])
+    if not req["text"].strip() and not req["links"] and not req["qr"]:
         raise FileError("No readable text was found in the file.")
     req["file"]["name"] = (name or "upload").rsplit("/", 1)[-1].rsplit("\\", 1)[-1][:120]
     return req

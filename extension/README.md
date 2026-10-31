@@ -32,8 +32,9 @@ the app's button becomes **Add to Chrome**.
 |---|---|
 | **Gmail** (open email) | A banner above the email. **Red** phishing likely · **amber** suspicious · **green** no phishing signs · **grey** "Low risk: limited checks" (some checks unavailable) or "Couldn't check this message" (server not reachable). Up to 3 reasons; **Details** shows the rest, the explanation and which checks ran. On non-safe emails, flagged phrases are highlighted and risky links outlined. |
 | **Other websites** | Links to other sites that look risky are outlined in red (risky) or amber (be careful). Hover for the reason. The icon badge counts them. |
+| **Stop page** | Clicking a risky link (on any site, or in a Gmail email) shows a full-screen warning first: where the link really goes and why it was stopped, with **Go back** (default, also Esc) and **Open anyway**. A link the page scan hasn't reached yet is checked on the spot (up to 2.5 s). Can be turned off in Settings. |
 | **Toolbar popup** | Server status and a box to paste any message or link and check it. |
-| **Settings** | Server address, Gmail on/off, and link checking: *Automatic* (only when the server is on this computer), *On*, or *Off*. |
+| **Settings** | Server address, Gmail on/off, link checking: *Automatic* (only when the server is on this computer), *On*, or *Off*, and the stop page on/off. |
 
 ## Privacy
 
@@ -51,7 +52,7 @@ the app's button becomes **Add to Chrome**.
 | `shared/verdict.js` | Turns an API response into headline, reasons, highlights and link risks. Shared by everything; unit-tested in Node |
 | `content/ui.js` | Banner in a closed Shadow DOM. All API text inserted with `textContent`, never HTML |
 | `content/gmail.js` | Finds opened emails (Gmail selectors in one `SEL` object), extracts sender, subject, text and links (unwrapping `google.com/url?q=`), shows the banner |
-| `content/links.js` | Outlines risky outgoing links on other sites |
+| `content/links.js` | Outlines risky outgoing links on other sites; checks an unscanned link when it's clicked |
 | `content/app-bridge.js` | On the PhishShield app's own pages only: marks the page with the installed version so **Get the extension** can confirm the install |
 | `popup/`, `options/` | Toolbar popup and settings page |
 

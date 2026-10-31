@@ -242,6 +242,8 @@ def find_urls(text: str) -> List[Tuple[str, int, int]]:
         if any(a <= s < b for a, b in taken):
             continue
         value = m.group(0).rstrip(URL_TRAILING)
+        if text[s + len(value):s + len(value) + 1] == "@":
+            continue  # the name part of an email address or UPI ID (sbi.kyc.support@okaxis), not a website
         info = parse_url(value)
         if not info.valid or info.is_ip or info.suffix.split(".")[-1].lower() in _FILE_LIKE:
             continue

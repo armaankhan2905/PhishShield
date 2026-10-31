@@ -37,9 +37,22 @@
     PS.send({ type: "badge", count: flagged });
   }
 
+  // A link clicked before the page scan reached it is checked on the spot.
+  async function checkOne(a) {
+    let host = "";
+    try { host = new URL(a.href).hostname; } catch (e) { return null; }
+    if (host === location.hostname) return null;
+    const resp = await PS.send({ type: "links", links: [{ text: (a.innerText || "").trim().slice(0, 300), href: a.href }] });
+    if (!resp.ok) return null;
+    const risk = PS.linkRisks(resp.data)[a.href];
+    if (risk && PSUI.markLink(a, risk)) { flagged++; PS.send({ type: "badge", count: flagged }); }
+    return risk || null;
+  }
+
   PS.settings().then((s) => {
     const on = s.linkScan === "on" || (s.linkScan === "auto" && PS.isLocalApi(s.apiBase));
     if (!on) return;
+    if (s.stopPage) PSUI.guardClicks(checkOne);
     let timer = null;
     new MutationObserver(() => {
       clearTimeout(timer);

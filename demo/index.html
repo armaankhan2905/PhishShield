@@ -14,12 +14,12 @@
   <div class="split">
     <section class="intake" aria-labelledby="inTitle">
       <h1 id="inTitle">Get a report on any message.</h1>
-      <p class="lede">Paste an SMS, an email or a link, or upload a saved email. PhishShield checks it and explains exactly why.</p>
+      <p class="lede">Paste an SMS, an email or a link, or drop in a screenshot or QR code. PhishShield checks it and explains exactly why.</p>
       <div class="tabs" role="tablist" aria-label="What to check">
         <button role="tab" id="tab-message" aria-controls="pane-message" aria-selected="true" data-kind="message">Message</button>
         <button role="tab" id="tab-email" aria-controls="pane-email" aria-selected="false" data-kind="email">Email</button>
         <button role="tab" id="tab-url" aria-controls="pane-url" aria-selected="false" data-kind="url">Link</button>
-        <button role="tab" id="tab-file" aria-controls="pane-file" aria-selected="false" data-kind="file">Upload file</button>
+        <button role="tab" id="tab-file" aria-controls="pane-file" aria-selected="false" data-kind="file">Screenshot or file</button>
       </div>
 
       <div role="tabpanel" id="pane-message" aria-labelledby="tab-message">
@@ -44,8 +44,9 @@
       <div role="tabpanel" id="pane-file" aria-labelledby="tab-file" hidden>
         <div class="drop" id="drop">
           <p><b>Drop a file here</b> or <label for="fileIn" style="color:var(--g3);cursor:pointer;text-decoration:underline">choose one</label></p>
-          <p class="small">Saved email (.eml), PDF or text file, up to 10 MB. Files are read, not stored.</p>
-          <input type="file" id="fileIn" accept=".eml,.pdf,.txt,message/rfc822,application/pdf,text/plain" hidden>
+          <p class="small">A WhatsApp or SMS screenshot, a photo of a QR code, a saved email (.eml), PDF or text file, up to 10 MB.
+            Text and QR codes are read on this computer; nothing is stored. You can also paste a screenshot with Ctrl + V.</p>
+          <input type="file" id="fileIn" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp,.eml,.pdf,.txt,message/rfc822,application/pdf,text/plain" hidden>
           <p id="fileName" class="small mono"></p>
         </div>
       </div>
@@ -58,6 +59,8 @@
       <div class="samples">
         <p>Try a sample</p>
         <div id="samples"></div>
+        <p style="margin-top:6px">Try a screenshot</p>
+        <div id="imageSamples"></div>
       </div>
     </section>
 

@@ -19,7 +19,7 @@
       const granted = await chrome.permissions.request({ origins: [apiBase + "/*"] });
       if (!granted) { out.textContent = "Permission for " + apiBase + " was not granted, so nothing was saved."; out.className = "status bad"; return; }
     }
-    await chrome.storage.sync.set({ apiBase, gmail: $("gmail").checked, linkScan: $("linkScan").value });
+    await chrome.storage.sync.set({ apiBase, gmail: $("gmail").checked, linkScan: $("linkScan").value, stopPage: $("stopPage").checked });
     $("apiBase").value = apiBase;
     out.textContent = "Saved. Reload open tabs to apply.";
     out.className = "status ok";
@@ -40,6 +40,7 @@
     $("apiBase").value = s.apiBase;
     $("gmail").checked = s.gmail;
     $("linkScan").value = s.linkScan;
+    $("stopPage").checked = s.stopPage;
   });
   $("save").addEventListener("click", save);
   $("test").addEventListener("click", test);

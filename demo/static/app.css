@@ -69,6 +69,7 @@ textarea { resize: vertical; min-height: 150px; }
 .drop { border: 1.5px dashed var(--sage); border-radius: 14px; padding: 22px; text-align: center; color: var(--muted); background: var(--card); }
 .drop.over { border-color: var(--g3); background: var(--mint); }
 .drop b { color: var(--ink); }
+.drop .preview { display: block; max-width: 100%; max-height: 220px; margin: 10px auto 0; border-radius: 10px; border: 1px solid var(--line); }
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .btn { font: 700 15px var(--font); background: var(--g3); color: var(--mint); border: 0; border-radius: 12px; padding: 11px 22px; cursor: pointer; }
 .btn:hover { background: var(--ink); }

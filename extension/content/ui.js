@@ -127,8 +127,11 @@
   }
 
   /** Outline a risky link and explain it on hover. Returns true if marked. */
+  const RISKS = new WeakMap();  // link element -> {level, reasons}, for the stop page
+
   function markLink(a, risk) {
     if (!risk || a.dataset.phishshieldLink) return false;
+    RISKS.set(a, risk);
     a.dataset.phishshieldLink = risk.level;
     const color = risk.level === "risky" ? "#b42318" : "#b54708";
     a.style.setProperty("outline", "2px solid " + color, "important");
@@ -140,5 +143,121 @@
     return true;
   }
 
-  root.PSUI = { banner, markPhrases, markLink };
+  // --- stop page: a full-screen warning before a risky link opens -----------------------------
+
+  const STOP_STYLE = `
+    :host { all: initial; }
+    .veil { position: fixed; inset: 0; z-index: 2147483647; background: rgba(11, 18, 16, .72); display: grid; place-items: center;
+            padding: 16px; font: 15px/1.5 "Segoe UI", Roboto, Arial, sans-serif; }
+    .card { background: #fff; color: #1f2328; max-width: 520px; width: 100%; border-radius: 16px; padding: 24px 24px 20px;
+            box-shadow: 0 30px 80px rgba(0,0,0,.45); border-top: 6px solid var(--accent); }
+    .risky { --accent: #b42318; --ink: #7a1a12; --soft: #fdecea; }
+    .caution { --accent: #b54708; --ink: #7a3306; --soft: #fff6e0; }
+    .brand { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #57606a; }
+    h1 { font-size: 24px; line-height: 1.2; margin: 6px 0 8px; color: var(--ink); }
+    .dest { background: var(--soft); border-radius: 10px; padding: 10px 12px; margin: 12px 0; word-break: break-all;
+            font: 13px/1.45 ui-monospace, Consolas, monospace; color: #1f2328; }
+    .dest b { display: block; font: 600 12px "Segoe UI", Roboto, Arial, sans-serif; color: #57606a; margin-bottom: 2px; }
+    ul { margin: 8px 0 0; padding-left: 20px; } li { margin: 3px 0; }
+    .row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+    button { font: 600 15px "Segoe UI", Roboto, Arial, sans-serif; border-radius: 10px; padding: 10px 18px; cursor: pointer; border: 1px solid #d0d5dd; }
+    .back { background: #0b2b26; color: #fff; border-color: #0b2b26; flex: 1; }
+    .go { background: #fff; color: #57606a; }
+    button:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+    .note { font-size: 12.5px; color: #57606a; margin-top: 12px; }
+    @media (prefers-color-scheme: dark) {
+      .card { background: #1b1f24; color: #e6e9ef; } .dest { color: #e6e9ef; } .brand, .note, .dest b { color: #9aa3b2; }
+      .risky { --ink: #fca5a0; --soft: #3a1714; } .caution { --ink: #fcd38d; --soft: #3a2a10; }
+      .go { background: #1b1f24; color: #c4cad4; border-color: #3a404b; }
+      .back { background: #daf1de; color: #0b2b26; border-color: #daf1de; }
+    }`;
+
+  let stopOpen = false;
+
+  /** Shows the stop page for *href*. Resolves true when the user chooses to open the link anyway. */
+  function stopPage(href, risk) {
+    return new Promise((resolve) => {
+      stopOpen = true;
+      const host = document.createElement("phishshield-stop");
+      const shadow = host.attachShadow({ mode: "closed" });
+      const style = document.createElement("style");
+      style.textContent = STOP_STYLE;
+      const veil = el("div", "veil");
+      const card = el("div", "card " + (risk.level === "risky" ? "risky" : "caution"));
+      card.setAttribute("role", "alertdialog");
+      card.setAttribute("aria-modal", "true");
+      const title = el("h1", null, risk.level === "risky" ? "Stop. This link looks risky." : "Be careful with this link.");
+      title.id = "t";
+      card.setAttribute("aria-labelledby", "t");
+      let host_ = href;
+      try { host_ = new URL(href).hostname; } catch (e) { /* keep the raw address */ }
+      const dest = el("div", "dest");
+      dest.append(el("b", null, "It really goes to"), document.createTextNode(host_ + (host_ !== href ? "  ·  " + href.slice(0, 200) : "")));
+      const ul = el("ul");
+      (risk.reasons || []).slice(0, 5).forEach((r) => ul.append(el("li", null, r)));
+      const back = el("button", "back", "Go back (recommended)");
+      const go = el("button", "go", "Open anyway");
+      const row = el("div", "row");
+      row.append(back, go);
+      card.append(el("div", "brand", "PhishShield"), title,
+        el("div", null, "PhishShield checked this link before opening it. Here's why it was stopped:"), ul, dest, row,
+        el("div", "note", "Never enter passwords, OTPs, card details or your UPI PIN on a page you reached this way."));
+      veil.append(card);
+      shadow.append(style, veil);
+      document.documentElement.append(host);
+      const prevFocus = document.activeElement;
+      const done = (open) => {
+        stopOpen = false;
+        host.remove();
+        document.removeEventListener("keydown", onKey, true);
+        if (prevFocus && prevFocus.focus) try { prevFocus.focus(); } catch (e) { /* page may have changed */ }
+        resolve(open);
+      };
+      const onKey = (e) => {
+        if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); done(false); }
+        if (e.key === "Tab") { e.preventDefault(); (shadow.activeElement === back ? go : back).focus(); }
+      };
+      back.addEventListener("click", () => done(false));
+      go.addEventListener("click", () => done(true));
+      veil.addEventListener("click", (e) => { if (e.target === veil) done(false); });
+      document.addEventListener("keydown", onKey, true);
+      back.focus();
+    });
+  }
+
+  function webLink(a) {
+    try { return /^https?:$/.test(new URL(a.href).protocol); } catch (e) { return false; }
+  }
+
+  /**
+   * Stops clicks on risky links and shows the stop page first. *checkUnknown(a)* (optional) checks a link
+   * that hasn't been checked yet and resolves to its risk or null; it gets CHECK_TIMEOUT_MS.
+   */
+  const CHECK_TIMEOUT_MS = 2500;
+  function guardClicks(checkUnknown) {
+    const handler = async (e) => {
+      if (stopOpen || e.defaultPrevented || (e.type === "auxclick" && e.button !== 1) || (e.type === "click" && e.button !== 0)) return;
+      const a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
+      if (!a || !webLink(a) || a.dataset.phishshieldAllowed) return;
+      let risk = RISKS.get(a);
+      if (!risk && !checkUnknown) return;
+      const newTab = e.type === "auxclick" || e.ctrlKey || e.metaKey || e.shiftKey || a.target === "_blank";
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (!risk) {
+        risk = await Promise.race([checkUnknown(a).catch(() => null),
+                                   new Promise((r) => setTimeout(() => r(null), CHECK_TIMEOUT_MS))]);
+      }
+      const open = risk ? await stopPage(a.href, risk) : true;
+      if (!open) return;
+      a.dataset.phishshieldAllowed = "1";  // the user decided; don't ask again for this link on this page
+      if (root.__phishshieldTestPage) return;  // extension/dev test pages never follow their sample links
+      if (newTab) window.open(a.href, "_blank", "noopener");
+      else location.assign(a.href);
+    };
+    window.addEventListener("click", handler, true);
+    window.addEventListener("auxclick", handler, true);
+  }
+
+  root.PSUI = { banner, markPhrases, markLink, stopPage, guardClicks };
 })(globalThis);

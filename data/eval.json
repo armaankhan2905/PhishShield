@@ -660,19 +660,19 @@
   "url_test system metrics use a fixed sample of the URL test split; url_model metrics use all of it"
  ],
  "run": {
-  "commit": "a9174c0",
+  "commit": "a46581f",
   "metrics_sha256": "e3cf332db2b04269131555dccb22c4457ce9684d75721e5f46eb165b1d5de192",
   "ms_per_item": {
-   "text_test_sms": 3.22,
-   "text_test_email": 11.34,
-   "url_test": 8.59,
-   "openphish": 12.38,
-   "tranco": 8.07,
-   "uci_sms_ham": 1.78,
-   "uci_sms_spam": 4.4,
-   "curated": 5.74
+   "text_test_sms": 2.97,
+   "text_test_email": 9.37,
+   "url_test": 11.55,
+   "openphish": 17.84,
+   "tranco": 11.24,
+   "uci_sms_ham": 2.38,
+   "uci_sms_spam": 5.89,
+   "curated": 7.29
   },
-  "seconds": 133.7,
-  "generated": "2026-10-31T23:56:47"
+  "seconds": 162.0,
+  "generated": "2026-11-01T03:21:44"
  }
 }

@@ -24,7 +24,8 @@
        <a href="https://en.wikipedia.org/wiki/Phishing">Wikipedia: Phishing</a></p>
   </article>
   <script>
-    // Test page: never follow the sample links.
+    // Test page: never follow the sample links (the stop page still shows for risky ones).
+    window.__phishshieldTestPage = true;
     document.addEventListener("click", (e) => { if (e.target.closest("a")) e.preventDefault(); });
   </script>
   <script src="../shared/verdict.js"></script>

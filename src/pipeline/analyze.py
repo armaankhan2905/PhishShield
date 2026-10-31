@@ -52,13 +52,14 @@ def utf16_index(text: str, i: Optional[int]) -> Optional[int]:
 
 
 def analyze(text: str, kind: str = "auto", email: Optional[dict] = None,
-            links: Optional[List[dict]] = None) -> dict:
+            links: Optional[List[dict]] = None, qr: Optional[List[str]] = None) -> dict:
+    """qr: payloads of QR codes read from an uploaded image (src/pipeline/images.py)."""
     t0 = time.perf_counter()
     links = links or []
     if kind == "auto":
         kind = detect_kind(text, email)
 
-    det = engine.run(text, kind, email, links, MAX_URLS)
+    det = engine.run(text, kind, email, links, MAX_URLS, qr)
     findings = det.findings
     order = sorted(range(len(findings)), key=lambda i: (findings[i].start is None, findings[i].start or 0))
     findings = [findings[i] for i in order]

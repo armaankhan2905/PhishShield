@@ -19,7 +19,11 @@
   <ol class="steps">
     <li><div><h3>Read the message</h3><p>Links are pulled out of the text, including ones written without <code>https://</code>.
       Gmail's redirect wrappers are removed. For saved emails, the sender, reply-to and subject are read, and HTML is turned into
-      plain text without running anything in it. Links are only read, never opened.</p></div></li>
+      plain text without running anything in it. Screenshots are read on this computer: the text with a local OCR model, and any
+      QR code is decoded to see what it really does. Links are only read, never opened.</p></div></li>
+    <li><div><h3>Check UPI payments</h3><p>A UPI QR code, a "collect request" and your UPI PIN can only ever <em>send</em> money. A message
+      that says to scan, approve or enter your PIN to <em>receive</em> a refund, prize or cashback is flagged, and so is a QR code whose
+      payee name claims a bank while the money goes to a personal UPI ID, or a UPI ID like <code>sbi.kyc.support@okaxis</code>.</p></div></li>
     <li><div><h3>Check every link's real owner</h3><p>Each link's real domain is worked out with the Public Suffix List
       (so <code>login.sbi.co.in</code> and <code>sbi.co.in.evil.xyz</code> are told apart). It's then compared with 36
       commonly impersonated brands for look-alike characters, misspellings, brand-plus-phishing-word names and brands placed in front of
