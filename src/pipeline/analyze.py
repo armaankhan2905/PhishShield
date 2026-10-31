@@ -1,7 +1,7 @@
 """Analyze pipeline behind POST /api/analyze (contract: doc/API.md).
 
-  message -> detection engine (rules, anomaly checks; models from Phase 3)
-          -> fuse() -> sanitize() -> explanation
+  message -> detection engine (rules, anomaly checks, URL + text models)
+          -> fuse() -> sanitize() -> template explanation (the local-AI one is /api/explain)
 
 The original text is never modified: findings point into it, and only a
 separate sanitized copy goes on to the explanation step. A layer that did not
@@ -23,6 +23,7 @@ from typing import List, Optional
 
 from src.detection import engine, rules
 from src.detection.fuse import FAILED, fuse
+from src.pipeline.explain import template
 from src.pipeline.sanitize import SanitizationError, sanitize
 
 KINDS = ("auto", "email", "sms", "url")
@@ -48,25 +49,6 @@ def detect_kind(text: str, email: Optional[dict]) -> str:
 def utf16_index(text: str, i: Optional[int]) -> Optional[int]:
     """Python indexes code points; JavaScript strings index UTF-16 units (emoji count twice)."""
     return None if i is None else len(text[:i].encode("utf-16-le")) // 2
-
-
-def explain(verdict: str, score: int, ranked: List[rules.Finding], confidence: str, gate: Optional[str]) -> str:
-    """Template explanation built only from findings. Phase 5 (Ryan) adds the grounded local LLM."""
-    reasons = []
-    for f in ranked:
-        if f.reason not in reasons:
-            reasons.append(f.reason)
-    if not reasons:
-        text = "No phishing signals were found in this message."
-    elif verdict == "safe":
-        text = f"No strong phishing evidence ({score}/100). Worth noting: " + "; ".join(reasons[:2]) + "."
-    else:
-        text = f"Rated {verdict} ({score}/100). Main reasons: " + "; ".join(reasons[:3]) + "."
-    if gate == "nothing_to_act_on":
-        text += " The message has no link or number to act on, which keeps the risk low."
-    if confidence == "low":
-        text += " Some checks were not available, so treat this result with caution."
-    return text
 
 
 def analyze(text: str, kind: str = "auto", email: Optional[dict] = None,
@@ -107,7 +89,7 @@ def analyze(text: str, kind: str = "auto", email: Optional[dict] = None,
         "findings": out_findings,
         "urls": det.urls,
         "coverage": det.coverage,
-        "explanation": explain(result.verdict, result.score, ranked, result.confidence, result.gate),
+        "explanation": template(result.verdict, result.score, [f.reason for f in ranked], result.confidence, result.gate),
         "explanation_source": "template",
         "sanitized": sanitized,
         "partial": partial,

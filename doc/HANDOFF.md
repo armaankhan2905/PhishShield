@@ -256,3 +256,77 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
 - **Feedback buttons:** not built (Could Have).
 - **Hosted use:** the API's CORS allows any `chrome-extension://` origin. For a hosted deploy, consider pinning the published extension ID.
 - **Web app:** the main web page is still the PrivacyLens demo. The PhishShield result screen is part of P5. The popup's result card (`popup/`) and `shared/verdict.js` can be reused for it.
+
+---
+
+## P5 Integration and deployment → P6 Demo and submission
+
+**From:** Ryan · **To:** Atharvva
+
+### What works (tag `v1.0`)
+- **Web app** at http://localhost:8000:
+  - **Check a message:** tabs for message / email (From, Reply-To, Subject) / link / file upload, and 7 one-click samples.
+  - **The result shows:**
+    - verdict colour, score bar (30 / 70 marks) and confidence;
+    - which checks ran;
+    - reasons labelled Proven / Pattern / Model with their points (top 5, then "Show all");
+    - highlighted phrases, and a links table with risk and URL-model score;
+    - the explanation.
+  - **Results:** every number read from `data/eval.json` via `/api/eval`.
+  - **How it works:** the checks, the privacy facts for the current mode, and what the labels mean.
+  - It reuses the extension's result logic (`/shared/verdict.js`), so the web app and the Gmail banner always agree.
+- **Local AI explanations** (`src/pipeline/explain.py`, `POST /api/explain`):
+  - Ollama `qwen2.5:3b` on this computer, called separately so `/api/analyze` stays fast.
+  - It sees only the reasons, their domains and the **sanitized** message.
+  - Answers are rejected (template used instead) if they name another domain, contradict the verdict, skip the reasons or the "What to do" advice, or run long.
+  - Never used for safe results or in hosted mode.
+- **Uploads** (`src/pipeline/files.py`, `POST /api/analyze/file`):
+  - `.eml`: From / Reply-To / Subject are read, so the Reply-To check now works. HTML becomes text with scripts and hidden text dropped; link text vs real link is kept; attachments are listed, never opened.
+  - PDF and `.txt` are supported too.
+  - Clear 415 / 413 / 400 errors.
+- **Local vs hosted** (`PHISHSHIELD_MODE`):
+  - hosted shows a disclosure on every page and uses template explanations;
+  - nothing is stored or logged in either mode (tested);
+  - `render.yaml` + `requirements-demo.txt` were checked in a **clean venv**: no torch, about 238 MB RAM, identical model scores;
+  - `PHISHSHIELD_EXTENSION_IDS` can lock the API to the published extension.
+- **Removed:** the PrivacyLens features outside scope (document Q&A, `/api/rag*`, `/api/document`, `/api/pipeline`, the ask/training pages, old PII training and benchmark code). Old page URLs redirect.
+- **Tests:**
+  - **133 Python tests**, including the full fallback matrix: rules only, each model missing, Ollama down or erroring, bad AI answers, empty / oversized / malformed input, HTML email, unsupported and broken files, no message text in logs, removed endpoints;
+  - **5 extension tests**.
+- **Final measurement:**
+  - two runs give identical `metrics_sha256 = 9b5ff4ec33237882`;
+  - the system's numbers are unchanged from P3;
+  - the old-formula comparison was fixed: it had treated "no wording to read" on bare links as a 0 score. The fair numbers are in the model card.
+
+### Checked in the browser
+- **All 7 samples:**
+  - the 4 scams are phishing 83–100 with a local-AI explanation;
+  - the bank OTP and Amazon shipping messages are green 0;
+  - the KYC reminder is green 29, with its notes labelled "not enough to flag".
+- **Uploaded HDFC `.eml`:** phishing 100, from 5 proven findings including link text vs real link and sender mismatch. The attachment was not opened and the hidden text was ignored.
+- **Errors:** PNG upload → clear "wrong type" message. Server offline → grey "Couldn't check this message".
+- **Hosted mode:** disclosure banner and the "Hosted demo" / "Template explanations" chips.
+- **Layout:** works in a desktop window and at 375 px phone width.
+
+### For the demo (P6)
+- **Start:** `python -m src.pipeline.demo`, with Ollama running for AI explanations. The header chips should read "Running on this computer · Models ready · Local AI explanations".
+- **Suggested order:**
+  1. SBI KYC SMS: phishing, proven reasons and the AI explanation.
+  2. Bank OTP alert: green.
+  3. KYC reminder: green 29, "not enough to flag".
+  4. Upload the HDFC `.eml`, or the Fake PayPal email sample.
+  5. Lookalike link.
+  6. Gmail with the extension.
+  7. Results page.
+  8. How it works → Privacy.
+- The AI explanation takes about 3–8 s and appears after the result. If Ollama is off, the template is used and the header says so.
+
+### Still not done (before the demo)
+- **The extension in real Chrome on real Gmail** (see the P4 notes).
+- **Deploying to Render** needs a Render account connected to the GitHub repo (New → Blueprint → pick the repo). Not done here.
+- **Real, redacted Indian messages** to measure false alarms on real data (model card limitation).
+
+### Acceptance test for your submission (revised plan §10)
+- Every number on screen or in the slides traces to `data/eval.json` / the model card.
+- Privacy statements match the mode shown.
+- Two rehearsals done.

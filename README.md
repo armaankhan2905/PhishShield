@@ -32,6 +32,18 @@ pip install -r requirements-demo.txt
 python -m src.pipeline.demo     # http://localhost:8000
 ```
 
+Open http://localhost:8000 to check a message, email, link or uploaded `.eml` / PDF.
+**Results** shows the measured accuracy and **How it works** explains the checks.
+
+Optional, for plain-English explanations written by a local AI model
+([Ollama](https://ollama.com) on the same computer; without it a template is used):
+
+```bash
+ollama pull qwen2.5:3b
+```
+
+Chrome extension (Gmail banner, risky-link outlines): see [extension/README.md](extension/README.md).
+
 Try the API:
 
 ```bash
@@ -53,8 +65,20 @@ Run the tests:
 
 ```bash
 pip install pytest httpx
-python -m pytest tests
+python -m pytest tests                    # Python: API, detection, models, fallbacks, privacy
+node --test extension/test/*.test.js      # extension result logic
 ```
+
+## Hosted demo (Render)
+
+`render.yaml` deploys the web app with `PHISHSHIELD_MODE=hosted`:
+- every page shows that messages are sent to the server;
+- explanations use the template (no Ollama on the server);
+- nothing is stored or logged.
+
+The build uses only `requirements-demo.txt` (no torch) and runs in about 240 MB.
+To deploy: in Render, choose **New → Blueprint**, pick this repository, and confirm.
+Optionally set `PHISHSHIELD_EXTENSION_IDS` to your published extension's ID.
 
 ## How it works
 
@@ -74,8 +98,8 @@ The request and response format is in [doc/API.md](doc/API.md).
 src/detection/   engine.py · rules.py · anomaly.py · domains.py · brands.py · fuse.py · main.py (reused regexes)
 src/model/       URL + text models: fetch_data · prepare · train_url · train_text · predict
 src/eval/        phish_bench.py (every reported number comes from here)
-src/pipeline/    demo.py (server) · analyze.py · sanitize.py · rag.py · documents.py
-demo/            web app pages
+src/pipeline/    demo.py (server) · analyze.py · explain.py (local AI) · files.py (.eml/PDF) · sanitize.py · documents.py
+demo/            web app: index.html (check) · results.html · how.html · static/
 extension/       Chrome extension (Manifest V3): Gmail banner, risky-link outlines, popup; see extension/README.md
 data/            eval.json · calibration.json · curated/ (raw/ and processed/ are rebuilt, not in git)
 models/          url_model.joblib · text_model.joblib (~4 MB, committed)
@@ -91,5 +115,5 @@ tests/           API contract tests
 | P2 Detection engine | Armaan | Done: rules, domain and sender checks, evidence-gated scoring, 81 tests passing |
 | P3 ML models | Govind | Done: URL + text models, calibrated scoring, held-out evaluation ([MODEL_CARD](doc/MODEL_CARD.md)) |
 | P4 Extension live | Atharvva | Done: Gmail banner, link outlines, popup, settings (checked on dev pages; real-Gmail check pending) |
-| P5 Integrate + deploy | Ryan | Next |
-| P6 Demo + submit | Atharvva | Pending |
+| P5 Integrate + deploy | Ryan | Done: web app, local-AI explanations, .eml/PDF upload, hosted mode, fallback tests, v1.0 |
+| P6 Demo + submit | Atharvva | Next |

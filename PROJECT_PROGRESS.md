@@ -1,6 +1,6 @@
 # PhishShield project progress
 
-**Updated:** 2026-10-31, after Phase 4 was completed.
+**Updated:** 2026-10-31, after Phase 5 was completed (tag `v1.0`).
 
 | Phase | Lead | Status |
 |---|---|---|
@@ -8,8 +8,8 @@
 | P2 Core detection | Armaan | ✅ Done |
 | P3 Machine learning | Govind | ✅ Done: see [doc/MODEL_CARD.md](doc/MODEL_CARD.md) and the P3 section of [doc/HANDOFF.md](doc/HANDOFF.md) |
 | P4 Browser extension | Atharvva | ✅ Done: see [extension/README.md](extension/README.md). Real-Gmail check still to do |
-| P5 Integration + deployment | Ryan | ⏳ Next |
-| P6 Demo + submission | Atharvva | ⏳ |
+| P5 Integration + deployment | Ryan | ✅ Done: web app, local-AI explanations, .eml/PDF upload, hosted mode, fallback tests. Render deploy not done (needs an account) |
+| P6 Demo + submission | Atharvva | ⏳ Next |
 
 ## Phase 3 summary
 - **Models:** URL model (`url-hgb-1`) and text model (`text-tfidf-lr-1`), calibrated, committed in `models/`.
@@ -32,14 +32,18 @@
 - The first evaluation pair was interrupted by the user. It was restarted once, then stopped again by me after the hand-written test set was found to overlap synthetic training templates. It was re-run after the fix and the reproducibility check passed.
 
 ## Next
-P5 (integration + deployment): see the P4 → P5 section of doc/HANDOFF.md.
-Before the demo: load the extension in real Chrome and check it against real Gmail.
+P6 (demo + submission): see the P5 → P6 section of doc/HANDOFF.md.
+Before the demo:
+- load the extension in real Chrome and check it against real Gmail;
+- optionally deploy to Render (New → Blueprint).
+
+Latest evaluation: `metrics_sha256 = 9b5ff4ec33237882` (two identical runs).
 
 ## Commands
 
 ```bash
 python -m src.pipeline.demo                    # server on http://localhost:8000
-python -m pytest tests -q                      # 100 tests
+python -m pytest tests -q                      # 133 tests
 python -m src.eval.phish_bench                 # re-measure (about 2.5 min), writes data/eval.json
 python -m src.pipeline.demo --dev              # + extension test pages at /dev/extension/dev/gmail.html
 node --test extension/test/*.test.js           # extension unit tests

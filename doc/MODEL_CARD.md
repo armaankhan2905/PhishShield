@@ -59,21 +59,24 @@ model as evidence of safety.
 
 Positive = **flagged** (suspicious or phishing, score ≥ 30). The **system** column
 is the full product: rules + both models + scoring. Run twice with identical
-results (`metrics_sha256 = ffabd7431ec8dd8b`).
+results (`metrics_sha256 = 9b5ff4ec33237882`).
 
 | Test set | n | System P | System R | System F1 | System FPR | Model alone F1 / FPR | Old 35/30/35 formula F1 / FPR |
 |---|---|---|---|---|---|---|---|
 | Emails | 2,543 | 0.926 | 0.956 | **0.941** | 4.5% (72) | text 0.972 / 1.9% | 0.956 / 3.3% |
 | SMS | 424 | 1.000 | 0.622 | **0.767** | 0.0% (0) | text 0.908 / 7.3% | 0.916 / 4.1% |
-| URLs (fixed 6,000 sample) | 6,000 | 0.978 | 0.607 | **0.749** | 0.8% (30) | URL 0.837 / 6.1% (all 31,767) | 0.120 / 0.0% |
-| OpenPhish (recent, unseen domains) | 276 | 1.000 | 0.685 | 0.813 | n/a | URL 0.913 | 0.014 |
-| Tranco top sites (benign) | 4,089 | n/a | n/a | n/a | **0.8%** (33) | URL FPR 5.6% | 0.0% |
+| URLs (fixed 6,000 sample) | 6,000 | 0.978 | 0.607 | **0.749** | 0.8% (30) | URL 0.837 / 6.1% (all 31,767) | 0.805 / 1.8% |
+| OpenPhish (recent, unseen domains) | 276 | 1.000 | 0.685 | 0.813 | n/a | URL 0.913 | 0.871 |
+| Tranco top sites (benign) | 4,089 | n/a | n/a | n/a | **0.8%** (33) | URL FPR 5.6% | 1.5% |
 | UCI SMS ham (unseen source) | 3,630 | n/a | n/a | n/a | **0.03%** (1) | text FPR 9.5% | 5.5% (198) |
 | UCI SMS spam (spam ≠ phishing, information only) | 151 | 1.000 | 0.755 | 0.860 | n/a | text 0.973 | 0.966 |
 | Hand-written Indian set (synthetic) | 36 | 1.000 | 1.000 | 1.000 | 0.0% | text 0.941 / 10% | 0.970 / 5% |
 
 **How to read this:**
-- **Fewer false alarms, by design.** The scoring gives up some recall to keep false alarms low. On UCI SMS ham, the old 35/30/35 formula flags 198 legitimate messages and the system flags 1. On SMS the old formula catches more (F1 0.92 vs 0.77). That's the trade-off the revised plan asked for.
+- **Fewer false alarms, by design.** The scoring gives up some recall to keep false alarms low.
+  - The old 35/30/35 formula catches more SMS (F1 0.92 vs 0.77), links (0.81 vs 0.75) and recent phishing (0.87 vs 0.81).
+  - But it raises about twice as many false alarms on links (1.8% vs 0.8%) and popular sites (1.5% vs 0.8%), and **198** false alarms on ordinary SMS where the system raises **1**.
+  - That's the trade-off the revised plan asked for. Lowering `SAFE_BELOW` or raising `ML_MAX` moves along it.
 - **Low "phishing"-level recall is expected.** A **phishing** verdict needs proven technical evidence (look-alike domain, sender mismatch, link-text mismatch, a request for details sent to a domain the brand doesn't own). Dataset rows rarely carry it: there are no headers, and many links were stripped. Phishing-level precision is 0.90–1.00 on every set.
 - **Rules alone catch little on these datasets** (F1 ≤ 0.11). The datasets lack the sender and link context the rules look at. The rules matter most on real messages; on the hand-written set they alone reach F1 0.97.
 
@@ -108,6 +111,9 @@ Chosen: `ML_MAX = 45`, `URL_FLOOR = 0.7`, `TEXT_FLOOR = 0.5`, `SAFE_BELOW = 30`.
 - **Datasets age quickly.** OpenPhish results show how the models handle phishing collected today; other numbers come from older corpora.
 
 ## Changes made after seeing test results (disclosed)
+
+0. **Old-formula comparison fixed in Phase 5.** The 35/30/35 comparison used to treat the text model as "scored 0" for a bare link (there is no wording to read), which made the old formula look far worse on links (F1 0.12). It now skips that layer for links, as the formula intends. Only the comparison column changed; the system's own numbers are identical.
+
 
 1. **SMS/email labelling was corrected after the first test run.** The original rule (≤ 300 characters = SMS) put short spam emails in the SMS set.
    - First-run test numbers: SMS F1 0.486, email F1 0.944, URLs F1 0.749.

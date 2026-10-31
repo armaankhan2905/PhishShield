@@ -1,210 +1,78 @@
 <!doctype html>
-<html lang="en" data-theme="5">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PhishShield</title>
+<link rel="icon" href="/static/favicon.png">
 <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
-<div class="wrap">
-  <div id="top"></div>
+<header class="top" id="top"></header>
+<main class="wrap">
+  <p class="notice" id="hostedNote" hidden></p>
+  <h1>Check a message for phishing</h1>
+  <p class="lede">Paste an SMS, an email or a link, or upload a saved email. PhishShield shows how risky it looks and exactly why.</p>
 
-  <section class="hero">
-    <div>
-      <h2>Point the <b>lens</b> at anything sensitive.</h2>
-      <p class="lead" id="lead">Under the lens, every card, OTP, phone and name is already redacted by 7 validated patterns and a fine-tuned BERT model, then checked for leaks before release.</p>
-      <span class="hint">◉ Move your mouse over the card. It shows exactly what you type or upload below.</span>
-    </div>
-    <div class="stage" id="stage" role="img" aria-label="Your input, with sensitive values revealed as redacted under a moving lens"></div>
-  </section>
+  <div class="split">
+    <section class="card" aria-labelledby="inTitle">
+      <h2 id="inTitle" hidden>Message</h2>
+      <div class="tabs" role="tablist" aria-label="What to check">
+        <button role="tab" id="tab-message" aria-controls="pane-message" aria-selected="true" data-kind="message">Message</button>
+        <button role="tab" id="tab-email" aria-controls="pane-email" aria-selected="false" data-kind="email">Email</button>
+        <button role="tab" id="tab-url" aria-controls="pane-url" aria-selected="false" data-kind="url">Link</button>
+        <button role="tab" id="tab-file" aria-controls="pane-file" aria-selected="false" data-kind="file">Upload file</button>
+      </div>
 
-  <section class="stats" aria-label="Summary">
-    <div class="stat"><b id="sCount">0</b><span>sensitive spans</span></div>
-    <div class="stat"><b id="sTypes">—</b><span>types found</span></div>
-    <div class="stat"><b id="sLatency">—</b><span>detection latency</span></div>
-    <div class="stat" id="leakStat"><b id="sLeak">0</b><span>values leaked to output</span></div>
-  </section>
-
-  <section class="flow">
-    <div class="panel">
-      <div class="phead"><h2><span class="n">01</span>Input</h2>
-        <div class="acts"><label class="filebtn">Upload PDF<input type="file" id="pdf" accept="application/pdf,.pdf"></label><button class="ghost" id="clear">Clear</button></div></div>
-      <div class="pbody">
-        <div class="docbar" id="docbar" hidden>
-          <div><b id="docName"></b><div class="meta" id="docMeta"></div></div>
-          <div class="pager"><button class="ghost" id="prev" aria-label="Previous page">‹</button><span id="pageNo"></span><button class="ghost" id="next2" aria-label="Next page">›</button></div>
-          <button class="ghost" id="backMsg">Back to message</button>
+      <div role="tabpanel" id="pane-message" aria-labelledby="tab-message">
+        <div class="field">
+          <label for="msgText">SMS or message text</label>
+          <textarea id="msgText" placeholder="Paste the message here"></textarea>
         </div>
-        <div class="busy" id="busy" hidden></div>
-        <textarea id="input" spellcheck="false" placeholder="Paste a form, chat message, or page text…"></textarea>
-        <div class="samples" id="samples"></div>
-        <div class="samples" id="pdfSamples"></div>
       </div>
-    </div>
-
-    <div class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-
-    <div class="panel">
-      <div class="phead"><h2><span class="n">02</span>Detections</h2></div>
-      <div class="pbody">
-        <div class="text" id="highlight"><span class="empty">Detected spans appear here.</span></div>
-        <ul class="list" id="list"></ul>
+      <div role="tabpanel" id="pane-email" aria-labelledby="tab-email" hidden>
+        <div class="field"><label for="emFrom">From</label><input type="text" id="emFrom" placeholder="SBI Alerts &lt;alert@example.com&gt;"></div>
+        <div class="field"><label for="emReply">Reply-To (optional)</label><input type="text" id="emReply"></div>
+        <div class="field"><label for="emSubject">Subject</label><input type="text" id="emSubject"></div>
+        <div class="field"><label for="emBody">Email text</label><textarea id="emBody"></textarea></div>
       </div>
-    </div>
-
-    <div class="arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-
-    <div class="panel">
-      <div class="phead"><h2><span class="n">03</span>Sanitized output</h2><button class="ghost" id="copy">Copy</button></div>
-      <div class="pbody">
-        <div class="text" id="output"><span class="empty">Safe-to-share text appears here.</span></div>
-        <div class="err" id="err" hidden></div>
+      <div role="tabpanel" id="pane-url" aria-labelledby="tab-url" hidden>
+        <div class="field">
+          <label for="urlText">Link</label>
+          <input type="url" id="urlText" placeholder="https://…">
+          <span class="muted small">The link is only read, never opened.</span>
+        </div>
       </div>
-    </div>
-  </section>
+      <div role="tabpanel" id="pane-file" aria-labelledby="tab-file" hidden>
+        <div class="drop" id="drop">
+          <p><b>Drop a file here</b> or <label for="fileIn" style="color:var(--accent);cursor:pointer;text-decoration:underline">choose one</label></p>
+          <p class="small">Saved email (.eml), PDF or text file, up to 10 MB. Files are read, not stored.</p>
+          <input type="file" id="fileIn" accept=".eml,.pdf,.txt,message/rfc822,application/pdf,text/plain" hidden>
+          <p id="fileName" class="small mono"></p>
+        </div>
+      </div>
 
-  <p style="margin:16px 0 0"><a class="cta" href="/pipeline">See how this exact input moves through the pipeline →</a></p>
+      <div class="row" style="margin-top:6px">
+        <button class="btn" id="checkBtn" type="button">Check</button>
+        <span class="muted small">Ctrl + Enter</span>
+      </div>
 
-  <div class="next" id="next"></div>
-  <footer id="foot"></footer>
-</div>
+      <div class="samples">
+        <p>Try a sample</p>
+        <div id="samples"></div>
+      </div>
+    </section>
 
-<script src="/static/common.js"></script>
-<script>
-const input = $("input");
-const lensView = lens($("stage"));
-let latest = null;
+    <section class="card" id="result" aria-live="polite" aria-labelledby="resTitle">
+      <h2 id="resTitle" hidden>Result</h2>
+      <div class="empty"><b>No message checked yet</b>Paste something on the left, or try a sample.</div>
+    </section>
+  </div>
+</main>
+<footer class="wrap">PhishShield · PECathon 2026 · Results are guidance, not a guarantee: when in doubt, contact the organisation through its official app or website.</footer>
 
-function renderHighlight(text, dets) {
-  if (!text) return '<span class="empty">Detected spans appear here.</span>';
-  let html = "", cur = 0;
-  dets.forEach((d, i) => {
-    html += esc(text.slice(cur, d.start));
-    html += `<mark data-i="${i}">${esc(text.slice(d.start, d.end))}<sup>${d.label}</sup></mark>`;
-    cur = d.end;
-  });
-  return html + esc(text.slice(cur));
-}
-
-// The hero copy follows what the server is actually running.
-const LEAD = {
-  loaded: "Under the lens, every card, OTP, phone and name is already redacted by 7 validated patterns and a fine-tuned BERT model, then checked for leaks before release.",
-  loading: "Under the lens, cards, OTPs, phones, emails, PAN, IPs and URLs are redacted by 7 validated patterns. The BERT model for names is still loading and joins in a few seconds.",
-  off: "Under the lens, cards, OTPs, phones, emails, PAN, IPs and URLs are redacted by 7 validated patterns, then checked for leaks before release. The BERT model that also catches names isn't running on this server; run the demo locally to see it.",
-};
-
-function render(res) {
-  latest = res;
-  const dets = res.detections;
-  const state = res.trace && res.trace.model ? res.trace.model.state : "off";
-  $("lead").textContent = LEAD[state] || LEAD.off;
-  $("highlight").innerHTML = renderHighlight(res.original, dets);
-  lensView.show(res.original, dets);
-  $("output").innerHTML = renderOutput(res.sanitized);
-  $("list").innerHTML = dets.map((d, i) =>
-    `<li data-i="${i}"><span class="lbl">${d.label}</span><span class="val" title="${esc(d.text)}">${esc(d.text)}</span><span class="conf">${Math.round(d.confidence * 100)}%</span></li>`
-  ).join("");
-  const types = [...new Set(dets.map((d) => d.label))];
-  $("sCount").textContent = dets.length;
-  $("sTypes").textContent = types.length ? types.join(" · ") : "—";
-  $("sTypes").style.fontSize = types.length > 2 ? "15px" : "";
-  $("sLatency").textContent = res.original ? `${res.latency_ms.toFixed(1)} ms` : "—";
-  $("sLeak").textContent = `${res.leaked} / ${dets.length}`;
-  $("leakStat").classList.toggle("alert", res.leaked > 0);
-  $("err").hidden = true;
-}
-
-const run = liveSanitize(input, {
-  onResult: render,
-  onError: (e) => {
-    $("output").innerHTML = '<span class="empty">Output withheld.</span>';
-    $("err").textContent = e.message || "Backend unreachable";
-    $("err").hidden = false;
-  },
-});
-
-// ---- PDF mode: same lens, highlights and output, one page at a time -------
-let doc = null, page = 0;
-
-function showPage(i) {
-  page = Math.max(0, Math.min(doc.pages.length - 1, i));
-  const p = doc.pages[page];
-  input.value = p.original;
-  $("pageNo").textContent = `page ${page + 1} / ${doc.pages.length}`;
-  $("prev").disabled = page === 0;
-  $("next2").disabled = page === doc.pages.length - 1;
-  render(p);
-  lensView.reset();
-}
-
-function enterDoc(d) {
-  doc = d;
-  input.readOnly = true;
-  $("docbar").hidden = false;
-  $("docName").textContent = d.name;
-  const types = Object.keys(d.by_label).join(", ") || "none";
-  $("docMeta").innerHTML = `${d.detections} sensitive values on ${d.page_count} page${d.page_count === 1 ? "" : "s"} (${esc(types)}) · ${d.leaked} leaked` +
-    (d.indexed ? ` · <a href="/ask">indexed for Ask documents →</a>` : d.index_error ? ` · ${esc(d.index_error)}` : "") + (d.truncated ? " · first 30 pages only" : "");
-  setStatus(d.leaked === 0, d.leaked === 0 ? `${WHERE} · 0 leaks` : `${d.leaked} leaked`);
-  showPage(0);
-}
-
-function leaveDoc() {
-  doc = null;
-  input.readOnly = false;
-  $("docbar").hidden = true;
-  input.value = lastInput.get() || SAMPLES["Checkout form"];
-  lensView.reset();
-  run(true);
-}
-
-async function onPdf(blob, name) {
-  $("busy").hidden = false;
-  $("busy").textContent = `Reading ${name} and sanitizing every page…`;
-  $("err").hidden = true;
-  try {
-    const d = await uploadPdf(blob, name);
-    try { sessionStorage.setItem("pl:doc", JSON.stringify(d)); } catch {}
-    enterDoc(d);
-  } catch (e) {
-    $("err").textContent = e.message;
-    $("err").hidden = false;
-  } finally {
-    $("busy").hidden = true;
-  }
-}
-
-pdfPickers($("pdf"), $("pdfSamples"), onPdf);
-$("prev").onclick = () => showPage(page - 1);
-$("next2").onclick = () => showPage(page + 1);
-$("backMsg").onclick = leaveDoc;
-
-addSamples($("samples"), (text) => { if (doc) leaveDoc(); input.value = text; run(true); });
-$("clear").onclick = () => { if (doc) leaveDoc(); input.value = ""; run(true); input.focus(); };
-$("copy").onclick = async () => {
-  if (!latest || !latest.sanitized) return;
-  try { await navigator.clipboard.writeText(latest.sanitized); $("copy").textContent = "Copied"; }
-  catch { $("copy").textContent = "Copy failed"; }
-  setTimeout(() => ($("copy").textContent = "Copy"), 1200);
-};
-
-function linkHover(e, on) {
-  const el = e.target.closest("[data-i]");
-  if (!el) return;
-  const m = $("highlight").querySelector(`mark[data-i="${el.dataset.i}"]`);
-  if (m) m.classList.toggle("on", on);
-}
-$("list").addEventListener("mouseover", (e) => linkHover(e, true));
-$("list").addEventListener("mouseout", (e) => linkHover(e, false));
-
-// /?doc=last opens the PDF last uploaded in this browser tab (e.g. from Ask documents).
-let saved = null;
-if (new URLSearchParams(location.search).get("doc") === "last") {
-  try { saved = JSON.parse(sessionStorage.getItem("pl:doc") || "null"); } catch {}
-}
-if (saved && saved.pages) enterDoc(saved);
-else { input.value = lastInput.get() || SAMPLES["Checkout form"]; run(true); }
-</script>
+<script src="/shared/verdict.js"></script>
+<script src="/static/app.js"></script>
+<script src="/static/analyze.js"></script>
 </body>
 </html>

@@ -85,7 +85,7 @@ def collect(items: List[dict]) -> List[dict]:
         else:
             det = engine.run(it["text"], it.get("kind", "sms"), None, [])
         t0 = time.perf_counter()
-        out.append({"label": it["label"], "det": det, "slice": it.get("slice") or it.get("kind") or "url",
+        out.append({"label": it["label"], "det": det, "slice": it.get("slice") or it.get("kind") or "url", "is_url": "url" in it,
                     "ms": (time.perf_counter() - t0) * 1000})
     return out
 
@@ -116,7 +116,8 @@ def baseline_scores(collected: List[dict]) -> List[int]:
                 parts.append((0.30, 100 * max(scores)))
         elif url:
             parts.append((0.30, 100 * max(url)))
-        if c["det"].coverage.get("text_model") == FU.RAN:
+        # A bare link has no wording to read: the text layer is "missing", not "scored 0".
+        if c["det"].coverage.get("text_model") == FU.RAN and not c.get("is_url"):
             parts.append((0.35, 100 * (max(txt) if txt else 0.0)))
         out.append(round(sum(w * s for w, s in parts) / sum(w for w, _ in parts)))
     return out

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Results · PhishShield</title>
+<link rel="icon" href="/static/favicon.png">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header class="top" id="top"></header>
+<main class="wrap">
+  <h1>How well PhishShield works</h1>
+  <p class="lede">Measured on data the models never trained on. Every number on this page is read from
+    <code>data/eval.json</code>, produced by <code>python -m src.eval.phish_bench</code>. Nothing is typed in by hand.</p>
+  <div id="out" class="stack"><p class="muted">Loading results…</p></div>
+</main>
+<footer class="wrap">Full details, data sources and limitations: <code>doc/MODEL_CARD.md</code> in the repository.</footer>
+<script src="/static/app.js"></script>
+<script src="/static/results.js"></script>
+</body>
+</html>

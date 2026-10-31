@@ -57,14 +57,14 @@
     "n": 6000,
     "positives": 2174,
     "negatives": 3826,
-    "tp": 139,
-    "fp": 0,
-    "fn": 2035,
-    "tn": 3826,
-    "precision": 1.0,
-    "recall": 0.0639,
-    "f1": 0.1202,
-    "fpr": 0.0
+    "tp": 1513,
+    "fp": 70,
+    "fn": 661,
+    "tn": 3756,
+    "precision": 0.9558,
+    "recall": 0.696,
+    "f1": 0.8054,
+    "fpr": 0.0183
    }
   },
   "openphish": {
@@ -124,13 +124,13 @@
     "n": 276,
     "positives": 276,
     "negatives": 0,
-    "tp": 2,
+    "tp": 213,
     "fp": 0,
-    "fn": 274,
+    "fn": 63,
     "tn": 0,
     "precision": 1.0,
-    "recall": 0.0072,
-    "f1": 0.0144,
+    "recall": 0.7717,
+    "f1": 0.8712,
     "fpr": null
    }
   },
@@ -192,13 +192,13 @@
     "positives": 0,
     "negatives": 4089,
     "tp": 0,
-    "fp": 0,
+    "fp": 61,
     "fn": 0,
-    "tn": 4089,
-    "precision": null,
+    "tn": 4028,
+    "precision": 0.0,
     "recall": null,
     "f1": null,
-    "fpr": 0.0
+    "fpr": 0.0149
    }
   },
   "text_test_sms": {
@@ -660,19 +660,19 @@
   "url_test system metrics use a fixed sample of the URL test split; url_model metrics use all of it"
  ],
  "run": {
-  "commit": "278432e",
-  "metrics_sha256": "ffabd7431ec8dd8ba495b106f44ae5d9f11065a7fa3ee595e958eb603df71d5a",
+  "commit": "1690e09",
+  "metrics_sha256": "9b5ff4ec33237882103c64fa1a5b6b969db7e0e36e262e4a0414e1e1deeb1194",
   "ms_per_item": {
-   "text_test_sms": 3.93,
-   "text_test_email": 12.55,
-   "url_test": 9.53,
-   "openphish": 13.38,
-   "tranco": 9.17,
-   "uci_sms_ham": 1.92,
-   "uci_sms_spam": 4.13,
-   "curated": 5.83
+   "text_test_sms": 4.14,
+   "text_test_email": 10.28,
+   "url_test": 7.46,
+   "openphish": 11.96,
+   "tranco": 7.83,
+   "uci_sms_ham": 1.53,
+   "uci_sms_spam": 4.03,
+   "curated": 5.27
   },
-  "seconds": 149.2,
-  "generated": "2026-10-31T17:00:44"
+  "seconds": 125.2,
+  "generated": "2026-10-31T17:35:18"
  }
 }

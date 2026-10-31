@@ -1,41 +1,47 @@
-"""PhishShield server: the web app pages and the local analysis API.
+"""PhishShield server: the web app pages and the analysis API.
 
 Endpoints:
-  POST /api/analyze    -> message / URL / email -> score, verdict, findings (doc/API.md)
-  GET  /               -> demo/index.html (live demo)
-  GET  /pipeline, /training, /evaluation -> demo/<page>.html
-  GET  /static/*       -> demo/static (shared CSS/JS)
-  POST /api/sanitize   -> {"text": "..."} -> original, sanitized, detections, leaked
-  POST /api/document   -> multipart PDF -> per-page sanitize results (+ indexed for RAG)
-  GET  /api/rag        -> this visitor's documents + local LLM status (scoped by X-PL-Session)
-  POST /api/rag/ask    -> {"question": "..."} -> sanitized question, retrieved chunks, answer
-  POST /api/rag/text   -> {"name", "text"} -> index a message
-  DELETE /api/rag/docs[/{id}] -> remove one / all documents
-  GET  /api/health     -> {"ok": true, "models": {"url": state, "text": state}}
+  GET  /                      analyse page (demo/index.html)
+  GET  /results               measured results (demo/results.html)
+  GET  /how-it-works          how a message is checked (demo/how.html)
+  GET  /static/*              page assets
+  GET  /shared/*              extension/shared: result logic shared by the web app and the extension
+  POST /api/analyze           message / URL / email -> score, verdict, findings (doc/API.md)
+  POST /api/analyze/file      .eml / .pdf / .txt upload -> the same, plus the text that was analysed
+  POST /api/explain           same body as /api/analyze -> explanation from the local AI model, or the template
+  POST /api/sanitize          {"text"} -> personal data redacted
+  GET  /api/eval              data/eval.json and calibration summary, for the results page
+  GET  /api/health            {"ok", "mode", "models", "explainer"}
+
+Modes (PHISHSHIELD_MODE): "local" (default, the server runs on the user's machine) or
+"hosted" (messages arrive over the network: the UI says so, explanations use the template).
+Nothing in this server stores or logs message text.
 
 Run (from repo root):
     python -m src.pipeline.demo            # http://localhost:8000
+    python -m src.pipeline.demo --dev      # + extension test pages under /dev/extension/
     PORT=9000 python -m src.pipeline.demo
 """
 from __future__ import annotations
 
+import json
 import logging
 import os
+import re
 import sys
 import threading
 from pathlib import Path
 from typing import List, Literal, Optional
 
-from fastapi import FastAPI, File, Form, Header, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field
 
 from src.model import predict
-from src.pipeline import insights, rag
-from src.pipeline.analyze import analyze
-from src.pipeline.documents import MAX_BYTES, DocumentError, process_pdf
+from src.pipeline import explain, files
+from src.pipeline.analyze import analyze, mode
 from src.pipeline.sanitize import SanitizationError, sanitize
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -43,7 +49,9 @@ logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[2]
 DEMO = ROOT / "demo"
-PAGES = {"ask", "pipeline", "training", "evaluation"}
+DATA = ROOT / "data"
+PAGES = {"results": "results.html", "how-it-works": "how.html"}
+OLD_PAGES = {"evaluation": "/results", "training": "/results", "pipeline": "/how-it-works", "ask": "/"}
 MAX_CHARS = 20_000
 
 app = FastAPI(title="PhishShield", docs_url=None, redoc_url=None)
@@ -60,16 +68,6 @@ async def no_stale_pages(request, call_next):
 class SanitizeRequest(BaseModel):
     text: str = Field(default="", max_length=MAX_CHARS)
     typed: bool = True
-
-
-class AskRequest(BaseModel):
-    question: str = Field(min_length=1, max_length=2_000)
-    k: int = Field(default=4, ge=1, le=8)
-
-
-class TextDoc(BaseModel):
-    name: str = Field(default="Message", max_length=120)
-    text: str = Field(min_length=1, max_length=MAX_CHARS)
 
 
 class EmailMeta(BaseModel):
@@ -91,14 +89,17 @@ class AnalyzeRequest(BaseModel):
     links: List[Link] = Field(default_factory=list, max_length=500)
 
 
-app.add_middleware(
-    CORSMiddleware,
-    # The extension calls the API from its background service worker.
-    allow_origin_regex=r"^chrome-extension://[a-p]{32}$",
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
-)
+def _extension_origins() -> str:
+    """CORS for the extension's background worker. PHISHSHIELD_EXTENSION_IDS (comma-separated)
+    locks it to published extension IDs; otherwise any extension ID is allowed (local development)."""
+    ids = [i.strip() for i in os.environ.get("PHISHSHIELD_EXTENSION_IDS", "").split(",") if re.fullmatch(r"[a-p]{32}", i.strip())]
+    return r"^chrome-extension://(?:" + "|".join(ids) + r")$" if ids else r"^chrome-extension://[a-p]{32}$"
+
+
+app.add_middleware(CORSMiddleware, allow_origin_regex=_extension_origins(), allow_methods=["GET", "POST"],
+                   allow_headers=["Content-Type"])
 app.mount("/static", StaticFiles(directory=DEMO / "static"), name="static")
+app.mount("/shared", StaticFiles(directory=ROOT / "extension" / "shared"), name="shared")
 
 
 @app.get("/")
@@ -107,43 +108,63 @@ def index() -> FileResponse:
 
 
 @app.get("/{page}")
-def subpage(page: str) -> FileResponse:
+def subpage(page: str):
+    if page in OLD_PAGES:
+        return RedirectResponse(OLD_PAGES[page], status_code=301)
     if page not in PAGES:
         raise HTTPException(status_code=404)
-    return FileResponse(DEMO / f"{page}.html", media_type="text/html")
+    return FileResponse(DEMO / PAGES[page], media_type="text/html")
 
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"ok": True, "models": {k: predict.status(k)["state"] for k in ("url", "text")}}
-
-
-@app.get("/api/pipeline")
-def api_pipeline() -> dict:
-    """Training config, measured benchmark and canary audit for the 'How it works' view."""
-    return {
-        "detectors": insights.detectors_info(),
-        "training": insights.training_info(),
-        "evaluation": insights.evaluate_patterns(),
-        "model_evaluation": insights.model_evaluation(),
-        "canary": insights.canary_audit(),
-    }
+    return {"ok": True, "mode": mode(), "models": {k: predict.status(k)["state"] for k in ("url", "text")},
+            "explainer": explain.status()}
 
 
 @app.on_event("startup")
 def _warm_up() -> None:
-    insights.warm_up()
-    # Load the phishing models off the request path so the first analysis isn't ~3 s slower.
-    threading.Thread(target=lambda: [predict.status(k) for k in ("url", "text")],
-                     name="models-warmup", daemon=True).start()
+    # Load the models and probe Ollama off the request path so the first analysis isn't slow.
+    def run():
+        for k in ("url", "text"):
+            predict.status(k)
+        explain.status()
+    threading.Thread(target=run, name="warmup", daemon=True).start()
+
+
+def _request(req: AnalyzeRequest) -> tuple:
+    if not req.text.strip() and not req.links:
+        raise HTTPException(status_code=422, detail="Send some text or links to analyse.")
+    email = req.email.model_dump(by_alias=True) if req.email else None
+    return req.text, req.kind, email, [link.model_dump() for link in req.links]
 
 
 @app.post("/api/analyze")
 def api_analyze(req: AnalyzeRequest) -> dict:
-    if not req.text.strip() and not req.links:
-        raise HTTPException(status_code=422, detail="Send some text or links to analyse.")
-    email = req.email.model_dump(by_alias=True) if req.email else None
-    return analyze(req.text, req.kind, email, [link.model_dump() for link in req.links])
+    return analyze(*_request(req))
+
+
+@app.post("/api/analyze/file")
+def api_analyze_file(file: UploadFile = File(...)) -> dict:
+    data = file.file.read(files.MAX_BYTES + 1)
+    try:
+        req = files.from_upload(file.filename or "upload", data)
+    except files.FileError as exc:
+        raise HTTPException(status_code=exc.status, detail=str(exc))
+    result = analyze(req["text"], req["kind"], req["email"], req["links"])
+    # The uploader gets back the text that was analysed (for highlighting); it isn't stored.
+    return {**result, "file": req["file"], "text": req["text"], "email": req["email"], "links": req["links"]}
+
+
+@app.post("/api/explain")
+def api_explain(req: AnalyzeRequest) -> dict:
+    result = analyze(*_request(req))
+    ranked = sorted((f for f in result["findings"] if f["contribution"] > 0), key=lambda f: -f["contribution"])
+    out = explain.llm(result["verdict"], result["score"], result["confidence"], [f["reason"] for f in ranked],
+                      explain.domains_in(ranked), result["sanitized"] or "")
+    return {"explanation": out.get("text") or result["explanation"], "source": out["source"],
+            "detail": out.get("detail"), "model": out.get("model"), "ms": out.get("ms"),
+            "verdict": result["verdict"], "score": result["score"]}
 
 
 @app.post("/api/sanitize")
@@ -152,74 +173,28 @@ def api_sanitize(req: SanitizeRequest) -> dict:
         return sanitize(req.text, typed=req.typed).to_dict()
     except SanitizationError as exc:
         # Fail closed: never echo raw input back when sanitization failed.
-        logger.error("sanitization blocked: %s", exc)
+        logger.error("sanitization blocked: %s", type(exc).__name__)
         raise HTTPException(status_code=422, detail="Blocked: input could not be safely sanitized.")
 
 
-BLOCKED = "Blocked: the document could not be safely sanitized."
-
-
-SessionId = Header(default="", alias="X-PL-Session", description="Random per-browser id; scopes the RAG index")
-
-
-@app.post("/api/document")
-def api_document(file: UploadFile = File(...), index: bool = Form(True), sid: str = SessionId) -> dict:
-    """Sanitize a PDF page by page; optionally add the sanitized pages to this visitor's RAG index."""
-    data = file.file.read(MAX_BYTES + 1)
-    try:
-        doc = process_pdf(data)
-    except DocumentError as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
-    except SanitizationError as exc:
-        logger.error("document sanitization blocked: %s", exc)
-        raise HTTPException(status_code=422, detail=BLOCKED)
-    name = os.path.basename(file.filename or "document.pdf")[:120]
-    doc["name"] = name
-    if index:
-        try:
-            doc["indexed"] = rag.ingest_pages(name, [p["sanitized"] for p in doc["pages"]], doc["detections"], sid=sid)
-        except rag.TooManyDocuments as exc:
-            doc["index_error"] = str(exc)
-    return doc
-
-
-@app.get("/api/rag")
-def api_rag(sid: str = SessionId) -> dict:
-    idx = rag.index_for(sid)
-    return {"docs": sorted(idx.docs.values(), key=lambda d: d["added"]),
-            "chunks": len(idx.chunks), "llm": rag.llm_status(), "private": True}
-
-
-@app.post("/api/rag/ask")
-def api_rag_ask(req: AskRequest, sid: str = SessionId) -> dict:
-    try:
-        return rag.ask(req.question, req.k, sid=sid)
-    except SanitizationError as exc:
-        logger.error("rag blocked: %s", exc)
-        raise HTTPException(status_code=422, detail="Blocked: the question or answer could not be safely sanitized.")
-
-
-@app.post("/api/rag/text")
-def api_rag_text(req: TextDoc, sid: str = SessionId) -> dict:
-    try:
-        return rag.ingest_text(req.name, req.text, sid=sid)
-    except SanitizationError:
-        raise HTTPException(status_code=422, detail=BLOCKED)
-    except rag.TooManyDocuments as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
-
-
-@app.delete("/api/rag/docs/{doc_id}")
-def api_rag_delete(doc_id: str, sid: str = SessionId) -> dict:
-    if not rag.index_for(sid).remove(doc_id):
-        raise HTTPException(status_code=404, detail="No such document.")
-    return {"ok": True}
-
-
-@app.delete("/api/rag/docs")
-def api_rag_clear(sid: str = SessionId) -> dict:
-    rag.index_for(sid).clear()
-    return {"ok": True}
+@app.get("/api/eval")
+def api_eval() -> dict:
+    """Measured results for the results page. Every number comes from src/eval/phish_bench.py."""
+    path = DATA / "eval.json"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="No evaluation yet. Run: python -m src.eval.phish_bench")
+    out = json.loads(path.read_text(encoding="utf-8"))
+    cal = DATA / "calibration.json"
+    if cal.exists():
+        c = json.loads(cal.read_text(encoding="utf-8"))
+        out["calibration"] = {k: c.get(k) for k in ("chosen", "chosen_val", "fpr_limit", "grid", "n_text", "n_url")}
+    out["model_cards"] = {}
+    for kind in ("url", "text"):
+        meta = ROOT / "models" / f"{kind}_model.json"
+        if meta.exists():
+            m = json.loads(meta.read_text(encoding="utf-8"))
+            out["model_cards"][kind] = {k: m.get(k) for k in ("version", "train_n", "val_n", "val_calibrated", "C", "iterations")}
+    return out
 
 
 def main() -> None:
@@ -231,7 +206,7 @@ def main() -> None:
         # Extension test pages (extension/dev/*.html) run the real content scripts against this API.
         app.mount("/dev/extension", StaticFiles(directory=ROOT / "extension"), name="extension-dev")
         logger.info("dev: Gmail test page at http://localhost:%d/dev/extension/dev/gmail.html", port)
-    logger.info("PhishShield on http://localhost:%d", port)
+    logger.info("PhishShield (%s mode) on http://localhost:%d", mode(), port)
     uvicorn.run(app, host=host, port=port, log_level="warning")
 
 

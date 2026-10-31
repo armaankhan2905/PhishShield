@@ -161,18 +161,60 @@ Base URL: `http://localhost:8000` locally (`python -m src.pipeline.demo`).
 
 Make the request from the **background service worker**, not the content
 script: content scripts on `mail.google.com` are subject to Gmail's origin and
-will be blocked by CORS. Add `"host_permissions": ["http://localhost:8000/*"]`
-(and the hosted URL only if the user opts in) to `manifest.json`. The server
-allows `chrome-extension://<id>` origins.
+will be blocked by CORS. `extension/manifest.json` has `host_permissions` for
+`http://localhost:8000/*` only; another server needs the user's permission
+(the options page asks). The server allows `chrome-extension://<id>` origins;
+set `PHISHSHIELD_EXTENSION_IDS=<id>[,<id>]` to allow only your published extension.
 
-## Other endpoints kept from PrivacyLens
+## `POST /api/analyze/file`
+
+Multipart upload, field `file`. Accepts a saved email (`.eml`), a PDF or a text
+file (`.txt`), up to 10 MB. Files are processed in memory and not stored.
+
+- `.eml`: From, Reply-To and Subject are read. An HTML body is reduced to text
+  with `<script>`, `<style>` and hidden elements dropped, and every `<a href>`
+  becomes a `{text, href}` link. Attachments are listed by name, never opened.
+- PDF: text of the first 30 pages (no OCR).
+
+Response: everything `/api/analyze` returns, plus:
+
+| Field | Meaning |
+|---|---|
+| `file` | `{name, type: "eml"\|"pdf"\|"txt", attachments?, hidden_html_blocks?, pages?, truncated}` |
+| `text` | The text that was analysed. Highlight offsets point into this |
+| `email` | Headers read from an `.eml`, else `null` |
+| `links` | Links extracted from the HTML body |
+
+Errors: `415` wrong type, `413` too large, `400` empty / unreadable, all with a
+`detail` message that is safe to show.
+
+## `POST /api/explain`
+
+Same body as `/api/analyze`. Returns a plain-English explanation:
+
+```json
+{"explanation": "...", "source": "llm", "model": "qwen2.5:3b", "detail": "written by a local AI model from the findings",
+ "ms": 3120, "verdict": "phishing", "score": 100}
+```
+
+- **`source: "llm"`:** written by a local Ollama model from the findings only.
+  The model sees the reasons, the domains they name and the **sanitized** message.
+  An answer that names another domain, contradicts the verdict, skips the reasons
+  or the "What to do" advice, or is too long is rejected.
+- **`source: "template"`:** the same text as `/api/analyze`'s `explanation`.
+  Always used in hosted mode, when Ollama isn't running, for safe results, or when an answer was rejected. `detail` says why.
+
+The local model takes seconds, which is why it's a separate call: `/api/analyze`
+stays fast for the extension.
+
+## Other endpoints
 
 | Endpoint | Use |
 |---|---|
-| `GET /api/health` | `{"ok": true, "models": {"url": "loaded", "text": "loaded"}}`, for the extension's "server offline" check. Model states: `unloaded` (not loaded yet), `loaded`, `missing`, `disabled`, `error` |
-| `POST /api/sanitize` | Redact personal data from text |
-| `POST /api/document` | PDF upload → sanitized pages (may be reused for uploads) |
-| `GET /api/pipeline` | Data for the pipeline / training / evaluation pages (reworked later) |
+| `GET /api/health` | `{"ok": true, "mode": "local"\|"hosted", "models": {"url": state, "text": state}, "explainer": {"available", "model"?, "detail"}}`. Model states: `unloaded` (not loaded yet), `loaded`, `missing`, `disabled`, `error` |
+| `GET /api/eval` | `data/eval.json` plus the scoring calibration and model metadata, for the Results page |
+| `POST /api/sanitize` | Redact personal data from text (PrivacyLens) |
 
-The PrivacyLens document Q&A endpoints (`/api/rag*`, `/ask`) are out of scope
-for PhishShield and are planned to be hidden before the hosted demo.
+Removed in Phase 5 (PrivacyLens features outside PhishShield's scope):
+`/api/document`, `/api/rag*`, `/api/pipeline`, and the `/ask` and `/training` pages
+(old page URLs redirect to the new pages).

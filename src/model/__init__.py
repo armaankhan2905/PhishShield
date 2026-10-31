@@ -5,9 +5,6 @@
   train_url.py    URL model (gradient-boosted trees on lexical features)
   train_text.py   text model (TF-IDF + logistic regression)
   predict.py      lazy-loaded models used by the detection engine
-
-train.py, train_v2.py, accuracy_loop.py and corpus/ are the old PrivacyLens PII
-classifier, kept because the pipeline pages still read them.
 """
 import os
 

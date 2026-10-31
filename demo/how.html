@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How PhishShield works</title>
+<link rel="icon" href="/static/favicon.png">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header class="top" id="top"></header>
+<main class="wrap stack">
+  <div>
+    <h1>How a message is checked</h1>
+    <p class="lede">Several independent checks look at the message. A score is built only from what they found, and every point
+      comes with a reason you can read.</p>
+  </div>
+
+  <ol class="steps">
+    <li><div><h3>Read the message</h3><p>Links are pulled out of the text, including ones written without <code>https://</code>.
+      Gmail's redirect wrappers are removed. For saved emails, the sender, reply-to and subject are read, and HTML is turned into
+      plain text without running anything in it. Links are only read, never opened.</p></div></li>
+    <li><div><h3>Check every link's real owner</h3><p>Each link's real domain is worked out with the Public Suffix List
+      (so <code>login.sbi.co.in</code> and <code>sbi.co.in.evil.xyz</code> are told apart). It's then compared with 36
+      commonly impersonated brands for look-alike characters, misspellings, brand-plus-phishing-word names and brands placed in front of
+      someone else's domain.</p></div></li>
+    <li><div><h3>Check the sender</h3><p>Does the display name claim a brand the sending domain doesn't belong to? Is it a free email
+      address posing as a company? Do replies go somewhere else? Does a link's visible text show a different site from where it really goes?</p></div></li>
+    <li><div><h3>Read the wording</h3><p>Rules look for <em>requests</em> (share your OTP, pay a fee, install AnyDesk), threats,
+      prizes and pressure. "Never share your OTP" is a warning, not a request, and isn't flagged.</p></div></li>
+    <li><div><h3>Ask two small models</h3><p>A URL model scores each link from its spelling alone. A text model scores the
+      wording. Both run on this server; their probabilities are calibrated on held-out data.</p></div></li>
+    <li><div><h3>Score only what was found</h3><p>Proven technical evidence counts in full. Patterns count once each and are capped,
+      so repeating "urgent" adds nothing. <b>Phishing</b> needs proven evidence. A model alone can reach <b>suspicious</b> but never
+      phishing. A message with nothing to act on (no link, number, app or payment) stays <b>safe</b>. A check that didn't run lowers
+      the confidence; it never counts as safety.</p></div></li>
+    <li><div><h3>Explain it</h3><p>A plain summary is built from the reasons. On your own computer, a local AI model (Ollama) can
+      rewrite it in plain words. It sees only the reasons and a copy of the message with personal data removed, and an answer that
+      adds anything else is thrown away.</p></div></li>
+  </ol>
+
+  <section class="card">
+    <h2>Privacy</h2>
+    <dl class="kv" id="privacy">
+      <dt>Where checks run</dt><dd id="where">…</dd>
+      <dt>Stored</dt><dd>Nothing. Messages and files are checked in memory and not saved or logged.</dd>
+      <dt>AI explanation</dt><dd id="ai">…</dd>
+      <dt>Chrome extension</dt><dd>Talks only to the server address you set (by default this computer).
+        Link checking on other websites only runs automatically when the server is local.</dd>
+    </dl>
+  </section>
+
+  <section class="card">
+    <h2>What the labels mean</h2>
+    <dl class="kv">
+      <dt><span class="tier confirmed">Proven</span></dt><dd>A technical fact anyone can check, such as a link to <code>sbi-kyc.xyz</code> claiming to be SBI.</dd>
+      <dt><span class="tier">Pattern</span></dt><dd>Wording or link traits common in scams but also seen in real messages, such as urgency or a shortened link.</dd>
+      <dt><span class="tier ml">Model</span></dt><dd>A machine-learning score. Useful, but never enough on its own for a phishing verdict.</dd>
+    </dl>
+  </section>
+</main>
+<footer class="wrap">API reference: <code>doc/API.md</code> · Measured results: <a href="/results">Results</a></footer>
+<script src="/static/app.js"></script>
+<script>
+  loadHealth().then((s) => {
+    document.getElementById("where").textContent = !s ? "Server not reachable" : s.mode === "hosted"
+      ? "On the PhishShield demo server: messages you check are sent over the internet to it."
+      : "On this computer. Messages don't leave it.";
+    document.getElementById("ai").textContent = !s ? "–" : s.explainer.available
+      ? "Local AI model on this computer (" + s.explainer.model + ")." : "Plain summaries only (" + s.explainer.detail + ").";
+  });
+</script>
+</body>
+</html>

@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 MODELS = Path(__file__).resolve().parents[2] / "models"
 MODEL_DIR = MODELS / "pii_classifier"
-# train_v2.py saves weights only; the tokenizer is the base model's.
+# Optional PrivacyLens PII model (not shipped with PhishShield); patterns are used without it.
 BASE_DIR = MODELS / "google-bert_bert-base-uncased"
 MIN_SCORE = 0.6
 
@@ -37,7 +37,7 @@ def _load() -> None:
         return
     if not (MODEL_DIR / "model.safetensors").exists() and not (MODEL_DIR / "pytorch_model.bin").exists():
         _status.update(state="missing",
-                       detail="No trained weights in models/pii_classifier (run src/model/train_v2.py)")
+                       detail="No PII model in models/pii_classifier (optional; patterns are used)")
         return
     tok_dir = MODEL_DIR if (MODEL_DIR / "tokenizer_config.json").exists() else BASE_DIR
     if not (tok_dir / "vocab.txt").exists():
