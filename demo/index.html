@@ -9,14 +9,12 @@
 </head>
 <body>
 <header class="top" id="top"></header>
-<main class="wrap narrow">
+<main class="wrap">
   <p class="notice" id="hostedNote" hidden></p>
-  <h1 class="center">Is this message genuine?</h1>
-  <p class="lede center">Paste an SMS, an email or a link, or upload a saved email. PhishShield shows how risky it looks and exactly why.</p>
-
   <div class="split">
-    <section class="card" aria-labelledby="inTitle">
-      <h2 id="inTitle" hidden>Message</h2>
+    <section class="intake" aria-labelledby="inTitle">
+      <h1 id="inTitle">Get a report on any message.</h1>
+      <p class="lede">Paste an SMS, an email or a link, or upload a saved email. PhishShield checks it and explains exactly why.</p>
       <div class="tabs" role="tablist" aria-label="What to check">
         <button role="tab" id="tab-message" aria-controls="pane-message" aria-selected="true" data-kind="message">Message</button>
         <button role="tab" id="tab-email" aria-controls="pane-email" aria-selected="false" data-kind="email">Email</button>
@@ -45,7 +43,7 @@
       </div>
       <div role="tabpanel" id="pane-file" aria-labelledby="tab-file" hidden>
         <div class="drop" id="drop">
-          <p><b>Drop a file here</b> or <label for="fileIn" style="color:var(--accent);cursor:pointer;text-decoration:underline">choose one</label></p>
+          <p><b>Drop a file here</b> or <label for="fileIn" style="color:var(--g3);cursor:pointer;text-decoration:underline">choose one</label></p>
           <p class="small">Saved email (.eml), PDF or text file, up to 10 MB. Files are read, not stored.</p>
           <input type="file" id="fileIn" accept=".eml,.pdf,.txt,message/rfc822,application/pdf,text/plain" hidden>
           <p id="fileName" class="small mono"></p>
@@ -53,7 +51,7 @@
       </div>
 
       <div class="row" style="margin-top:6px">
-        <button class="btn" id="checkBtn" type="button">Check</button>
+        <button class="btn" id="checkBtn" type="button">Write the report</button>
         <span class="muted small">Ctrl + Enter</span>
       </div>
 
@@ -63,9 +61,8 @@
       </div>
     </section>
 
-    <section id="result" aria-live="polite" aria-labelledby="resTitle">
-      <h2 id="resTitle" hidden>Result</h2>
-      <div class="empty"><b>No message checked yet</b>Paste something on the left, or try a sample.</div>
+    <section class="sheet" id="result" aria-live="polite" aria-label="Report">
+      <div class="empty"><b>No report yet</b>Paste a message on the left, or try a sample.</div>
     </section>
   </div>
 </main>

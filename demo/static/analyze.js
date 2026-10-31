@@ -142,28 +142,40 @@ function showError(err) {
     h("p", { text: err === "offline" ? p.subtitle : err })));
 }
 
+const BADGE_WORDS = { danger: "Scam", warn: "Suspicious", limited: "Limited", safe: "Safe" };
+
+/* The result is laid out as a one-page report: a header (badge, verdict, score bar), numbered
+   sections (the flagged message, the reasons, the links) and a "What to do" box. */
 function render(result, text) {
   const p = PS.presentation(result);
   const box = $("result");
   const parts = [];
-
   const score = Math.max(0, Math.min(100, result.score));
-  parts.push(h("div", { class: "verdict " + p.tone },
-    h("div", { class: "ringbox", role: "img", "aria-label": "Risk score " + result.score + " out of 100" },
-      h("div", { class: "ring", style: "--to:" + score }), h("b", { text: String(result.score) })),
-    h("div", { class: "words" },
-      h("div", { class: "title" }, h("b", { text: p.title.replace(/ · \d+\/100$/, "") })),
-      h("p", { text: p.subtitle }),
-      h("div", { class: "meta", text: "Score " + result.score + "/100 · confidence " + result.confidence }),
-      h("div", { class: "checks" }, Object.entries(result.coverage).map(([k, v]) =>
-        h("span", { class: "chip " + (v === "ran" ? "ok" : v === "failed" ? "bad" : "off"), title: v,
-                    text: (CHECK_NAMES[k] || k) + (v === "ran" ? "" : " · " + v) }))))));
+
+  parts.push(h("header", { class: "rhead " + p.tone },
+    h("div", { class: "badge", role: "img", "aria-label": "Risk score " + result.score + " out of 100" },
+      h("b", { text: String(result.score) }), BADGE_WORDS[p.tone] || "Report"),
+    h("h2", null, h("span", { text: p.title.replace(/ · \d+\/100$/, "") + "." }), " " + p.subtitle),
+    h("div", { class: "meta", text: "Report · confidence " + result.confidence + " · checked in " + Math.round(result.latency_ms) + " ms " +
+      (result.mode === "hosted" ? "on the PhishShield server" : "on this computer") }),
+    h("div", { class: "checks" }, Object.entries(result.coverage).map(([k, v]) =>
+      h("span", { class: "chip " + (v === "ran" ? "ok" : v === "failed" ? "bad" : "off"), title: v,
+                  text: (CHECK_NAMES[k] || k) + (v === "ran" ? "" : " · " + v) }))),
+    h("div", { class: "scale", "aria-hidden": "true" }, h("i", { style: "width:" + score + "%" }))));
 
   if (PS.hostedNote(result)) parts.push(h("p", { class: "notice", text: PS.hostedNote(result) }));
-  if (result.file) parts.push(h("p", { class: "muted small", text: "File: " + result.file.name + " (" + result.file.type +
+  if (result.file) parts.push(h("p", { class: "muted small fileinfo", text: "File: " + result.file.name + " (" + result.file.type +
     (result.file.pages ? ", " + result.file.pages + " pages" : "") +
     (result.file.attachments && result.file.attachments.length ? ", attachments not opened: " + result.file.attachments.join(", ") : "") +
     (result.file.hidden_html_blocks ? ", " + result.file.hidden_html_blocks + " hidden text blocks ignored" : "") + ")" }));
+
+  const secs = [];
+  const spans = result.verdict === "safe" ? [] : PS.bodySpans(result);
+  if (spans.length && text) {
+    secs.push(h("li", null, h("div", null, h("h3", { text: "Flagged in the message" }),
+      h("div", { class: "text" }, PS.segments(text, spans).map((s) =>
+        s.mark ? h("mark", { title: s.title, text: s.text }) : document.createTextNode(s.text))))));
+  }
 
   const reasons = PS.reasons(result);
   if (reasons.length) {
@@ -174,21 +186,14 @@ function render(result, text) {
     const more = reasons.length > 5 ? h("button", { type: "button", class: "samples-more", style: "margin-top:8px",
       onclick: (e) => { items.forEach((li) => { li.hidden = false; }); e.target.remove(); },
       text: "Show all " + reasons.length + " reasons" }) : null;
-    parts.push(h("div", { class: "section" },
-      h("h3", { text: result.verdict === "safe" ? "Noted, but not enough to flag" : "Why" }),
-      h("ul", { class: "reasons" }, items), more));
-  }
-
-  const spans = result.verdict === "safe" ? [] : PS.bodySpans(result);
-  if (spans.length && text) {
-    parts.push(h("div", { class: "section" }, h("h3", { text: "Flagged in the message" }),
-      h("div", { class: "text" }, PS.segments(text, spans).map((s) =>
-        s.mark ? h("mark", { title: s.title, text: s.text }) : document.createTextNode(s.text)))));
+    secs.push(h("li", null, h("div", null,
+      h("h3", { text: result.verdict === "safe" ? "Noted, but not enough to flag" : "Why it scored " + result.score }),
+      h("ul", { class: "reasons" }, items), more)));
   }
 
   if (result.urls && result.urls.length) {
     const risks = PS.linkRisks(result);
-    parts.push(h("div", { class: "section" }, h("h3", { text: "Links" }), h("div", { class: "tablewrap" }, h("table", null,
+    secs.push(h("li", null, h("div", { style: "min-width:0" }, h("h3", { text: "Where the links go" }), h("div", { class: "tablewrap" }, h("table", null,
       h("thead", null, h("tr", null, h("th", { text: "Link" }), h("th", { text: "Risk" }), h("th", { class: "num", text: "URL model" }))),
       h("tbody", null, result.urls.map((u) => {
         const risk = risks[u.url];
@@ -197,15 +202,16 @@ function render(result, text) {
           h("td", null, h("span", { class: "risk " + (risk ? risk.level : "ok"), text: risk ? (risk.level === "risky" ? "Risky" : "Be careful") : "No issue found" }),
             risk ? h("div", { class: "small muted", text: risk.reasons.join(" · ") }) : null),
           h("td", { class: "num", text: u.score == null ? "–" : Math.round(u.score * 100) + "%" }));
-      }))))));
+      })))))));
   }
+  if (secs.length) parts.push(h("ol", { class: "secs" + (p.tone === "danger" ? " danger-report" : "") }, secs));
 
-  parts.push(h("div", { class: "section" }, h("h3", { text: "Explanation" }),
-    h("div", { class: "explain", id: "explainBox" }, h("p", { text: result.explanation }),
+  parts.push(h("div", { class: "todo" }, h("b", { text: result.verdict === "safe" ? "In plain words" : "What to do" }),
+    h("div", { id: "explainBox" }, h("p", { text: result.explanation }),
       h("p", { class: "src", text: shouldExplain(result) ? "" : "Plain summary built from the findings." }))));
 
-  parts.push(h("p", { class: "muted small", style: "margin-top:12px", text: "Checked in " + Math.round(result.latency_ms) + " ms · " +
-    (result.mode === "hosted" ? "on the PhishShield server" : "on this computer") + " · analysis " + result.analysis_id.slice(0, 8) }));
+  parts.push(h("p", { class: "foot", text: "Analysis " + result.analysis_id.slice(0, 8) +
+    " · results are guidance, not a guarantee" }));
   box.replaceChildren(...parts);
   if (window.innerWidth < 960) box.scrollIntoView({ behavior: "smooth", block: "start" });
 }
