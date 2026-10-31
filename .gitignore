@@ -28,9 +28,14 @@ pip-wheel-metadata/
 .installed.cfg
 *.egg
 
-# ML models (large — git-lfs or local only)
+# ML models: the small PhishShield models (~4 MB) are committed so the app runs without training;
+# anything else in models/ (e.g. old PrivacyLens BERT weights) stays local.
 models/*
 !models/.gitkeep
+!models/url_model.joblib
+!models/url_model.json
+!models/text_model.joblib
+!models/text_model.json
 
 # Data (sensitive / large / generated)
 data/raw/

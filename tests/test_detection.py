@@ -125,7 +125,7 @@ def test_repeated_heuristic_counts_once():
 def test_heuristics_alone_never_reach_phishing():
     r = fuse([H(f"H{i}", 20) for i in range(6)] + [H("L1", 20, "link"), H("L2", 20, "link")], COV)
     assert r.verdict != "phishing"
-    assert fuse([H(f"H{i}", 20) for i in range(6)], COV, Context(actionable=False)).score <= 30
+    assert fuse([H(f"H{i}", 20) for i in range(6)], COV, Context(actionable=False)).verdict == "safe"
 
 
 def test_confirmed_evidence_can_reach_phishing():
@@ -168,6 +168,12 @@ SUSPICIOUS = [
     "Install AnyDesk and share the code so our bank team can help with your refund",
     "Congratulations! You have won Rs 25 lakh in KBC lottery. Pay Rs 5000 processing fee to claim. Call 9876543210",
     "Your electricity connection will be disconnected tonight. Contact our officer 9876543210 immediately",
+    # No link or number: the payment request itself is the thing to act on.
+    "Congratulations! You have won Rs 25,00,000 in the KBC lottery. Pay Rs 5,000 processing fee to receive your prize.",
+    # Names a brand with nothing to check it against: must not count as "identity consistent".
+    "Your number won 50 lakh in Jio lucky draw. Send Rs 4999 registration fee to claim the prize amount.",
+    # No link or number, but asks you to send your OTP to someone: replying is the action.
+    "Your Aadhaar is linked to illegal activity. Share your Aadhaar number and OTP with our officer to avoid legal action.",
 ]
 LEGIT = [
     ("123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank", None, []),

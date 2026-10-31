@@ -1,0 +1,76 @@
+{
+  "version": "text-tfidf-lr-1",
+  "C": 32.0,
+  "c_search_val": {
+    "0.5": {
+      "n": 2997,
+      "precision": 0.9531,
+      "recall": 0.949,
+      "f1": 0.9511,
+      "fpr": 0.0293,
+      "pr_auc": 0.9903,
+      "brier": 0.0572
+    },
+    "2.0": {
+      "n": 2997,
+      "precision": 0.9692,
+      "recall": 0.9533,
+      "f1": 0.9612,
+      "fpr": 0.019,
+      "pr_auc": 0.994,
+      "brier": 0.033
+    },
+    "8.0": {
+      "n": 2997,
+      "precision": 0.9796,
+      "recall": 0.9568,
+      "f1": 0.9681,
+      "fpr": 0.0125,
+      "pr_auc": 0.9954,
+      "brier": 0.0227
+    },
+    "32.0": {
+      "n": 2997,
+      "precision": 0.9813,
+      "recall": 0.9533,
+      "f1": 0.9671,
+      "fpr": 0.0114,
+      "pr_auc": 0.9959,
+      "brier": 0.0191
+    }
+  },
+  "train_n": 14769,
+  "val_n": 2997,
+  "vocabulary": 150000,
+  "val_calibrated": {
+    "n": 2997,
+    "precision": 0.9731,
+    "recall": 0.968,
+    "f1": 0.9705,
+    "fpr": 0.0168,
+    "pr_auc": 0.9955,
+    "brier": 0.017
+  },
+  "val_calibrated_by_kind": {
+    "sms": {
+      "n": 765,
+      "precision": 0.9399,
+      "recall": 0.931,
+      "f1": 0.9354,
+      "fpr": 0.0426,
+      "pr_auc": 0.9836,
+      "brier": 0.0384
+    },
+    "email": {
+      "n": 2232,
+      "precision": 0.9856,
+      "recall": 0.9821,
+      "f1": 0.9839,
+      "fpr": 0.0086,
+      "pr_auc": 0.9983,
+      "brier": 0.0096
+    }
+  },
+  "note": "Validation metrics only (C and calibration chosen on validation). Held-out numbers come from src/eval/phish_bench.py.",
+  "train_seconds": 120.4
+}

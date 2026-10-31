@@ -67,6 +67,26 @@ _BARE_DOMAIN = re.compile(
     re.I,
 )
 
+# Endings a bare domain (no scheme, no path) is written with in messages. Run-together
+# sentences ("California.Now", "badly.It") end in a valid TLD too, so a bare domain
+# without a path must use one of these, in lower case.
+_BARE_TLDS = {
+    "com", "net", "org", "in", "info", "biz", "io", "co", "me", "app", "dev", "ly", "gl", "to", "xyz", "top", "online",
+    "site", "live", "shop", "club", "store", "tech", "website", "space", "fun", "link", "click", "buzz", "vip", "icu",
+    "cyou", "sbs", "cfd", "rest", "quest", "monster", "support", "help", "win", "bid", "loan", "work", "fit", "lol",
+    "ru", "cn", "tk", "ml", "ga", "cf", "gq", "uk", "us", "au", "ca", "de", "fr", "eu", "sbi", "pe", "gov", "edu",
+}
+
+
+def _looks_like_bare_domain(value: str, info: "UrlInfo") -> bool:
+    host = value.split("/", 1)[0].split(":", 1)[0]
+    last = host.rsplit(".", 1)[-1]
+    if last != last.lower():
+        return False                     # "California.Now", "types.IBM"
+    has_path = "/" in value
+    return has_path or "-" in info.label or any(ch.isdigit() for ch in info.label) or info.suffix.split(".")[-1] in _BARE_TLDS
+
+
 # Latin look-alikes from Cyrillic / Greek and common digit swaps.
 _CONFUSABLE = str.maketrans({
     "а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "у": "y", "х": "x", "і": "i", "ј": "j", "ԁ": "d",
@@ -195,6 +215,8 @@ def find_urls(text: str) -> List[Tuple[str, int, int]]:
         value = m.group(0).rstrip(URL_TRAILING)
         info = parse_url(value)
         if not info.valid or info.is_ip or info.suffix.split(".")[-1].lower() in _FILE_LIKE:
+            continue
+        if not _looks_like_bare_domain(value, info):
             continue
         found.append((value, s, s + len(value)))
     return sorted(found, key=lambda t: t[1])

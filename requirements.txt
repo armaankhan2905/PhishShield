@@ -13,7 +13,8 @@ pandas>=2.2.0
 numpy>=2.0.0
 datasets>=2.18.0
 evaluate>=0.4.0
-scikit-learn>=1.5.0
+scikit-learn==1.6.1  # must match the version models/*.joblib were trained with
+joblib>=1.3
 regex>=2024.5.15
 tldextract>=5.1.0
 pydantic>=2.8.0

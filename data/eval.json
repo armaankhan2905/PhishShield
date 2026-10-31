@@ -1,0 +1,678 @@
+{
+ "metrics": {
+  "url_test": {
+   "url_model": {
+    "n": 31767,
+    "positives": 11226,
+    "negatives": 20541,
+    "tp": 8972,
+    "fp": 1242,
+    "fn": 2254,
+    "tn": 19299,
+    "precision": 0.8784,
+    "recall": 0.7992,
+    "f1": 0.8369,
+    "fpr": 0.0605
+   },
+   "rules_only": {
+    "n": 6000,
+    "positives": 2174,
+    "negatives": 3826,
+    "tp": 121,
+    "fp": 3,
+    "fn": 2053,
+    "tn": 3823,
+    "precision": 0.9758,
+    "recall": 0.0557,
+    "f1": 0.1053,
+    "fpr": 0.0008
+   },
+   "system_flagged": {
+    "n": 6000,
+    "positives": 2174,
+    "negatives": 3826,
+    "tp": 1320,
+    "fp": 30,
+    "fn": 854,
+    "tn": 3796,
+    "precision": 0.9778,
+    "recall": 0.6072,
+    "f1": 0.7491,
+    "fpr": 0.0078
+   },
+   "system_phishing": {
+    "n": 6000,
+    "positives": 2174,
+    "negatives": 3826,
+    "tp": 117,
+    "fp": 0,
+    "fn": 2057,
+    "tn": 3826,
+    "precision": 1.0,
+    "recall": 0.0538,
+    "f1": 0.1021,
+    "fpr": 0.0
+   },
+   "baseline_35_30_35": {
+    "n": 6000,
+    "positives": 2174,
+    "negatives": 3826,
+    "tp": 139,
+    "fp": 0,
+    "fn": 2035,
+    "tn": 3826,
+    "precision": 1.0,
+    "recall": 0.0639,
+    "f1": 0.1202,
+    "fpr": 0.0
+   }
+  },
+  "openphish": {
+   "url_model": {
+    "n": 276,
+    "positives": 276,
+    "negatives": 0,
+    "tp": 232,
+    "fp": 0,
+    "fn": 44,
+    "tn": 0,
+    "precision": 1.0,
+    "recall": 0.8406,
+    "f1": 0.9134,
+    "fpr": null
+   },
+   "rules_only": {
+    "n": 276,
+    "positives": 276,
+    "negatives": 0,
+    "tp": 2,
+    "fp": 0,
+    "fn": 274,
+    "tn": 0,
+    "precision": 1.0,
+    "recall": 0.0072,
+    "f1": 0.0144,
+    "fpr": null
+   },
+   "system_flagged": {
+    "n": 276,
+    "positives": 276,
+    "negatives": 0,
+    "tp": 189,
+    "fp": 0,
+    "fn": 87,
+    "tn": 0,
+    "precision": 1.0,
+    "recall": 0.6848,
+    "f1": 0.8129,
+    "fpr": null
+   },
+   "system_phishing": {
+    "n": 276,
+    "positives": 276,
+    "negatives": 0,
+    "tp": 2,
+    "fp": 0,
+    "fn": 274,
+    "tn": 0,
+    "precision": 1.0,
+    "recall": 0.0072,
+    "f1": 0.0144,
+    "fpr": null
+   },
+   "baseline_35_30_35": {
+    "n": 276,
+    "positives": 276,
+    "negatives": 0,
+    "tp": 2,
+    "fp": 0,
+    "fn": 274,
+    "tn": 0,
+    "precision": 1.0,
+    "recall": 0.0072,
+    "f1": 0.0144,
+    "fpr": null
+   }
+  },
+  "tranco": {
+   "url_model": {
+    "n": 4089,
+    "positives": 0,
+    "negatives": 4089,
+    "tp": 0,
+    "fp": 229,
+    "fn": 0,
+    "tn": 3860,
+    "precision": 0.0,
+    "recall": null,
+    "f1": null,
+    "fpr": 0.056
+   },
+   "rules_only": {
+    "n": 4089,
+    "positives": 0,
+    "negatives": 4089,
+    "tp": 0,
+    "fp": 22,
+    "fn": 0,
+    "tn": 4067,
+    "precision": 0.0,
+    "recall": null,
+    "f1": null,
+    "fpr": 0.0054
+   },
+   "system_flagged": {
+    "n": 4089,
+    "positives": 0,
+    "negatives": 4089,
+    "tp": 0,
+    "fp": 33,
+    "fn": 0,
+    "tn": 4056,
+    "precision": 0.0,
+    "recall": null,
+    "f1": null,
+    "fpr": 0.0081
+   },
+   "system_phishing": {
+    "n": 4089,
+    "positives": 0,
+    "negatives": 4089,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "tn": 4089,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "fpr": 0.0
+   },
+   "baseline_35_30_35": {
+    "n": 4089,
+    "positives": 0,
+    "negatives": 4089,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "tn": 4089,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "fpr": 0.0
+   }
+  },
+  "text_test_sms": {
+   "text_model": {
+    "n": 424,
+    "positives": 177,
+    "negatives": 247,
+    "tp": 162,
+    "fp": 18,
+    "fn": 15,
+    "tn": 229,
+    "precision": 0.9,
+    "recall": 0.9153,
+    "f1": 0.9076,
+    "fpr": 0.0729
+   },
+   "rules_only": {
+    "n": 424,
+    "positives": 177,
+    "negatives": 247,
+    "tp": 6,
+    "fp": 0,
+    "fn": 171,
+    "tn": 247,
+    "precision": 1.0,
+    "recall": 0.0339,
+    "f1": 0.0656,
+    "fpr": 0.0
+   },
+   "system_flagged": {
+    "n": 424,
+    "positives": 177,
+    "negatives": 247,
+    "tp": 110,
+    "fp": 0,
+    "fn": 67,
+    "tn": 247,
+    "precision": 1.0,
+    "recall": 0.6215,
+    "f1": 0.7666,
+    "fpr": 0.0
+   },
+   "system_phishing": {
+    "n": 424,
+    "positives": 177,
+    "negatives": 247,
+    "tp": 14,
+    "fp": 0,
+    "fn": 163,
+    "tn": 247,
+    "precision": 1.0,
+    "recall": 0.0791,
+    "f1": 0.1466,
+    "fpr": 0.0
+   },
+   "baseline_35_30_35": {
+    "n": 424,
+    "positives": 177,
+    "negatives": 247,
+    "tp": 158,
+    "fp": 10,
+    "fn": 19,
+    "tn": 237,
+    "precision": 0.9405,
+    "recall": 0.8927,
+    "f1": 0.9159,
+    "fpr": 0.0405
+   }
+  },
+  "text_test_email": {
+   "text_model": {
+    "n": 2543,
+    "positives": 936,
+    "negatives": 1607,
+    "tp": 914,
+    "fp": 30,
+    "fn": 22,
+    "tn": 1577,
+    "precision": 0.9682,
+    "recall": 0.9765,
+    "f1": 0.9723,
+    "fpr": 0.0187
+   },
+   "rules_only": {
+    "n": 2543,
+    "positives": 936,
+    "negatives": 1607,
+    "tp": 20,
+    "fp": 18,
+    "fn": 916,
+    "tn": 1589,
+    "precision": 0.5263,
+    "recall": 0.0214,
+    "f1": 0.0411,
+    "fpr": 0.0112
+   },
+   "system_flagged": {
+    "n": 2543,
+    "positives": 936,
+    "negatives": 1607,
+    "tp": 895,
+    "fp": 72,
+    "fn": 41,
+    "tn": 1535,
+    "precision": 0.9255,
+    "recall": 0.9562,
+    "f1": 0.9406,
+    "fpr": 0.0448
+   },
+   "system_phishing": {
+    "n": 2543,
+    "positives": 936,
+    "negatives": 1607,
+    "tp": 47,
+    "fp": 5,
+    "fn": 889,
+    "tn": 1602,
+    "precision": 0.9038,
+    "recall": 0.0502,
+    "f1": 0.0951,
+    "fpr": 0.0031
+   },
+   "baseline_35_30_35": {
+    "n": 2543,
+    "positives": 936,
+    "negatives": 1607,
+    "tp": 905,
+    "fp": 53,
+    "fn": 31,
+    "tn": 1554,
+    "precision": 0.9447,
+    "recall": 0.9669,
+    "f1": 0.9556,
+    "fpr": 0.033
+   }
+  },
+  "uci_sms_ham": {
+   "text_model": {
+    "n": 3630,
+    "positives": 0,
+    "negatives": 3630,
+    "tp": 0,
+    "fp": 345,
+    "fn": 0,
+    "tn": 3285,
+    "precision": 0.0,
+    "recall": null,
+    "f1": null,
+    "fpr": 0.095
+   },
+   "rules_only": {
+    "n": 3630,
+    "positives": 0,
+    "negatives": 3630,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "tn": 3630,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "fpr": 0.0
+   },
+   "system_flagged": {
+    "n": 3630,
+    "positives": 0,
+    "negatives": 3630,
+    "tp": 0,
+    "fp": 1,
+    "fn": 0,
+    "tn": 3629,
+    "precision": 0.0,
+    "recall": null,
+    "f1": null,
+    "fpr": 0.0003
+   },
+   "system_phishing": {
+    "n": 3630,
+    "positives": 0,
+    "negatives": 3630,
+    "tp": 0,
+    "fp": 0,
+    "fn": 0,
+    "tn": 3630,
+    "precision": null,
+    "recall": null,
+    "f1": null,
+    "fpr": 0.0
+   },
+   "baseline_35_30_35": {
+    "n": 3630,
+    "positives": 0,
+    "negatives": 3630,
+    "tp": 0,
+    "fp": 198,
+    "fn": 0,
+    "tn": 3432,
+    "precision": 0.0,
+    "recall": null,
+    "f1": null,
+    "fpr": 0.0545
+   }
+  },
+  "uci_sms_spam": {
+   "text_model": {
+    "n": 151,
+    "positives": 151,
+    "negatives": 0,
+    "tp": 143,
+    "fp": 0,
+    "fn": 8,
+    "tn": 0,
+    "precision": 1.0,
+    "recall": 0.947,
+    "f1": 0.9728,
+    "fpr": null
+   },
+   "rules_only": {
+    "n": 151,
+    "positives": 151,
+    "negatives": 0,
+    "tp": 0,
+    "fp": 0,
+    "fn": 151,
+    "tn": 0,
+    "precision": null,
+    "recall": 0.0,
+    "f1": null,
+    "fpr": null
+   },
+   "system_flagged": {
+    "n": 151,
+    "positives": 151,
+    "negatives": 0,
+    "tp": 114,
+    "fp": 0,
+    "fn": 37,
+    "tn": 0,
+    "precision": 1.0,
+    "recall": 0.755,
+    "f1": 0.8604,
+    "fpr": null
+   },
+   "system_phishing": {
+    "n": 151,
+    "positives": 151,
+    "negatives": 0,
+    "tp": 8,
+    "fp": 0,
+    "fn": 143,
+    "tn": 0,
+    "precision": 1.0,
+    "recall": 0.053,
+    "f1": 0.1006,
+    "fpr": null
+   },
+   "baseline_35_30_35": {
+    "n": 151,
+    "positives": 151,
+    "negatives": 0,
+    "tp": 141,
+    "fp": 0,
+    "fn": 10,
+    "tn": 0,
+    "precision": 1.0,
+    "recall": 0.9338,
+    "f1": 0.9658,
+    "fpr": null
+   }
+  },
+  "curated": {
+   "text_model": {
+    "n": 36,
+    "positives": 16,
+    "negatives": 20,
+    "tp": 16,
+    "fp": 2,
+    "fn": 0,
+    "tn": 18,
+    "precision": 0.8889,
+    "recall": 1.0,
+    "f1": 0.9412,
+    "fpr": 0.1
+   },
+   "rules_only": {
+    "n": 36,
+    "positives": 16,
+    "negatives": 20,
+    "tp": 15,
+    "fp": 0,
+    "fn": 1,
+    "tn": 20,
+    "precision": 1.0,
+    "recall": 0.9375,
+    "f1": 0.9677,
+    "fpr": 0.0
+   },
+   "system_flagged": {
+    "n": 36,
+    "positives": 16,
+    "negatives": 20,
+    "tp": 16,
+    "fp": 0,
+    "fn": 0,
+    "tn": 20,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "fpr": 0.0
+   },
+   "system_phishing": {
+    "n": 36,
+    "positives": 16,
+    "negatives": 20,
+    "tp": 14,
+    "fp": 0,
+    "fn": 2,
+    "tn": 20,
+    "precision": 1.0,
+    "recall": 0.875,
+    "f1": 0.9333,
+    "fpr": 0.0
+   },
+   "baseline_35_30_35": {
+    "n": 36,
+    "positives": 16,
+    "negatives": 20,
+    "tp": 16,
+    "fp": 1,
+    "fn": 0,
+    "tn": 19,
+    "precision": 0.9412,
+    "recall": 1.0,
+    "f1": 0.9697,
+    "fpr": 0.05
+   }
+  }
+ },
+ "curated_by_group": {
+  "bank_alert": {
+   "n": 10,
+   "label": 0,
+   "verdicts": {
+    "safe": 10
+   }
+  },
+  "service": {
+   "n": 7,
+   "label": 0,
+   "verdicts": {
+    "safe": 7
+   }
+  },
+  "personal": {
+   "n": 3,
+   "label": 0,
+   "verdicts": {
+    "safe": 3
+   }
+  },
+  "bank_impersonation": {
+   "n": 5,
+   "label": 1,
+   "verdicts": {
+    "phishing": 5
+   }
+  },
+  "brand_impersonation": {
+   "n": 3,
+   "label": 1,
+   "verdicts": {
+    "phishing": 3
+   }
+  },
+  "delivery_scam": {
+   "n": 1,
+   "label": 1,
+   "verdicts": {
+    "phishing": 1
+   }
+  },
+  "remote_access": {
+   "n": 1,
+   "label": 1,
+   "verdicts": {
+    "phishing": 1
+   }
+  },
+  "lottery": {
+   "n": 2,
+   "label": 1,
+   "verdicts": {
+    "phishing": 2
+   }
+  },
+  "utility_scam": {
+   "n": 1,
+   "label": 1,
+   "verdicts": {
+    "suspicious": 1
+   }
+  },
+  "job_scam": {
+   "n": 1,
+   "label": 1,
+   "verdicts": {
+    "suspicious": 1
+   }
+  },
+  "courier_scam": {
+   "n": 1,
+   "label": 1,
+   "verdicts": {
+    "phishing": 1
+   }
+  },
+  "family_impersonation": {
+   "n": 1,
+   "label": 1,
+   "verdicts": {
+    "phishing": 1
+   }
+  }
+ },
+ "scoring": {
+  "SAFE_BELOW": 30,
+  "PHISHING_FROM": 70,
+  "FAMILY_CAPS": {
+   "content": 40,
+   "link": 25,
+   "sender": 25
+  },
+  "ML_MAX": 45,
+  "ML_CONFIDENT": 0.8,
+  "HEURISTIC_ONLY_CAP": 60,
+  "CONSISTENT_DISCOUNT": 0.5,
+  "URL_FLOOR": 0.7,
+  "TEXT_FLOOR": 0.5
+ },
+ "models": {
+  "url": "url-hgb-1",
+  "text": "text-tfidf-lr-1"
+ },
+ "data": {
+  "manifest_sha256": "b286db515d98cf7bc4742ac33c33d0f34763d0464dcf783e1faeceada214bca1",
+  "files": {
+   "urls.jsonl.gz": "7899d74194e9ad91aaacab5bf4f26d45bf28cff7b45e0092acf7ae13d43b978e",
+   "texts.jsonl.gz": "7349ad1fe077cab1188c721277c3c7b907e6fddcfd2b56382f8d5fb32971e61f",
+   "slices.jsonl.gz": "170a02511bf5cf108b85937e5d9d11f81462f200766e1a18c247444ecdfe14e1"
+  },
+  "url_system_sample": 6000,
+  "seed": 2026
+ },
+ "notes": [
+  "test split = 15% held out by hash of registered domain (URLs) or near-duplicate key (texts); never used for training, calibration or tuning",
+  "openphish and tranco exclude every registered domain seen in train or validation",
+  "uci_sms_spam is spam, not phishing: reported for information, not as a phishing score",
+  "curated is 40 hand-written synthetic messages by the project team: not an accuracy claim",
+  "url_test system metrics use a fixed sample of the URL test split; url_model metrics use all of it"
+ ],
+ "run": {
+  "commit": "278432e",
+  "metrics_sha256": "ffabd7431ec8dd8ba495b106f44ae5d9f11065a7fa3ee595e958eb603df71d5a",
+  "ms_per_item": {
+   "text_test_sms": 3.93,
+   "text_test_email": 12.55,
+   "url_test": 9.53,
+   "openphish": 13.38,
+   "tranco": 9.17,
+   "uci_sms_ham": 1.92,
+   "uci_sms_spam": 4.13,
+   "curated": 5.83
+  },
+  "seconds": 149.2,
+  "generated": "2026-10-31T17:00:44"
+ }
+}

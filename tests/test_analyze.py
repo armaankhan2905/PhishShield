@@ -42,10 +42,10 @@ def test_findings_point_into_the_original_text():
     ids = [f["id"] for f in body["findings"]]
     assert len(ids) == len(set(ids))
     for f in body["findings"]:
-        if f["field"] == "body":
-            assert SBI[f["start"]:f["end"]] == f["text"]
-        else:
-            assert f["start"] is None and f["end"] is None
+        if f["start"] is not None:
+            assert f["field"] == "body" and SBI[f["start"]:f["end"]] == f["text"]
+        else:  # header / link findings, and message-level model findings
+            assert f["end"] is None and (f["field"] != "body" or f["tier"] == "ml")
 
 
 def test_utf16_offsets_survive_emoji():

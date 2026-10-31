@@ -38,6 +38,17 @@ Try the API:
 curl -X POST localhost:8000/api/analyze -H "Content-Type: application/json" -d "{\"text\": \"URGENT: your SBI KYC is pending, verify at http://sbi-kyc.xyz/login\"}"
 ```
 
+Rebuild the models and measurements (optional: the trained models are committed):
+
+```bash
+python -m src.model.fetch_data        # download public datasets to data/raw/
+python -m src.model.prepare           # clean, de-duplicate, split by domain -> data/processed/
+python -m src.model.train_url         # ~35 s
+python -m src.model.train_text        # ~90 s
+python -m src.eval.phish_bench --tune # tune scoring on validation -> data/calibration.json
+python -m src.eval.phish_bench        # held-out results -> data/eval.json
+```
+
 Run the tests:
 
 ```bash
@@ -61,14 +72,14 @@ The request and response format is in [doc/API.md](doc/API.md).
 
 ```text
 src/detection/   engine.py · rules.py · anomaly.py · domains.py · brands.py · fuse.py · main.py (reused regexes)
-src/model/       classifiers + training
-src/eval/        benchmarks
+src/model/       URL + text models: fetch_data · prepare · train_url · train_text · predict
+src/eval/        phish_bench.py (every reported number comes from here)
 src/pipeline/    demo.py (server) · analyze.py · sanitize.py · rag.py · documents.py
 demo/            web app pages
 extension/       Chrome extension (Phase 1 side task)
-data/            datasets (raw/ and processed/ are not in git)
-models/          trained models (not in git)
-doc/             API.md · HANDOFF.md · privacylens/ (old project docs)
+data/            eval.json · calibration.json · curated/ (raw/ and processed/ are rebuilt, not in git)
+models/          url_model.joblib · text_model.joblib (~4 MB, committed)
+doc/             API.md · HANDOFF.md · MODEL_CARD.md · privacylens/ (old project docs)
 tests/           API contract tests
 ```
 
@@ -78,7 +89,7 @@ tests/           API contract tests
 |---|---|---|
 | P1 Foundation | Ryan | Done: API contract v1.1, stub detection live, 13 contract tests passing |
 | P2 Detection engine | Armaan | Done: rules, domain and sender checks, evidence-gated scoring, 81 tests passing |
-| P3 ML models | Govind | Next |
-| P4 Extension live | Atharvva | Pending |
+| P3 ML models | Govind | Done: URL + text models, calibrated scoring, held-out evaluation ([MODEL_CARD](doc/MODEL_CARD.md)) |
+| P4 Extension live | Atharvva | Next |
 | P5 Integrate + deploy | Ryan | Pending |
 | P6 Demo + submit | Atharvva | Pending |

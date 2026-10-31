@@ -141,3 +141,59 @@ These are unit-test fixtures, **not an accuracy measurement**.
 - **Legitimate links on unknown domains.** A brand mention plus a link to a domain not in the registry gives `BRAND_LINK_UNVERIFIED` (heuristic, 15). That turns into a confirmed finding when the message also asks for details or payment, so a real bank SMS using an unlisted shortener can be flagged. Add the shortener to the brand's domains.
 - **No redirect following and no domain-age or reputation lookups** (Could Have, off by design).
 - `src/detection/ensemble.py` is still old PrivacyLens code that nothing imports.
+
+---
+
+## P3 Machine learning → P4 Browser extension
+
+**From:** Govind · **To:** Atharvva
+
+### What works
+- **Two calibrated models** are plugged into the detection engine (details and limits in [MODEL_CARD.md](MODEL_CARD.md)):
+  - URL model: gradient-boosted trees on the URL's spelling only, never fetched;
+  - text model: TF-IDF + logistic regression.
+
+  They're committed in `models/` (~4 MB, scikit-learn 1.6.1), so `python -m src.pipeline.demo` works without training.
+- **Model findings** appear as `URL_MODEL` (per link) and `TEXT_MODEL` (whole message, `start: null`), tier `ml`. They're listed only when the model is confident enough to add points.
+- **`urls[].score`** now carries the URL model's probability.
+- **Coverage:** `url_model` / `text_model` are `ran` when the models are loaded, so `confidence` can now be `high`. If a model is missing it's `unavailable`; if it crashes it's `failed` with `partial: true`.
+- **Startup:** the server loads both models in the background. `GET /api/health` reports `{"models": {"url": "loaded", "text": "loaded"}}`.
+- **Scoring tuned on validation:**
+  - **safe is now < 30** (was < 35);
+  - a confident model adds up to 45 points;
+  - a model alone can reach suspicious but never phishing;
+  - messages with nothing to act on stay safe whatever the models say.
+- **Reproducible evaluation:** `python -m src.eval.phish_bench` gave identical metrics on two runs (`ffabd7431ec8dd8b`). No domain or text overlaps between splits.
+- **Tests:** 100 pass. They run rules-only by default (`tests/conftest.py`); model tests use fake models plus the real ones when present.
+
+### Headline held-out results (system, flagged = suspicious or phishing)
+
+| Set | F1 | False alarms |
+|---|---|---|
+| Emails | 0.941 | 4.5% |
+| SMS | 0.767 | 0% |
+| URLs | 0.749 | 0.8% |
+| OpenPhish (recent) | n/a | recall 0.685 |
+| Tranco top sites | n/a | 0.8% |
+| UCI SMS ham | n/a | 0.03% (1 of 3,630) |
+
+The full table, the comparison with the old 35/30/35 formula and the caveats are in the model card. The Indian set results there are synthetic and not an accuracy claim.
+
+### For the extension (what you need from the API)
+- Call `/api/analyze` from the background service worker (see API.md). Send `email.from` / `reply_to` / `subject` and every link as `{text, href}`; sender and link checks need them.
+- The first call after server start can take ~1–3 s if the models are still loading. Use `/api/health` to show "starting…".
+- Show `TEXT_MODEL` as a message-level reason (no highlight). Highlight everything else with `start_u16` / `end_u16`, or by matching `text` for `field: "link"` findings.
+- Grey "Low risk: limited checks" when `confidence` is `low`. Grey "Couldn't check this message" when the request fails. Never green in either case.
+
+### Acceptance test for your handover to Ryan (revised plan §10)
+- 20 Gmail samples are correct.
+- Stopping the server → grey banner.
+- HTML/script inside an email is shown as text.
+- `google.com/url?q=` links are unwrapped. The server also does this, but the extension should send the real target.
+- No hard-coded results anywhere in the extension.
+
+### Known gaps / notes
+- **English only.** Indian SMS are represented by synthetic training templates only. Collect real, redacted messages to replace them and to measure false alarms properly.
+- **Spam vs phishing.** The text model partly learned "spam". Marketing SMS may score high, but scoring keeps them safe unless they contain a link, number or payment request.
+- **Rebuilding the models** (`fetch_data → prepare → train_url → train_text → phish_bench --tune → phish_bench`) needs ~180 MB of downloads and ~8 minutes. Re-run `--tune` after retraining and copy the chosen values into `fuse.py`.
+- `src/model/train.py`, `train_v2.py`, `accuracy_loop.py` and `corpus/` are the old PrivacyLens PII model. The pipeline/training pages still read them; they're reworked in P5.

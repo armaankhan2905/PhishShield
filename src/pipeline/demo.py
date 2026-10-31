@@ -11,7 +11,7 @@ Endpoints:
   POST /api/rag/ask    -> {"question": "..."} -> sanitized question, retrieved chunks, answer
   POST /api/rag/text   -> {"name", "text"} -> index a message
   DELETE /api/rag/docs[/{id}] -> remove one / all documents
-  GET  /api/health     -> {"ok": true}
+  GET  /api/health     -> {"ok": true, "models": {"url": state, "text": state}}
 
 Run (from repo root):
     python -m src.pipeline.demo            # http://localhost:8000
@@ -22,6 +22,7 @@ from __future__ import annotations
 import logging
 import os
 import sys
+import threading
 from pathlib import Path
 from typing import List, Literal, Optional
 
@@ -31,6 +32,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field
 
+from src.model import predict
 from src.pipeline import insights, rag
 from src.pipeline.analyze import analyze
 from src.pipeline.documents import MAX_BYTES, DocumentError, process_pdf
@@ -113,7 +115,7 @@ def subpage(page: str) -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"ok": True}
+    return {"ok": True, "models": {k: predict.status(k)["state"] for k in ("url", "text")}}
 
 
 @app.get("/api/pipeline")
@@ -131,6 +133,9 @@ def api_pipeline() -> dict:
 @app.on_event("startup")
 def _warm_up() -> None:
     insights.warm_up()
+    # Load the phishing models off the request path so the first analysis isn't ~3 s slower.
+    threading.Thread(target=lambda: [predict.status(k) for k in ("url", "text")],
+                     name="models-warmup", daemon=True).start()
 
 
 @app.post("/api/analyze")

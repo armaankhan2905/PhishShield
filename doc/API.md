@@ -105,7 +105,7 @@ Base URL: `http://localhost:8000` locally (`python -m src.pipeline.demo`).
 |---|---|
 | `analysis_id` | Random id for this result. Feedback refers to it; it is not derived from the message |
 | `score` | 0–100, higher = more likely phishing. Equals the sum of finding `contribution`s (±1 for rounding) |
-| `verdict` | `safe` (< 35), `suspicious` (35–69), `phishing` (≥ 70). **Provisional thresholds**, calibrated in Phase 3 (`src/detection/fuse.py`) |
+| `verdict` | `safe` (< 30), `suspicious` (30–69), `phishing` (≥ 70). The safe line was tuned on validation data in Phase 3 (`src/detection/fuse.py`, record in `data/calibration.json`) |
 | `confidence` | `high`: every detection layer ran. `medium`: a layer is missing but a confirmed finding stands on its own. `low`: anything else |
 | `category` | `impersonation`, `urgency`, `credential_harvesting`, `suspicious_link`, `financial_scam`, or `null` when nothing was found |
 | `kind` | The kind actually used (resolved from `auto`) |
@@ -127,7 +127,7 @@ Base URL: `http://localhost:8000` locally (`python -m src.pipeline.demo`).
 | `id` | `f1`, `f2`, … unique within one response |
 | `label` | Machine name, e.g. `LOOKALIKE_DOMAIN`, `URGENCY`, `URL_MODEL` |
 | `text` | The exact evidence: a substring of `text` when `field` is `body`, otherwise the header value or URL |
-| `start`, `end` | Positions in `text` in Python characters (code points). `null` unless `field` is `body` |
+| `start`, `end` | Positions in `text` in Python characters (code points). `null` for header and link findings, and for message-level model findings (`TEXT_MODEL`, `field: "body"`) |
 | `start_u16`, `end_u16` | The same positions in UTF-16 units. **JavaScript must use these** (`text.slice(start_u16, end_u16)`); they differ when the text has emoji |
 | `reason` | One sentence stating what was detected. No guesses beyond the evidence |
 | `source` | `rule`, `anomaly`, `url-model`, `text-model` |
@@ -140,13 +140,14 @@ Base URL: `http://localhost:8000` locally (`python -m src.pipeline.demo`).
 | `confidence` | Model probability for `ml` findings; `null` for rules |
 | `category` | As above, or `null` |
 
-### Finding labels (Phase 2)
+### Finding labels
 
 | Family | Confirmed | Heuristic |
 |---|---|---|
 | `link` | `HOMOGRAPH_DOMAIN`, `TYPOSQUAT_DOMAIN`, `BRAND_IN_DOMAIN`, `BRAND_IN_SUBDOMAIN`, `MIXED_SCRIPT_DOMAIN`, `USERINFO_IN_URL`, `IP_HOST`, `SCRIPT_URL`, `LINK_TEXT_MISMATCH`, `REQUEST_TO_UNOFFICIAL_LINK` (`BRAND_OTHER_TLD` on a risky ending) | `BRAND_OTHER_TLD`, `IDN_DOMAIN`, `SHORTENER`, `FREE_HOSTING`, `RISKY_TLD`, `DEEP_SUBDOMAINS`, `NONSTANDARD_PORT`, `NO_HTTPS`, `MALFORMED_URL`, `REQUEST_WITH_LINK`, `BRAND_LINK_UNVERIFIED`, `BRAND_SHORT_LINK` |
 | `sender` | `SENDER_BRAND_MISMATCH`, `SENDER_LOOKALIKE`, `DISPLAY_NAME_SPOOF` | `REPLY_TO_MISMATCH` |
 | `content` | none (wording alone is never proof) | `CREDENTIAL_REQUEST`, `ACCOUNT_VERIFICATION`, `LOGIN_PROMPT`, `KYC_PENDING`, `PAYMENT_REQUEST`, `REMOTE_ACCESS`, `THREAT`, `MONEY_BAIT`, `URGENCY`, `CALLBACK_REQUEST`, `CLICK_PROMPT`, `GENERIC_GREETING` |
+| `ml` | none (a model score is never proof on its own) | tier `ml`, not heuristic: `URL_MODEL` (one per link, `confidence` = probability, listed only above the URL model's floor), `TEXT_MODEL` (whole message, `text` = "(whole message)", listed only above the text model's floor) |
 
 ### Rules for every client
 
@@ -168,7 +169,7 @@ allows `chrome-extension://<id>` origins.
 
 | Endpoint | Use |
 |---|---|
-| `GET /api/health` | `{"ok": true}`, for the extension's "server offline" check |
+| `GET /api/health` | `{"ok": true, "models": {"url": "loaded", "text": "loaded"}}`, for the extension's "server offline" check. Model states: `unloaded` (not loaded yet), `loaded`, `missing`, `disabled`, `error` |
 | `POST /api/sanitize` | Redact personal data from text |
 | `POST /api/document` | PDF upload → sanitized pages (may be reused for uploads) |
 | `GET /api/pipeline` | Data for the pipeline / training / evaluation pages (reworked later) |

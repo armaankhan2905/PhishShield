@@ -1,0 +1,40 @@
+{"text": "123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank", "label": 0, "kind": "sms", "group": "bank_alert"}
+{"text": "Rs.500 debited from HDFC Bank A/c **1234 on 12-10-24 to VPA abc@okaxis. Not you? Call 18002586161 -HDFC Bank", "label": 0, "kind": "sms", "group": "bank_alert"}
+{"text": "Dear Customer, your a/c XX4321 is credited with INR 25,000.00 on 03-11-24 by NEFT. Available bal INR 41,210.55 -SBI", "label": 0, "kind": "sms", "group": "bank_alert"}
+{"text": "Your ICICI Bank Credit Card XX9012 has been used for INR 1,499.00 at SWIGGY on 02-Nov-24. Not you? Call 18001080 to block.", "label": 0, "kind": "sms", "group": "bank_alert"}
+{"text": "OTP for login to Axis Mobile is 784512. Never share your OTP with anyone. Axis Bank never asks for OTP.", "label": 0, "kind": "sms", "group": "bank_alert"}
+{"text": "Dear customer, update your KYC within 24 hours using our official website.", "label": 0, "kind": "sms", "group": "bank_alert"}
+{"text": "Your SBI card statement is ready: https://www.sbicard.com/en/personal/statement", "label": 0, "kind": "sms", "group": "bank_alert"}
+{"text": "Pay your bill at https://hdfc.payu.in/pay/123 before the due date", "label": 0, "kind": "sms", "group": "bank_alert"}
+{"text": "EMI of Rs 4,250 for loan a/c XX7788 is due on 05-11-24. Please keep sufficient balance. -Kotak Mahindra Bank", "label": 0, "kind": "sms", "group": "bank_alert"}
+{"text": "UPI transaction of Rs 120 to Ramesh Kirana successful. UPI Ref 431298765412. -PhonePe", "label": 0, "kind": "sms", "group": "bank_alert"}
+{"text": "Your Amazon order has shipped. Track it at https://www.amazon.in/gp/your-orders", "label": 0, "kind": "sms", "group": "service"}
+{"text": "Do not share this code with anyone. 482910 is your Swiggy login code", "label": 0, "kind": "sms", "group": "service"}
+{"text": "Your Flipkart order for Boat Airdopes will be delivered today by 9 PM. Track: https://www.flipkart.com/account/orders", "label": 0, "kind": "sms", "group": "service"}
+{"text": "Your Jio number recharge of Rs 299 is successful. Validity till 30-Nov-24. Check usage on MyJio app.", "label": 0, "kind": "sms", "group": "service"}
+{"text": "PNR 4512367890: Train 12951 coach B2 seat 34 confirmed for 15-Nov. Have a safe journey -IRCTC", "label": 0, "kind": "sms", "group": "service"}
+{"text": "Your ITR for AY 2024-25 has been processed. Refund of Rs 3,410 will be credited to your bank account. -Income Tax Department", "label": 0, "kind": "sms", "group": "service"}
+{"text": "Meeting moved to 4pm, see you there 🙂", "label": 0, "kind": "sms", "group": "personal"}
+{"text": "Mom, reached the hostel. Will call after dinner.", "label": 0, "kind": "sms", "group": "personal"}
+{"text": "Hey, can you send me the notes from today's lecture? Exam is on Monday.", "label": 0, "kind": "sms", "group": "personal"}
+{"text": "Your Zomato order from Biryani House is out for delivery. Delivery partner: Raju.", "label": 0, "kind": "sms", "group": "service"}
+{"text": "URGENT: your SBI KYC is pending, verify at http://sbi-kyc.xyz/login", "label": 1, "kind": "sms", "group": "bank_impersonation"}
+{"text": "Dear user, your PayPal account is restricted. Verify your account at https://paypa1.com/secure", "label": 1, "kind": "sms", "group": "brand_impersonation"}
+{"text": "Your parcel is held. Pay Rs 25 delivery fee: https://indiapost-delivery.top/pay", "label": 1, "kind": "sms", "group": "delivery_scam"}
+{"text": "Your HDFC NetBanking is blocked. Login at https://hdfcbank.com.secure-login.info to unlock", "label": 1, "kind": "sms", "group": "bank_impersonation"}
+{"text": "Amazon: your refund is approved. Claim at http://amaz0n-refund.in/claim", "label": 1, "kind": "sms", "group": "brand_impersonation"}
+{"text": "Your account will be blocked. Update PAN at bit.ly/sbi-pan-upd today", "label": 1, "kind": "sms", "group": "bank_impersonation"}
+{"text": "Install AnyDesk and share the code so our bank team can help with your refund", "label": 1, "kind": "sms", "group": "remote_access"}
+{"text": "Congratulations! You have won Rs 25,00,000 in the KBC lottery. Pay Rs 5,000 processing fee to receive your prize.", "label": 1, "kind": "sms", "group": "lottery"}
+{"text": "Your number won 50 lakh in Jio lucky draw. Send Rs 4999 registration fee to claim the prize amount.", "label": 1, "kind": "sms", "group": "lottery"}
+{"text": "Your electricity connection will be disconnected tonight at 9:30 PM as last month's bill was not updated. Contact officer 9876543210 immediately.", "label": 1, "kind": "sms", "group": "utility_scam"}
+{"text": "Dear customer, your ICICI credit card reward points worth Rs 7,850 expire today. Redeem now: http://icici-rewardz.co/redeem", "label": 1, "kind": "sms", "group": "bank_impersonation"}
+{"text": "Income Tax refund of Rs 15,490 approved. Submit your bank account details at http://incometax-refund.online to receive it.", "label": 1, "kind": "sms", "group": "govt_impersonation"}
+{"text": "Part-time job! Earn Rs 3000/day liking YouTube videos. WhatsApp 9123456780 to start today.", "label": 1, "kind": "sms", "group": "job_scam"}
+{"text": "Your FedEx parcel contains illegal items. A case is registered. Call 9988776655 immediately to avoid arrest.", "label": 1, "kind": "sms", "group": "courier_scam"}
+{"text": "Dear user, your Paytm KYC has expired and your wallet will be blocked. Call 9876501234 to complete KYC.", "label": 1, "kind": "sms", "group": "wallet_scam"}
+{"text": "Netflix: your payment failed and your membership is on hold. Update your card details at https://netflix-billing.com/update", "label": 1, "kind": "sms", "group": "brand_impersonation"}
+{"text": "SBI: Your YONO account is suspended. Click here to reactivate: http://yono-sbi.help/reactivate", "label": 1, "kind": "sms", "group": "bank_impersonation"}
+{"text": "Your Aadhaar is linked to illegal activity. Share your Aadhaar number and OTP with our officer to avoid legal action.", "label": 1, "kind": "sms", "group": "govt_impersonation"}
+{"text": "You have a pending traffic challan of Rs 500. Pay now at https://echallan-parivahan.top to avoid penalty.", "label": 1, "kind": "sms", "group": "govt_impersonation"}
+{"text": "Hi Mum, I lost my phone, this is my new number. Can you send Rs 8,000 urgently for my rent? Will return tomorrow.", "label": 1, "kind": "sms", "group": "family_impersonation"}

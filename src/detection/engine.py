@@ -4,8 +4,8 @@ Owner: Armaan. Called by src/pipeline/analyze.py, which turns the result into
 the API response. Each layer is isolated: if one raises, it is reported as
 "failed" in coverage and the others still run.
 
-Phase 3 (Govind): the URL and text models plug in here as extra layers that
-return tier "ml" findings and set coverage["url_model"/"text_model"] = "ran".
+The URL and text models (src/model/predict.py) run here as extra layers that
+return tier "ml" findings; a model that is not installed is "unavailable".
 """
 from __future__ import annotations
 
@@ -14,10 +14,11 @@ import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from . import anomaly, brands as B, domains as D, rules
+from . import anomaly, brands as B, domains as D, fuse as FU, rules
 from .fuse import FAILED, RAN, UNAVAILABLE, Context
 from .main import PHONE_RX
 from .rules import Finding
+from src.model import predict
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,53 @@ def _layer(name: str, coverage: Dict[str, str], fn, *args) -> list:
         logger.exception("%s layer failed", name)
         coverage[name] = FAILED
         return []
+
+
+MIN_TEXT_WORDS = 3
+
+# Other ways a message asks you to act: "txt MUSIC to 87121" short codes, and numbers
+# written with spaces ("call 0844 861 85 85") that PHONE_RX doesn't match.
+_CONTACT_RX = re.compile(
+    r"\b(?:txt|text|sms|reply|send)\b(?:\W+\w+){0,3}?\W+to\s+\d{4,6}\b|"
+    r"\b(?:call|ring|dial|whatsapp|contact|phone)\b[^.\n]{0,25}?\+?\d[\d\s-]{8,}\d",
+    re.I)
+_SEND_RX = re.compile(r"(?:share|send|tell|give|forward|reply|read\s+out)\b", re.I)
+
+
+def _ml_severity(p: float) -> str:
+    return "high" if p >= 0.9 else "medium" if p >= 0.7 else "low"
+
+
+def _model_layer(name: str, coverage: Dict[str, str], fn, *args):
+    """Like _layer, but a model that isn't installed is "unavailable", not "failed"."""
+    try:
+        out = fn(*args)
+    except Exception:  # noqa: BLE001
+        logger.exception("%s failed", name)
+        coverage[name] = FAILED
+        return None
+    coverage[name] = UNAVAILABLE if out is None else RAN
+    return out
+
+
+def _url_model(spots) -> Optional[Dict[str, float]]:
+    if not predict.available("url"):
+        return None
+    urls = [u for u, *_ in spots]
+    return dict(zip(urls, predict.url_proba(urls) or []))
+
+
+def _text_model(text: str, kind: str) -> Optional[List[Finding]]:
+    if not predict.available("text"):
+        return None
+    if kind == "url" or len(text.split()) < MIN_TEXT_WORDS:
+        return []  # nothing for a language model to read; the layer still counts as checked
+    p = predict.text_proba(text)
+    if p is None or p < FU.TEXT_FLOOR:  # below the floor it adds no points, so it is not listed as evidence
+        return []
+    return [Finding("TEXT_MODEL", "(whole message)", None, None,
+                    f"The text model rates the wording {p:.0%} likely to be phishing", "text-model", 0, None,
+                    "ml", "ml", "body", _ml_severity(p), round(p, 4))]
 
 
 def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls: int = 50) -> Detection:
@@ -81,17 +129,32 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
     if coverage["rules"] == RAN:
         findings += _layer("rules", coverage, rules.correlate, findings, claimed, spots)
 
+    url_probs = _model_layer("url_model", coverage, _url_model, spots)
+    findings += [f for f in _model_layer("text_model", coverage, _text_model, text, kind) or []]
+    for u, s, e, fld in spots:
+        p = (url_probs or {}).get(u)
+        if p is not None and p >= FU.URL_FLOOR:
+            findings.append(Finding("URL_MODEL", u, s, e, f"The URL model rates this link {p:.0%} likely to be phishing",
+                                    "url-model", 0, "suspicious_link", "ml", "ml", fld, _ml_severity(p), round(p, 4)))
+
     infos = [D.parse_url(u) for u, *_ in spots]
     sender = D.parse_host(email["from"].rsplit("@", 1)[-1].strip(" >").lower()) if email and "@" in (email.get("from") or "") else None
     names = {b.name for b in claimed}
-    consistent = bool(names) and all(B.official_for(i) & names for i in infos) and \
+    # Consistency needs something to check: at least one link or a sender, all belonging to the named brand.
+    consistent = bool(names) and bool(infos or sender) and all(B.official_for(i) & names for i in infos) and \
         (sender is None or bool(B.official_for(sender) & names))
-    actionable = bool(spots) or bool(PHONE_RX.search(text)) or \
-        any(f.label in ("REMOTE_ACCESS", "CALLBACK_REQUEST") for f in findings) or bool(email and email.get("reply_to"))
+    # A payment request is something to act on even without a link: the scammer follows up with how to pay.
+    # An email can always be answered, and "reply with your details" scams need nothing else.
+    # Asking you to send or share an OTP / PIN with someone is itself the thing to act on (you reply);
+    # "update your KYC on our website" is not.
+    actionable = kind == "email" or bool(spots) or bool(PHONE_RX.search(text)) or bool(_CONTACT_RX.search(text)) or \
+        any(f.label in ("REMOTE_ACCESS", "CALLBACK_REQUEST", "PAYMENT_REQUEST") for f in findings) or \
+        any(f.label == "CREDENTIAL_REQUEST" and _SEND_RX.match(f.text) for f in findings)
 
     flags_by_url: Dict[str, List[str]] = {}
     for f in findings:
         if f.family == "link" and f.source == "rule":
             flags_by_url.setdefault(f.text, []).append(f.label.lower())
-    url_rows = [{"url": u, "score": None, "flags": flags_by_url.get(u, [])} for u, *_ in spots]
+    url_rows = [{"url": u, "score": None if url_probs is None else round(url_probs[u], 4), "flags": flags_by_url.get(u, [])}
+                for u, *_ in spots]
     return Detection(findings, url_rows, Context(actionable, consistent), coverage, [b.name for b in claimed])

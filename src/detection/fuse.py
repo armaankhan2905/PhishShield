@@ -5,17 +5,18 @@ to a finding ("contribution"), and every number below is a named constant.
 
   1. Points. Confirmed findings count in full. Heuristics count once per label
      and are capped per family, so repeating "urgent" five times adds nothing.
-     Model findings add 0 below p=0.5, rising to ML_MAX at p=1.
+     Model findings add 0 below their floor (URL_FLOOR / TEXT_FLOOR), rising to ML_MAX at p=1.
   2. Gates. "phishing" needs a confirmed finding, or a confident model backed by
      a heuristic from another family. Heuristics alone stop at HEURISTIC_ONLY_CAP,
-     and at NO_ACTION_CAP when the message gives you nothing to act on (no link,
+     and just under SAFE_BELOW when the message gives you nothing to act on (no link,
      phone number or app to install).
   3. Consistency. When every link and the sender belong to the brand the
      message names, heuristic points are halved. Confirmed and model evidence
      is never discounted, and nothing is ever declared safe by domain alone.
   4. Confidence. Missing layers lower confidence; they never count as safety.
 
-All values are PROVISIONAL until calibrated on validation data in Phase 3.
+Model-related values and SAFE_BELOW are tuned on validation data (see below); the
+heuristic weights and caps are hand-set and still provisional.
 """
 from __future__ import annotations
 
@@ -24,15 +25,19 @@ from typing import Dict, List, Optional
 
 from .rules import Finding
 
-SAFE_BELOW = 35      # score < 35        -> safe
+# SAFE_BELOW, ML_MAX, URL_FLOOR and TEXT_FLOOR were chosen on the validation split by
+# `python -m src.eval.phish_bench --tune` (record: data/calibration.json). Re-run it after retraining.
+SAFE_BELOW = 30      # score < 30        -> safe
 PHISHING_FROM = 70   # score >= 70       -> phishing; in between -> suspicious
 
 FAMILY_CAPS = {"content": 40, "link": 25, "sender": 25}  # heuristic points per family
-ML_MAX = 25                    # points per model at p = 1.0
+ML_MAX = 45                    # points per model at p = 1.0
+URL_FLOOR = 0.7                # URL model adds points only above this calibrated probability
+TEXT_FLOOR = 0.5               # same for the text model
 ML_CONFIDENT = 0.8             # model probability that can stand in for a confirmed finding
 HEURISTIC_ONLY_CAP = 60
-NO_ACTION_CAP = 30
 CONSISTENT_DISCOUNT = 0.5
+# Messages with nothing to act on (no link, number, app or payment) always stay just under SAFE_BELOW.
 
 CATEGORIES = ("impersonation", "urgency", "credential_harvesting", "suspicious_link", "financial_scam")
 
@@ -73,8 +78,12 @@ def confidence_for(findings: List[Finding], coverage: Dict[str, str]) -> str:
     return "low"
 
 
-def _ml_points(p: Optional[float]) -> float:
-    return 0.0 if p is None or p < 0.5 else ML_MAX * (p - 0.5) / 0.5
+def ml_floor(source: str) -> float:
+    return URL_FLOOR if source == "url-model" else TEXT_FLOOR
+
+
+def _ml_points(p: Optional[float], floor: float) -> float:
+    return 0.0 if p is None or p < floor else ML_MAX * (p - floor) / max(1e-9, 1 - floor)
 
 
 def fuse(findings: List[Finding], coverage: Dict[str, str], context: Optional[Context] = None) -> FusionResult:
@@ -108,7 +117,7 @@ def fuse(findings: List[Finding], coverage: Dict[str, str], context: Optional[Co
         idx = [i for i, f in enumerate(findings) if f.tier == "ml" and f.source == source]
         if idx:
             top = max(idx, key=lambda i: findings[i].confidence or 0)
-            raw[top] = _ml_points(findings[top].confidence)
+            raw[top] = _ml_points(findings[top].confidence, ml_floor(source))
 
     total = sum(raw.values())
     confirmed = any(findings[i].tier == "confirmed" and pts > 0 for i, pts in raw.items())
@@ -118,14 +127,14 @@ def fuse(findings: List[Finding], coverage: Dict[str, str], context: Optional[Co
 
     cap, gate = 100.0, None
     if not confirmed:
-        if ml_conf and heur_fams:
+        if not ctx.actionable:
+            cap, gate = SAFE_BELOW - 1, "nothing_to_act_on"   # applies whatever the models say
+        elif ml_conf and heur_fams:
             cap, gate = 100.0, None
         elif any_ml:
             cap, gate = PHISHING_FROM - 1, "no_corroboration"
-        elif ctx.actionable:
-            cap, gate = HEURISTIC_ONLY_CAP, "heuristics_only"
         else:
-            cap, gate = NO_ACTION_CAP, "nothing_to_act_on"
+            cap, gate = HEURISTIC_ONLY_CAP, "heuristics_only"
     score = round(min(total, cap, 100.0))
     if total > score > 0:
         factor = score / total
