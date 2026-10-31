@@ -2,7 +2,7 @@
 
 **Presenter:** Atharvva (lead) · **Driver at the keyboard:** Ryan · Armaan and Govind take judge questions on detection and models.
 
-Every number below is from `data/eval.json` (`metrics_sha256 e3cf332d…`) and [MODEL_CARD.md](MODEL_CARD.md). Don't round them differently on stage.
+Every number below is from `data/eval.json` (`metrics_sha256 ca1d8651…`) and [MODEL_CARD.md](MODEL_CARD.md). Don't round them differently on stage.
 
 ## Before you go on (10 minutes before)
 

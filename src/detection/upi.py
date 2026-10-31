@@ -30,8 +30,18 @@ CONSUMER_HANDLES = {
 _VPA = re.compile(r"\b([a-z0-9][a-z0-9._-]{1,63})@([a-z][a-z0-9]{1,30})\b(?!\.[a-z])", re.I)
 _SERVICE = re.compile(r"refund|kyc|support|care|help|reward|cashback|prize|verify|claim|customer|service|helpdesk|"
                       r"offer|lottery|gift|bonus|desk|official|team", re.I)
-_RECEIVE = re.compile(r"\b(?:receive|get|gets|credited|credit|refund|refunded|cash\s*back|cashback|prize|reward|won|"
-                      r"winnings?|claim|lottery|bonus|payout|salary|deposit)\b", re.I)
+# Words that promise you money. Strong ones mean the QR is supposed to pay *you*. Weak ones also appear
+# on ordinary shop QR codes ("pay with any UPI app, get 5% cashback"), so they only count when the
+# message doesn't also tell you to pay.
+_RECEIVE_STRONG = re.compile(r"\b(?:receive|received|credited|refund|refunded|prize|won|winnings?|lottery|payout|"
+                             r"salary|claim\s+(?:your|the)\s+(?:money|amount|refund|prize))\b", re.I)
+_RECEIVE_WEAK = re.compile(r"\b(?:get|gets|cash\s*back|cashback|reward|bonus|deposit)\b", re.I)
+_PAY_INTENT = re.compile(r"\b(?:scan\s+(?:and|&|to)\s+pay|pay\s+(?:with|using|via|by|your\s+bill|the\s+bill|now|here)|"
+                         r"\d+\s*%\s*(?:cash\s*back|off|discount)|cash\s*back\s+on\s+(?:your\s+)?(?:first\s+)?(?:payment|order|bill))\b", re.I)
+
+
+def _promises_money(text: str) -> bool:
+    return bool(_RECEIVE_STRONG.search(text)) or (bool(_RECEIVE_WEAK.search(text)) and not _PAY_INTENT.search(text))
 SCAN_TO_RECEIVE = re.compile(
     r"\b(?:scan(?:ning)?\s+(?:the\s+|this\s+|our\s+|below\s+|attached\s+)?(?:qr|code|barcode)|"
     r"(?:approve|accept)\s+(?:the\s+|this\s+|my\s+|our\s+)?(?:upi\s+)?(?:collect|payment|money)\s*request|"
@@ -90,7 +100,7 @@ def qr_findings(payloads: List[str], text: str) -> List[Finding]:
         if not upi:
             continue
         label = f"UPI QR: pay {upi['pn'] or upi['pa']}" + (f" Rs {upi['am']}" if upi["am"] else "")
-        if _RECEIVE.search(text) or _RECEIVE.search(upi["tn"]):
+        if _promises_money(text) or _promises_money(upi["tn"]):
             out.append(_f("QR_PAY_TO_RECEIVE", p, None, None, "link",
                           "The message promises you money, but its QR code is a UPI payment code: scanning it sends "
                           f"money to {upi['pa'] or 'someone'}" + (f" (Rs {upi['am']})" if upi["am"] else "")

@@ -21,6 +21,17 @@
       Gmail's redirect wrappers are removed. For saved emails, the sender, reply-to and subject are read, and HTML is turned into
       plain text without running anything in it. Screenshots are read on this computer: the text with a local OCR model, and any
       QR code is decoded to see what it really does. Links are only read, never opened.</p></div></li>
+    <li><div><h3>Undo filter-dodging tricks</h3><p>Scammers disguise messages so keyword filters miss them: invisible characters
+      inside words (<code>re&#8203;fund</code>), letters from other alphabets that look English (a Cyrillic "а" in
+      <code>аccount</code>), styled Unicode letters (<code>𝐒𝐁𝐈</code>), numbers for letters (<code>v3rify</code>) and disguised
+      links (<code>hxxp://sbi-kyc[.]xyz</code>). These are undone before any check runs, and using them counts as a warning sign.
+      Look-alike letters inside a <em>link</em> are kept as they are, because there they prove impersonation. The Results page
+      shows how many disguised scams are caught with and without this step.</p></div></li>
+    <li><div><h3>Know India's scam playbook</h3><p>Rules cover the scams Indians actually receive: "digital arrest" (fake CBI,
+      police or customs cases), part-time "like videos and earn" task jobs, parcels held at customs, electricity disconnection
+      threats, instant-loan processing fees, KYC and UPI tricks, and the same requests written in Hinglish
+      (<code>OTP bhejo</code>, <code>account band ho jayega</code>) and Hindi (<code>खाता बंद हो जाएगा</code>). "Never share your
+      OTP" stays a warning in every language.</p></div></li>
     <li><div><h3>Check UPI payments</h3><p>A UPI QR code, a "collect request" and your UPI PIN can only ever <em>send</em> money. A message
       that says to scan, approve or enter your PIN to <em>receive</em> a refund, prize or cashback is flagged, and so is a QR code whose
       payee name claims a bank while the money goes to a personal UPI ID, or a UPI ID like <code>sbi.kyc.support@okaxis</code>.</p></div></li>

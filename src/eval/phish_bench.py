@@ -28,6 +28,7 @@ import hashlib
 import itertools
 import json
 import random
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -171,6 +172,86 @@ def tune() -> dict:
     return record
 
 
+# --- evasion: the same phishing messages, disguised the way scammers dodge filters ---------
+
+EVASION_SAMPLE = 300   # test-split phishing SMS used (plus every curated phishing message)
+_WORD = re.compile(r"[A-Za-z]{4,}")
+_CYR = {"a": "а", "e": "е", "o": "о", "c": "с", "p": "р", "i": "і", "x": "х", "y": "у"}
+_LEET_OUT = {"o": "0", "e": "3", "i": "1", "a": "4"}
+
+
+def _bold(ch: str) -> str:
+    if "A" <= ch <= "Z":
+        return chr(0x1D400 + ord(ch) - ord("A"))
+    if "a" <= ch <= "z":
+        return chr(0x1D41A + ord(ch) - ord("a"))
+    return ch
+
+
+def _outside_links(text: str, fn) -> str:
+    """Apply fn to every 4+ letter word that isn't part of a link."""
+    from src.detection.domains import find_urls
+    spans = [(s, e) for _, s, e in find_urls(text)]
+    return _WORD.sub(lambda m: m.group(0) if any(s <= m.start() < e for s, e in spans) else fn(m.group(0)), text)
+
+
+def disguise(text: str, trick: str) -> str:
+    """One deterministic disguise of a message. Links are left working except by the link trick."""
+    if trick == "invisible":
+        return _outside_links(text, lambda w: w[:len(w) // 2] + "​" + w[len(w) // 2:])
+    if trick == "lookalike_letters":
+        return _outside_links(text, lambda w: next((w[:i] + _CYR[c] + w[i + 1:] for i, c in enumerate(w) if c in _CYR), w))
+    if trick == "styled":
+        return _outside_links(text, lambda w: "".join(_bold(c) for c in w))
+    if trick == "digit_swap":
+        return _outside_links(text, lambda w: w[0] + "".join(_LEET_OUT.get(c, c) for c in w[1:-1]) + w[-1])
+    if trick == "disguised_link":
+        from src.detection.domains import find_urls
+        out = text
+        for url, s, e in sorted(find_urls(text), key=lambda t: -t[1]):
+            d = re.sub(r"^http", "hxxp", url)
+            host_end = d.find("/", d.find("//") + 2 if "//" in d else 0)
+            host = d if host_end < 0 else d[:host_end]
+            d = host.replace(".", "[.]") + ("" if host_end < 0 else d[host_end:])
+            out = out[:s] + d + out[e:]
+        return out
+    raise ValueError(trick)
+
+
+def evasion_test(items: List[dict]) -> dict:
+    """Recall on disguised phishing, with and without trick-undoing (src/detection/normalize.py)."""
+    from src.detection import normalize
+    phish = [it for it in items if it["label"] == 1 and it.get("slice") == "curated"]
+    sms = sorted((it for it in items if it["label"] == 1 and it.get("slice") != "curated"), key=lambda it: it["text"])
+    phish += random.Random(SEED).sample(sms, min(EVASION_SAMPLE, len(sms)))
+    tricks = ["invisible", "lookalike_letters", "styled", "digit_swap", "disguised_link"]
+    by_trick, all_with, all_without, all_plain = {}, [], [], []
+    real_fold = normalize.fold
+    plain = dict(zip((it["text"] for it in phish), (int(s >= FU.SAFE_BELOW) for s in system_scores(collect(phish)))))
+    for trick in tricks:
+        pairs = [(dict(it, text=disguise(it["text"], trick)), it) for it in phish]
+        pairs = [(r, it) for r, it in pairs if r["text"] != it["text"]]  # e.g. no link to disguise
+        rows = [r for r, _ in pairs]
+        undisguised = [plain[it["text"]] for _, it in pairs]
+        with_s = system_scores(collect(rows))
+        normalize.fold = lambda t: normalize.Folded(t, t, list(range(len(t) + 1)), {})  # trick-undoing off
+        try:
+            without_s = system_scores(collect(rows))
+        finally:
+            normalize.fold = real_fold
+        y = [1] * len(rows)
+        w = [int(s >= FU.SAFE_BELOW) for s in with_s]
+        wo = [int(s >= FU.SAFE_BELOW) for s in without_s]
+        by_trick[trick] = {"n": len(rows), "undisguised": confusion(y, undisguised)["recall"],
+                           "with": confusion(y, w)["recall"], "without": confusion(y, wo)["recall"]}
+        all_with += w
+        all_without += wo
+        all_plain += undisguised
+    y = [1] * len(all_with)
+    return {"n": len(all_with), "messages": len(phish), "undisguised": confusion(y, all_plain),
+            "with": confusion(y, all_with), "without": confusion(y, all_without), "by_trick": by_trick}
+
+
 # --- evaluation -----------------------------------------------------------------------
 
 def evaluate() -> dict:
@@ -231,6 +312,10 @@ def evaluate() -> dict:
                 g["verdicts"][v] = g["verdicts"].get(v, 0) + 1
         print(f"{name:16s} n={len(items):5d}  flagged F1={m['system_flagged']['f1']}  FPR={m['system_flagged']['fpr']}", flush=True)
 
+    evasion = evasion_test(system_sets["curated"] + system_sets["text_test_sms"])
+    print(f"evasion          n={evasion['n']}  caught with folding={evasion['with']['recall']}  "
+          f"without={evasion['without']['recall']}", flush=True)
+
     manifest = json.loads((PROC / "MANIFEST.json").read_text(encoding="utf-8"))
     try:
         commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
@@ -239,6 +324,7 @@ def evaluate() -> dict:
     result = {
         "metrics": metrics,
         "curated_by_group": curated_groups,
+        "evasion": evasion,
         "scoring": {k: getattr(FU, k) for k in ("SAFE_BELOW", "PHISHING_FROM", "FAMILY_CAPS", "ML_MAX", "ML_CONFIDENT",
                                                  "HEURISTIC_ONLY_CAP", "CONSISTENT_DISCOUNT", "URL_FLOOR", "TEXT_FLOOR")},
         "models": {k: predict.status(k).get("version") for k in ("url", "text")},
@@ -250,6 +336,8 @@ def evaluate() -> dict:
             "uci_sms_spam is spam, not phishing: reported for information, not as a phishing score",
             "curated is 40 hand-written synthetic messages by the project team: not an accuracy claim",
             "url_test system metrics use a fixed sample of the URL test split; url_model metrics use all of it",
+            "evasion: every curated phishing message plus test-split phishing SMS (up to 300), each rewritten with "
+            "one filter-dodging trick at a time; 'without' runs the same engine with trick-undoing switched off",
         ],
     }
     det_hash = hashlib.sha256(json.dumps(result, sort_keys=True).encode()).hexdigest()

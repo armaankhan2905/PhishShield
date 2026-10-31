@@ -40,7 +40,7 @@ See [doc/SUBMISSION.md](doc/SUBMISSION.md):
 5. Do two rehearsals ([doc/DEMO_SCRIPT.md](doc/DEMO_SCRIPT.md)).
 6. Submit on the portal.
 
-Latest evaluation: `metrics_sha256 = e3cf332db2b04269` (two identical runs).
+Latest evaluation: `metrics_sha256 = ca1d8651eeb44b87` (two identical runs).
 
 ## Commands
 

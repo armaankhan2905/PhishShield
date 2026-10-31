@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield stopped this site</title>
+<link rel="icon" href="../icons/icon32.png">
+<link rel="stylesheet" href="stop.css">
+</head>
+<body>
+  <main class="card" id="card" role="alertdialog" aria-labelledby="title" aria-describedby="why">
+    <div class="brand"><img src="../icons/icon32.png" alt="" width="18" height="18"> PhishShield</div>
+    <h1 id="title">Stop. This site looks risky.</h1>
+    <p id="why">PhishShield checked this address before opening it. Here's why it was stopped:</p>
+    <ul id="reasons"></ul>
+    <div class="dest"><b>The address</b><span id="url"></span></div>
+    <div class="row">
+      <button id="back" type="button" class="back">Go back (recommended)</button>
+      <button id="go" type="button" class="go">Open anyway</button>
+    </div>
+    <p class="note">Never enter passwords, OTPs, card details or your UPI PIN on a site you reached this way.
+      If you've already shared details or paid, call <b>1930</b> (National Cyber Crime Helpline) and your bank now.</p>
+  </main>
+  <script src="stop.js"></script>
+</body>
+</html>

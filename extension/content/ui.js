@@ -252,6 +252,7 @@
       if (!open) return;
       a.dataset.phishshieldAllowed = "1";  // the user decided; don't ask again for this link on this page
       if (root.__phishshieldTestPage) return;  // extension/dev test pages never follow their sample links
+      await PS.send({ type: "allow", url: a.href });  // so the address-bar check doesn't stop it a second time
       if (newTab) window.open(a.href, "_blank", "noopener");
       else location.assign(a.href);
     };

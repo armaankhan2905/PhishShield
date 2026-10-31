@@ -59,7 +59,7 @@ model as evidence of safety.
 
 Positive = **flagged** (suspicious or phishing, score ≥ 30). The **system** column
 is the full product: rules + both models + scoring. Run twice with identical
-results (`metrics_sha256 = e3cf332db2b04269`).
+results (`metrics_sha256 = ca1d8651eeb44b87`).
 
 | Test set | n | System P | System R | System F1 | System FPR | Model alone F1 / FPR | Old 35/30/35 formula F1 / FPR |
 |---|---|---|---|---|---|---|---|
@@ -79,6 +79,7 @@ results (`metrics_sha256 = e3cf332db2b04269`).
   - That's the trade-off the revised plan asked for. Lowering `SAFE_BELOW` or raising `ML_MAX` moves along it.
 - **Low "phishing"-level recall is expected.** A **phishing** verdict needs proven technical evidence (look-alike domain, sender mismatch, link-text mismatch, a request for details sent to a domain the brand doesn't own). Dataset rows rarely carry it: there are no headers, and many links were stripped. Phishing-level precision is 0.90–1.00 on every set.
 - **Rules alone catch little on these datasets** (F1 ≤ 0.11). The datasets lack the sender and link context the rules look at. The rules matter most on real messages; on the hand-written set they alone reach F1 0.97.
+- **Disguised messages (`evasion` in eval.json).** 193 phishing messages (every hand-written one plus every test-split phishing SMS), each rewritten with one filter-dodging trick at a time (818 disguised messages). Undisguised, 67.0% are caught; disguised, 45.5% without trick-undoing and 63.1% with it. Invisible characters, styled letters and disguised links are fully recovered (disguised links: 25% → 96%); Cyrillic look-alikes nearly (62% vs 65%); digit swaps partly (52% vs 65%), because they are only undone in scam vocabulary to avoid false alarms. Synthetic disguises: read as robustness, not as an accuracy claim.
 
 **Validation (chosen scoring setting, `data/calibration.json`):**
 - Texts: precision 0.946, recall 0.884, false alarms 3.2%.

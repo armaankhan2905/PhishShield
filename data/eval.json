@@ -286,13 +286,13 @@
     "n": 2543,
     "positives": 936,
     "negatives": 1607,
-    "tp": 20,
+    "tp": 18,
     "fp": 18,
-    "fn": 916,
+    "fn": 918,
     "tn": 1589,
-    "precision": 0.5263,
-    "recall": 0.0214,
-    "f1": 0.0411,
+    "precision": 0.5,
+    "recall": 0.0192,
+    "f1": 0.037,
     "fpr": 0.0112
    },
    "system_flagged": {
@@ -312,26 +312,26 @@
     "n": 2543,
     "positives": 936,
     "negatives": 1607,
-    "tp": 47,
+    "tp": 44,
     "fp": 5,
-    "fn": 889,
+    "fn": 892,
     "tn": 1602,
-    "precision": 0.9038,
-    "recall": 0.0502,
-    "f1": 0.0951,
+    "precision": 0.898,
+    "recall": 0.047,
+    "f1": 0.0893,
     "fpr": 0.0031
    },
    "baseline_35_30_35": {
     "n": 2543,
     "positives": 936,
     "negatives": 1607,
-    "tp": 905,
+    "tp": 906,
     "fp": 53,
-    "fn": 31,
+    "fn": 30,
     "tn": 1554,
     "precision": 0.9447,
-    "recall": 0.9669,
-    "f1": 0.9556,
+    "recall": 0.9679,
+    "f1": 0.9562,
     "fpr": 0.033
    }
   },
@@ -623,6 +623,81 @@
    }
   }
  },
+ "evasion": {
+  "n": 818,
+  "messages": 193,
+  "undisguised": {
+   "n": 818,
+   "positives": 818,
+   "negatives": 0,
+   "tp": 548,
+   "fp": 0,
+   "fn": 270,
+   "tn": 0,
+   "precision": 1.0,
+   "recall": 0.6699,
+   "f1": 0.8023,
+   "fpr": null
+  },
+  "with": {
+   "n": 818,
+   "positives": 818,
+   "negatives": 0,
+   "tp": 516,
+   "fp": 0,
+   "fn": 302,
+   "tn": 0,
+   "precision": 1.0,
+   "recall": 0.6308,
+   "f1": 0.7736,
+   "fpr": null
+  },
+  "without": {
+   "n": 818,
+   "positives": 818,
+   "negatives": 0,
+   "tp": 372,
+   "fp": 0,
+   "fn": 446,
+   "tn": 0,
+   "precision": 1.0,
+   "recall": 0.4548,
+   "f1": 0.6252,
+   "fpr": null
+  },
+  "by_trick": {
+   "invisible": {
+    "n": 193,
+    "undisguised": 0.6528,
+    "with": 0.6528,
+    "without": 0.4663
+   },
+   "lookalike_letters": {
+    "n": 192,
+    "undisguised": 0.651,
+    "with": 0.6198,
+    "without": 0.5208
+   },
+   "styled": {
+    "n": 193,
+    "undisguised": 0.6528,
+    "with": 0.6528,
+    "without": 0.399
+   },
+   "digit_swap": {
+    "n": 192,
+    "undisguised": 0.651,
+    "with": 0.5156,
+    "without": 0.4844
+   },
+   "disguised_link": {
+    "n": 48,
+    "undisguised": 0.9583,
+    "with": 0.9583,
+    "without": 0.25
+   }
+  }
+ },
  "scoring": {
   "SAFE_BELOW": 30,
   "PHISHING_FROM": 70,
@@ -657,22 +732,23 @@
   "openphish and tranco exclude every registered domain seen in train or validation",
   "uci_sms_spam is spam, not phishing: reported for information, not as a phishing score",
   "curated is 40 hand-written synthetic messages by the project team: not an accuracy claim",
-  "url_test system metrics use a fixed sample of the URL test split; url_model metrics use all of it"
+  "url_test system metrics use a fixed sample of the URL test split; url_model metrics use all of it",
+  "evasion: every curated phishing message plus test-split phishing SMS (up to 300), each rewritten with one filter-dodging trick at a time; 'without' runs the same engine with trick-undoing switched off"
  ],
  "run": {
-  "commit": "a46581f",
-  "metrics_sha256": "e3cf332db2b04269131555dccb22c4457ce9684d75721e5f46eb165b1d5de192",
+  "commit": "1bdd18b",
+  "metrics_sha256": "ca1d8651eeb44b877fc79464c9f5a6bd164679a7f5a288300006b7a731a0d6cd",
   "ms_per_item": {
-   "text_test_sms": 2.97,
-   "text_test_email": 9.37,
-   "url_test": 11.55,
-   "openphish": 17.84,
-   "tranco": 11.24,
-   "uci_sms_ham": 2.38,
-   "uci_sms_spam": 5.89,
-   "curated": 7.29
+   "text_test_sms": 2.77,
+   "text_test_email": 12.88,
+   "url_test": 7.48,
+   "openphish": 10.42,
+   "tranco": 6.98,
+   "uci_sms_ham": 1.65,
+   "uci_sms_spam": 3.28,
+   "curated": 4.39
   },
-  "seconds": 162.0,
-  "generated": "2026-11-01T03:21:44"
+  "seconds": 130.8,
+  "generated": "2026-11-01T04:12:30"
  }
 }

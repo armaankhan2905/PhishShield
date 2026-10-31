@@ -99,7 +99,8 @@ CONTENT_RULES = [
      r"\b(?:account|card|sim|number|service|connection|electricity|power|wallet|upi|pan|aadhaa?r|net\s*banking|"
      r"banking|login|profile|mailbox|email)\b[^.!?\n]{0,30}"
      r"\b(?:will\s+be|has\s+been|is\s+being|is|are)\s+(?:temporarily\s+)?(?:blocked|suspended|deactivated|disconnected|"
-     r"terminated|closed|frozen|restricted|cancelled|locked)\b|\b(?:legal\s+action|arrest(?:ed)?|police\s+(?:case|complaint)|"
+     r"terminated|closed|frozen|restricted|cancelled|locked)\b|\b(?:legal\s+action|you\s+(?:will|may|can|shall)\s+be\s+arrested|"
+     r"arrest\s+warrant|police\s+(?:case|complaint)|"
      r"fir\s+(?:will|has))\b",
      "urgency", 15, "Threatens to block your account or service, or with legal action", False),
     ("MONEY_BAIT",
@@ -120,9 +121,88 @@ CONTENT_RULES = [
     ("GENERIC_GREETING",
      r"\bdear\s+(?:customer|user|valued\s+customer|sir\s*/\s*madam|account\s*holder|member|client)\b",
      None, 3, "Uses a generic greeting instead of your name", False),
+
+    # --- scam types common in India (2024-26) ---------------------------------------------------
+    ("DIGITAL_ARREST",
+     r"\bdigital\s+arrest\b|"
+     # an agency, aimed at you ("your", "against you", "aapka"), with an arrest or case word - not news about others
+     r"\b(?:cbi|ncb|narcotics|crime\s+branch|cyber\s*(?:cell|crime\s+(?:branch|department))|enforcement\s+directorate|"
+     r"customs\s+(?:officer|department)|trai|(?:mumbai|delhi)\s+police)\b(?=[^.!?\n]{0,100}?\b(?:you|your|aap|aapka|aapke)\b)"
+     r"[^.!?\n]{0,80}?\b(?:arrest\w*|warrant|money\s+laundering|"
+     r"illegal|seized|drugs|case\s+(?:is\s+)?(?:registered|filed|against)|video\s+call|skype|verification\s+call)\b|"
+     r"\b(?:aadhaa?r|pan|mobile\s+number|sim|bank\s+account)\b[^.!?\n]{0,40}?\b(?:linked|used|involved)\b[^.!?\n]{0,30}?"
+     r"\b(?:money\s+laundering|illegal|crime|drugs|fraud\s+case|terror)\w*",
+     "impersonation", 30, "Claims police, CBI, customs or another agency has a case against you (the 'digital arrest' "
+     "scam). Real agencies never do this over calls or messages", False),
+    ("TASK_JOB_SCAM",
+     r"\b(?:like|subscribe(?:\s+to)?|rate|review)\s+(?:\w+\s+){0,2}(?:youtube\s+)?(?:videos?|channels?|hotels?|products?|"
+     r"restaurants?|posts?|reviews?)\b[^.!?\n]{0,50}?\b(?:earn|paid|income|commission|salary|rs\.?|₹|inr)\b|"
+     r"\b(?:prepaid|telegram|merchant)\s+tasks?\b|\btask[\s-]+based\s+(?:job|work|income)\b|"
+     r"\b(?:part[\s-]?time|work\s+from\s+home|home[\s-]+based)\s+(?:job|work|opportunity)\b[^.!?\n]{0,60}?"
+     r"\b(?:earn|daily|per\s+day|per\s+task|rs\.?\s?\d|₹\s?\d)",
+     "financial_scam", 30, "Offers easy money for simple online tasks (the 'task job' scam: small payouts first, "
+     "then you're asked to pay in)", False),
+    ("PARCEL_HOLD",
+     r"\b(?:parcel|package|courier|shipment|consignment|delivery)\b[^.!?\n]{0,50}?\b(?:on\s+hold|held|seized|stuck|"
+     r"returned|undeliver\w*|failed|suspended|contains?\s+(?:illegal|drugs|contraband))\b",
+     "urgency", 12, "Says a parcel or courier is held, seized or undelivered", False),
+    ("ELECTRICITY_CUT",
+     r"\b(?:electricity|power|bijli|light)\s*(?:bill|connection|supply|meter)?\b[^.!?\n]{0,60}?\b(?:will\s+be\s+)?"
+     r"(?:disconnect\w*|cut\s*off|cut|kat\s+(?:jayegi|jaegi|dega))\b",
+     "urgency", 15, "Threatens to cut your electricity", False),
+    ("LOAN_FEE",
+     r"\b(?:instant|pre-?approved|personal|quick)\s+loan\b[^.!?\n]{0,70}?\b(?:approved|sanctioned|disburs\w*|processing\s+fee|"
+     r"without\s+(?:cibil|documents|credit\s+check))\b|\bloan\b[^.!?\n]{0,40}?\b(?:processing|registration|insurance)\s+(?:fee|charges?)\b",
+     "financial_scam", 15, "Offers an instant or pre-approved loan, or asks a fee to release one", False),
+
+    # --- Hinglish -------------------------------------------------------------------------------
+    ("THREAT_HINGLISH",
+     r"\b(?:account|a/c|khata|sim|number|card|bijli|connection|upi|wallet)\b[^.!?\n]{0,30}?\b(?:band|block|bandh|suspend)\s+"
+     r"(?:ho\s+ja(?:y|)ega|ho\s+jaega|ho\s+jayega|kar\s+di(?:y|)a\s+ja(?:y|)ega|hoga|ho\s+gaya\s+hai)\b",
+     "urgency", 15, "Threatens to block your account or service (in Hinglish)", False),
+    ("URGENCY_HINGLISH",
+     r"\b(?:turant|jaldi\s+(?:karein|karo|kare)|abhi\s+(?:karein|karo|kare|update|verify)|aaj\s+hi)\b",
+     "urgency", 10, "Pressures you to act quickly (in Hinglish)", False),
+    ("CREDENTIAL_REQUEST_HINGLISH",
+     r"\b(?:otp|pin|upi\s+pin|password|cvv|card\s+(?:number|details))\b[^.!?\n]{0,25}?\b(?:bhejo|bhejein|bhej\s+do|bhejiye|"
+     r"bataiye|batao|bata\s+do|share\s+(?:karo|karein|kare|kijiye)|dijiye|de\s+do)\b",
+     "credential_harvesting", 20, "Asks you to send or tell an OTP, PIN or password (in Hinglish)", True),
+    ("KYC_HINGLISH",
+     r"\bkyc\b[^.!?\n]{0,25}?\b(?:update\s+(?:karein|karo|kare|kijiye)|pending\s+hai|nahi\s+hu(?:a|i)|expire\s+ho)\b",
+     "credential_harvesting", 12, "Says your KYC must be updated (in Hinglish)", False),
+    ("PAYMENT_REQUEST_HINGLISH",
+     r"(?:rs\.?|₹|inr)\s?\d[\d,]*(?:\s*(?:ka|ki|ke))?\s*(?:\w+\s+){0,2}?(?:bhejo|bhejein|bhej\s+do|jama\s+(?:karo|karein|kare)|"
+     r"pay\s+(?:karo|karein|kare)|transfer\s+(?:karo|karein)|bharo|bharein|de\s+do)\b|"
+     r"\b(?:fee|charge|charges|shulk)\b[^.!?\n]{0,25}?\b(?:bhejo|bhejein|jama\s+karo|pay\s+karo|bharo|bharein)\b",
+     "financial_scam", 20, "Asks you to pay money or a fee (in Hinglish)", True),
+    ("PAYMENT_REQUEST_HINDI",
+     r"(?:₹|रुपये|रु\.?|Rs\.?)\s*[\d,]+[^।.!?\n]{0,20}?(?:भेजें|भेजो|जमा\s*करें|भुगतान\s*करें|ट्रांसफर\s*करें)|"
+     r"(?:शुल्क|फीस)[^।.!?\n]{0,25}?(?:भेजें|जमा\s*करें|भुगतान\s*करें)",
+     "financial_scam", 20, "Asks you to pay money or a fee (in Hindi)", True),
+    ("MONEY_BAIT_HINGLISH",
+     r"\b(?:aapne|apne|aap\s+ne)\s+(?:\w+\s+){0,3}jeet[ae]\b|\b(?:inaam|lottery\s+lagi|lucky\s+draw\s+mein)\b",
+     "financial_scam", 15, "Says you've won a prize (in Hinglish)", False),
+
+    # --- Hindi (Devanagari; \b doesn't work with Devanagari vowel signs, so no word boundaries) -----
+    ("THREAT_HINDI",
+     r"(?:खाता|खाते|अकाउंट|सिम|बिजली|कनेक्शन|कार्ड)[^।.!?\n]{0,30}?(?:बंद|ब्लॉक|निलंबित)\s*(?:हो\s*जाएगा|कर\s*दिया\s*जाएगा|हो\s*जाएगी|होगा|कर\s*दी\s*जाएगी)",
+     "urgency", 15, "Threatens to block your account or service (in Hindi)", False),
+    ("URGENCY_HINDI", r"(?:तुरंत|तत्काल|आज\s*ही|जल्दी\s*करें|अंतिम\s*चेतावनी)",
+     "urgency", 10, "Pressures you to act quickly (in Hindi)", False),
+    ("CREDENTIAL_REQUEST_HINDI",
+     r"(?:ओटीपी|OTP|पिन|पासवर्ड|सीवीवी|कार्ड\s*नंबर)[^।.!?\n]{0,25}?(?:भेजें|भेजो|बताएं|बताओ|साझा\s*करें|शेयर\s*करें|दें|दीजिए)",
+     "credential_harvesting", 20, "Asks you to send or tell an OTP, PIN or password (in Hindi)", True),
+    ("KYC_HINDI", r"(?:केवाईसी|KYC)[^।.!?\n]{0,25}?(?:अपडेट|लंबित|पेंडिंग|अधूरा|समाप्त)",
+     "credential_harvesting", 12, "Says your KYC must be updated (in Hindi)", False),
+    ("MONEY_BAIT_HINDI", r"(?:इनाम|लॉटरी|आपने\s*[^।\n]{0,20}जीत|लकी\s*ड्रॉ)",
+     "financial_scam", 15, "Says you've won a prize (in Hindi)", False),
 ]
+# Hindi and Hinglish put "don't" after the request ("OTP kisi ko mat bhejo", "OTP किसी को न बताएं").
+_NEGATION_AFTER = re.compile(r"\b(?:mat|na\s+kar\w*|nahi|kabhi\s+nahi)\b|(?:मत|न\s|नहीं|कभी\s*न)", re.I)
 _COMPILED = [(lab, re.compile(rx, re.I), cat, w, reason, neg) for lab, rx, cat, w, reason, neg in CONTENT_RULES]
-REQUEST_LABELS = {"CREDENTIAL_REQUEST", "ACCOUNT_VERIFICATION", "LOGIN_PROMPT", "KYC_PENDING", "PAYMENT_REQUEST"}
+REQUEST_LABELS = {"CREDENTIAL_REQUEST", "ACCOUNT_VERIFICATION", "LOGIN_PROMPT", "KYC_PENDING", "PAYMENT_REQUEST",
+                  "CREDENTIAL_REQUEST_HINGLISH", "CREDENTIAL_REQUEST_HINDI", "KYC_HINGLISH", "KYC_HINDI", "LOAN_FEE",
+                  "PAYMENT_REQUEST_HINGLISH", "PAYMENT_REQUEST_HINDI"}
 
 
 def content_findings(text: str, skip: Sequence[tuple] = ()) -> List[Finding]:
@@ -131,7 +211,8 @@ def content_findings(text: str, skip: Sequence[tuple] = ()) -> List[Finding]:
         for m in rx.finditer(text):
             if any(s <= m.start() < e for s, e in skip):
                 continue
-            if negatable and _NEGATION.search(text[max(0, m.start() - 40):m.start()]):
+            if negatable and (_NEGATION.search(text[max(0, m.start() - 40):m.start()]) or
+                              _NEGATION_AFTER.search(text[m.start():m.end() + 12])):
                 continue
             out.append(Finding(label, m.group(0), m.start(), m.end(), reason, "rule", weight, cat,
                                "heuristic", "content", "body", _severity("heuristic", weight)))

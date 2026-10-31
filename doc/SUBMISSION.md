@@ -36,7 +36,7 @@
 ## Before you press submit
 - [ ] `python -m pytest tests -q` → 133 passed; `node --test extension/test/*.test.js` → 5 passed
 - [ ] Fresh clone works: `pip install -r requirements-demo.txt`, `python -m src.pipeline.demo`, and the header shows **Models ready**
-- [ ] Every number in slides, video and README matches `/results` (`metrics_sha256 e3cf332d…`)
+- [ ] Every number in slides, video and README matches `/results` (`metrics_sha256 ca1d8651…`)
 - [ ] Hosted URL (if any) shows the "hosted demo" notice
 - [ ] Video uploaded, link set to "anyone with the link"
 - [ ] Repository is public (or judges were given access)

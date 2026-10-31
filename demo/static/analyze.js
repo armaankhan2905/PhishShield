@@ -17,6 +17,18 @@ const SAMPLES = [
     text: "Your Amazon order has shipped. Track it at https://www.amazon.in/gp/your-orders" },
   { name: "KYC reminder", tag: "borderline", kind: "message",
     text: "Dear customer, update your KYC within 24 hours using our official website." },
+  { name: "Digital arrest", tag: "scam", kind: "message",
+    text: "This is CBI Mumbai. A case is registered against your Aadhaar for money laundering. You are under digital arrest. " +
+          "Join the video call on Skype now or you will be arrested. Call 9876543210" },
+  { name: "Task job", tag: "scam", kind: "message",
+    text: "Part time job! Like YouTube videos and earn Rs 3000 daily. Join our Telegram: t.me/earn_daily_job" },
+  { name: "Hinglish OTP", tag: "scam", kind: "message",
+    text: "Aapka SBI account band ho jayega. Turant OTP bhejo is number par 9876543210" },
+  { name: "Hindi KYC", tag: "phishing", kind: "message",
+    text: "प्रिय ग्राहक, आपका खाता आज बंद हो जाएगा। तुरंत अपना केवाईसी अपडेट करें: http://sbi-kyc.xyz/login" },
+  { name: "Disguised SBI", tag: "phishing", kind: "message",
+    text: "URG​ENT: Dеar customеr, your 𝐒𝐁𝐈 KYC is pending and your acc0unt will be blocked today. " +
+          "V3rify at hxxp://sbi-kyc[.]xyz/login" },
 ];
 
 // Synthetic screenshots made by the team (demo/samples/make_images.py), served from /static/samples/.

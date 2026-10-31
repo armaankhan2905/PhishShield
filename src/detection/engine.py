@@ -14,7 +14,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from . import anomaly, brands as B, domains as D, fuse as FU, rules, upi
+from . import anomaly, brands as B, domains as D, fuse as FU, normalize, rules, upi
 from .fuse import FAILED, RAN, UNAVAILABLE, Context
 from .main import PHONE_RX
 from .rules import Finding
@@ -101,6 +101,11 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
     """qr: payloads of QR codes found in an uploaded image. A link QR code is checked like any
     other link; a UPI QR code is checked by src/detection/upi.py."""
     coverage = {"rules": UNAVAILABLE, "anomaly": UNAVAILABLE, "url_model": UNAVAILABLE, "text_model": UNAVAILABLE}
+    # Undo filter-dodging tricks first (normalize.py). Links are read from `text`, wording from `words`;
+    # every position found below is mapped back to the original message at the end.
+    raw = text
+    folded = normalize.fold(raw)
+    text, words = folded.text, folded.words
     qr = [p for p in (qr or []) if p and p.strip()]
     links = [{"text": l.get("text", ""), "href": D.unwrap_redirect(l.get("href", ""))} for l in links if l.get("href")]
     for p in qr:
@@ -123,17 +128,22 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
     spots = spots[:max_urls]
 
     def rule_layer():
-        out = rules.content_findings(text, skip=[(s, e) for _, s, e in body_urls])
-        out += upi.text_findings(text) + upi.qr_findings(qr, text)
+        out = rules.content_findings(words, skip=[(s, e) for _, s, e in body_urls])
+        out += upi.text_findings(text) + upi.qr_findings(qr, words)
         for u, s, e, fld in spots:
             out += rules.url_findings(u, s, e, fld)
+        if folded.tricks:
+            used = [normalize.TRICK_NAMES[k] for k in folded.tricks]
+            out.append(Finding("OBFUSCATION", ", ".join(f"{k}: {n}" for k, n in folded.tricks.items()), None, None,
+                               "Uses tricks to get past filters: " + "; ".join(used), "rule", 15, None,
+                               "heuristic", "content", "body", "medium"))
         return out
 
     findings = _layer("rules", coverage, rule_layer)
     findings += _layer("anomaly", coverage, anomaly.check_email, email, links)
 
     url_skip = [(s, e) for _, s, e in body_urls]
-    claimed = B.brands_in_text(text, url_skip)
+    claimed = B.brands_in_text(words, url_skip)
     if email:
         claimed += [b for b in B.brands_in_text(email.get("subject") or "") if b not in claimed]
         name = (email.get("from") or "").split("<")[0]
@@ -146,7 +156,7 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
         findings += _layer("rules", coverage, rules.correlate, findings, claimed, spots, clean_sender)
 
     url_probs = _model_layer("url_model", coverage, _url_model, spots)
-    findings += [f for f in _model_layer("text_model", coverage, _text_model, text, kind) or []]
+    findings += [f for f in _model_layer("text_model", coverage, _text_model, words, kind) or []]
     for u, s, e, fld in spots:
         p = (url_probs or {}).get(u)
         if p is not None and p >= FU.URL_FLOOR:
@@ -163,7 +173,9 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
     # Asking you to send or share an OTP / PIN with someone is itself the thing to act on (you reply);
     # "update your KYC on our website" is not.
     actionable = kind == "email" or bool(spots) or bool(qr) or bool(PHONE_RX.search(text)) or bool(_CONTACT_RX.search(text)) or \
-        any(f.label in ("REMOTE_ACCESS", "CALLBACK_REQUEST", "PAYMENT_REQUEST", "SCAN_TO_RECEIVE", "UPI_ID_IMPERSONATION")
+        any(f.label in ("REMOTE_ACCESS", "CALLBACK_REQUEST", "PAYMENT_REQUEST", "SCAN_TO_RECEIVE", "UPI_ID_IMPERSONATION",
+                        "CREDENTIAL_REQUEST_HINGLISH", "CREDENTIAL_REQUEST_HINDI", "DIGITAL_ARREST", "LOAN_FEE",
+                        "PAYMENT_REQUEST_HINGLISH", "PAYMENT_REQUEST_HINDI")
             for f in findings) or \
         any(f.label == "CREDENTIAL_REQUEST" and _SEND_RX.match(f.text) for f in findings)
     # First-party email: the sender is clean and every link goes to the sender's own organisation (or to
@@ -172,6 +184,15 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
         all(D.same_org(i, clean_sender) or D.is_mail_infra(i) for i in infos) and \
         not any(f.tier == "confirmed" for f in findings) and \
         not any(f.label in _ASK_LABELS for f in findings)
+
+    # Positions back into the message as received. Wording findings show what the user actually sees
+    # ("v3rify", "re​fund"); link findings keep the restored address, which is what the link really is.
+    if folded.tricks or len(text) != len(raw):
+        for f in findings:
+            if f.start is not None:
+                f.start, f.end = folded.start(f.start), folded.end(f.end)
+                if f.family == "content":
+                    f.text = raw[f.start:f.end]
 
     flags_by_url: Dict[str, List[str]] = {}
     for f in findings:

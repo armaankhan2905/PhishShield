@@ -69,6 +69,27 @@ function render(d) {
           h("td", { text: Object.entries(v.verdicts).map(([k, c]) => c + " " + k).join(", ") }))))))));
   }
 
+  const ev = d.evasion;
+  if (ev && ev.by_trick) {
+    const NAMES = { invisible: "Invisible characters inside words", lookalike_letters: "Cyrillic look-alike letters (аccount)",
+                    styled: "Styled letters (𝐒𝐁𝐈)", digit_swap: "Numbers for letters (v3rify, acc0unt)",
+                    disguised_link: "Disguised links (hxxp://, sbi-kyc[.]xyz)" };
+    out.push(h("section", { class: "card" }, h("h2", { text: "Filter-dodging tricks" }),
+      h("p", { class: "muted small", text: "The same " + fmt.int(ev.messages) + " phishing messages, each rewritten with one trick " +
+        "scammers use to slip past filters. Caught = scored suspicious or phishing. 'Without' is the same engine with trick-undoing switched off." }),
+      h("div", { class: "tiles" },
+        tile("Undisguised", fmt.pct((ev.undisguised || {}).recall, 1), "the same messages without tricks"),
+        tile("Disguised, without trick-undoing", fmt.pct(ev.without.recall, 1), "n=" + fmt.int(ev.n) + " disguised messages"),
+        tile("Disguised, with trick-undoing", fmt.pct(ev.with.recall, 1), "same messages, same engine")),
+      h("div", { class: "tablewrap" }, h("table", null,
+        h("thead", null, h("tr", null, h("th", { text: "Trick" }), h("th", { class: "num", text: "n" }),
+          h("th", { class: "num", text: "Undisguised" }), h("th", { class: "num", text: "Without" }), h("th", { class: "num", text: "With" }))),
+        h("tbody", null, Object.entries(ev.by_trick).map(([k, v]) => h("tr", null,
+          h("td", { text: NAMES[k] || k }), h("td", { class: "num", text: fmt.int(v.n) }),
+          h("td", { class: "num", text: fmt.pct(v.undisguised, 1) }),
+          h("td", { class: "num", text: fmt.pct(v.without, 1) }), h("td", { class: "num", text: fmt.pct(v.with, 1) }))))))));
+  }
+
   const cal = d.calibration || {};
   const s = d.scoring || {};
   out.push(h("section", { class: "card" }, h("h2", { text: "How the scoring was tuned" }),

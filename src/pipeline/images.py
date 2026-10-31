@@ -68,6 +68,9 @@ def read_qr(img) -> List[str]:
     tries = [img, grey]
     if max(img.shape[:2]) < 1200:
         tries.append(cv2.resize(grey, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC))
+    # QR codes cropped right to the edge have no white margin ("quiet zone"), which detectors need.
+    pad = max(16, min(grey.shape[:2]) // 10)
+    tries.append(cv2.copyMakeBorder(grey, pad, pad, pad, pad, cv2.BORDER_CONSTANT, value=255))
     for im in tries:
         try:
             ok, texts, _, _ = det.detectAndDecodeMulti(im)

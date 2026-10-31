@@ -294,7 +294,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
   - **133 Python tests**, including the full fallback matrix: rules only, each model missing, Ollama down or erroring, bad AI answers, empty / oversized / malformed input, HTML email, unsupported and broken files, no message text in logs, removed endpoints;
   - **5 extension tests**.
 - **Final measurement:**
-  - two runs give identical `metrics_sha256 = e3cf332db2b04269`;
+  - two runs give identical `metrics_sha256 = ca1d8651eeb44b87`;
   - the system's numbers are unchanged from P3;
   - the old-formula comparison was fixed: it had treated "no wording to read" on bare links as a 0 score. The fair numbers are in the model card.
 
