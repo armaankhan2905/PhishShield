@@ -1,6 +1,6 @@
 """Analyze pipeline behind POST /api/analyze (contract: doc/API.md).
 
-  message -> extract URLs -> rules + anomaly checks (+ models, Phase 3)
+  message -> detection engine (rules, anomaly checks; models from Phase 3)
           -> fuse() -> sanitize() -> explanation
 
 The original text is never modified: findings point into it, and only a
@@ -8,30 +8,22 @@ separate sanitized copy goes on to the explanation step. A layer that did not
 run is reported in "coverage" and lowers "confidence"; it is never read as
 evidence of safety.
 
-While src.detection.rules.READY is False the findings come from
-src/pipeline/stub.py and the response carries "stub": true.
-
 Run:
     python -m src.pipeline.analyze "URGENT: your SBI KYC is pending, verify at http://sbi-kyc.xyz"
 """
 from __future__ import annotations
 
 import json
-import logging
 import os
 import re
 import sys
 import time
 import uuid
-from typing import Dict, List, Optional
+from typing import List, Optional
 
-from src.detection import anomaly, rules
-from src.detection.fuse import FAILED, RAN, STUB, UNAVAILABLE, fuse
-from src.detection.main import URL_RX, URL_TRAILING
-from src.pipeline import stub
+from src.detection import engine, rules
+from src.detection.fuse import FAILED, fuse
 from src.pipeline.sanitize import SanitizationError, sanitize
-
-logger = logging.getLogger(__name__)
 
 KINDS = ("auto", "email", "sms", "url")
 MODES = ("local", "hosted")
@@ -53,47 +45,28 @@ def detect_kind(text: str, email: Optional[dict]) -> str:
     return "sms"
 
 
-def extract_urls(text: str, kind: str, links: List[dict]) -> List[str]:
-    found = [text.strip()] if kind == "url" else [m.group(0).rstrip(URL_TRAILING) for m in URL_RX.finditer(text)]
-    found += [link.get("href", "") for link in links]
-    seen, out = set(), []
-    for u in found:
-        if u and u not in seen:
-            seen.add(u)
-            out.append(u)
-    return out[:MAX_URLS]
-
-
 def utf16_index(text: str, i: Optional[int]) -> Optional[int]:
     """Python indexes code points; JavaScript strings index UTF-16 units (emoji count twice)."""
     return None if i is None else len(text[:i].encode("utf-16-le")) // 2
 
 
-def explain(verdict: str, score: int, ranked: List[rules.Finding], confidence: str) -> str:
+def explain(verdict: str, score: int, ranked: List[rules.Finding], confidence: str, gate: Optional[str]) -> str:
     """Template explanation built only from findings. Phase 5 (Ryan) adds the grounded local LLM."""
     reasons = []
     for f in ranked:
-        r = f.reason.removeprefix("[stub] ")
-        if r not in reasons:
-            reasons.append(r)
+        if f.reason not in reasons:
+            reasons.append(f.reason)
     if not reasons:
         text = "No phishing signals were found in this message."
+    elif verdict == "safe":
+        text = f"No strong phishing evidence ({score}/100). Worth noting: " + "; ".join(reasons[:2]) + "."
     else:
         text = f"Rated {verdict} ({score}/100). Main reasons: " + "; ".join(reasons[:3]) + "."
+    if gate == "nothing_to_act_on":
+        text += " The message has no link or number to act on, which keeps the risk low."
     if confidence == "low":
         text += " Some checks were not available, so treat this result with caution."
     return text
-
-
-def _layer(name: str, coverage: Dict[str, str], fn, *args):
-    try:
-        out = fn(*args)
-        coverage[name] = RAN
-        return out
-    except Exception:  # noqa: BLE001 - one broken layer must not take the analysis down
-        logger.exception("%s layer failed", name)
-        coverage[name] = FAILED
-        return []
 
 
 def analyze(text: str, kind: str = "auto", email: Optional[dict] = None,
@@ -102,27 +75,12 @@ def analyze(text: str, kind: str = "auto", email: Optional[dict] = None,
     links = links or []
     if kind == "auto":
         kind = detect_kind(text, email)
-    urls = extract_urls(text, kind, links)
-    coverage = {"rules": UNAVAILABLE, "anomaly": UNAVAILABLE, "url_model": UNAVAILABLE, "text_model": UNAVAILABLE}
 
-    if rules.READY:
-        findings = _layer("rules", coverage, rules.analyze_rules, text)
-        findings += _layer("anomaly", coverage, anomaly.check_email, email, links)
-        url_rows = [{"url": u, "score": None, "flags": rules.analyze_url(u)} for u in urls]
-        # Phase 3: Govind's URL and text models add tier "ml" findings and set their coverage to "ran".
-    else:
-        findings = stub.findings(text)
-        coverage["rules"] = STUB
-        url_rows = []
-        for u in urls:
-            f, flags = stub.url_finding(text, u)
-            findings.append(f)
-            url_rows.append({"url": u, "score": f.confidence, "flags": flags})
-        if urls:
-            coverage["url_model"] = STUB
-
-    findings.sort(key=lambda f: (f.start is None, f.start or 0))
-    result = fuse(findings, coverage)
+    det = engine.run(text, kind, email, links, MAX_URLS)
+    findings = det.findings
+    order = sorted(range(len(findings)), key=lambda i: (findings[i].start is None, findings[i].start or 0))
+    findings = [findings[i] for i in order]
+    result = fuse(findings, det.coverage, det.context)
 
     out_findings = []
     for i, f in enumerate(findings):
@@ -131,7 +89,7 @@ def analyze(text: str, kind: str = "auto", email: Optional[dict] = None,
                  start_u16=utf16_index(text, f.start), end_u16=utf16_index(text, f.end))
         out_findings.append(d)
 
-    partial = any(state == FAILED for state in coverage.values())
+    partial = any(state == FAILED for state in det.coverage.values())
     try:
         sanitized = sanitize(text).sanitized if text.strip() else ""
     except SanitizationError:
@@ -147,9 +105,9 @@ def analyze(text: str, kind: str = "auto", email: Optional[dict] = None,
         "category": result.category,
         "kind": kind,
         "findings": out_findings,
-        "urls": url_rows,
-        "coverage": coverage,
-        "explanation": explain(result.verdict, result.score, ranked, result.confidence),
+        "urls": det.urls,
+        "coverage": det.coverage,
+        "explanation": explain(result.verdict, result.score, ranked, result.confidence, result.gate),
         "explanation_source": "template",
         "sanitized": sanitized,
         "partial": partial,

@@ -6,3 +6,4 @@ pydantic>=2.8.0
 pypdf>=4.0.0
 python-multipart>=0.0.9
 requests>=2.31.0
+tldextract>=5.1.0  # registered domains from the bundled Public Suffix List (offline)

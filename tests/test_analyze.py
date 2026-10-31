@@ -99,7 +99,8 @@ def test_sanitized_is_a_copy_and_hides_personal_data():
     text = "Call 9876543210 now to claim your prize"
     body = post(text=text).json()
     assert "9876543210" not in body["sanitized"]
-    assert any(f["text"] == "prize" and text[f["start"]:f["end"]] == "prize" for f in body["findings"])
+    money = [f for f in body["findings"] if f["label"] == "MONEY_BAIT"]
+    assert money and all(text[f["start"]:f["end"]] == f["text"] for f in money)
 
 
 def test_mode_follows_env(monkeypatch):

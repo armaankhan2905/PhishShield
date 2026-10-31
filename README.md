@@ -60,7 +60,7 @@ The request and response format is in [doc/API.md](doc/API.md).
 ## Layout
 
 ```text
-src/detection/   rules.py · anomaly.py · fuse.py · main.py (reused regexes)
+src/detection/   engine.py · rules.py · anomaly.py · domains.py · brands.py · fuse.py · main.py (reused regexes)
 src/model/       classifiers + training
 src/eval/        benchmarks
 src/pipeline/    demo.py (server) · analyze.py · sanitize.py · rag.py · documents.py
@@ -77,8 +77,8 @@ tests/           API contract tests
 | Phase | Lead | Status |
 |---|---|---|
 | P1 Foundation | Ryan | Done: API contract v1.1, stub detection live, 13 contract tests passing |
-| P2 Detection engine | Armaan | Next |
-| P3 ML models | Govind | Pending |
+| P2 Detection engine | Armaan | Done: rules, domain and sender checks, evidence-gated scoring, 81 tests passing |
+| P3 ML models | Govind | Next |
 | P4 Extension live | Atharvva | Pending |
 | P5 Integrate + deploy | Ryan | Pending |
 | P6 Demo + submit | Atharvva | Pending |

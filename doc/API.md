@@ -140,6 +140,14 @@ Base URL: `http://localhost:8000` locally (`python -m src.pipeline.demo`).
 | `confidence` | Model probability for `ml` findings; `null` for rules |
 | `category` | As above, or `null` |
 
+### Finding labels (Phase 2)
+
+| Family | Confirmed | Heuristic |
+|---|---|---|
+| `link` | `HOMOGRAPH_DOMAIN`, `TYPOSQUAT_DOMAIN`, `BRAND_IN_DOMAIN`, `BRAND_IN_SUBDOMAIN`, `MIXED_SCRIPT_DOMAIN`, `USERINFO_IN_URL`, `IP_HOST`, `SCRIPT_URL`, `LINK_TEXT_MISMATCH`, `REQUEST_TO_UNOFFICIAL_LINK` (`BRAND_OTHER_TLD` on a risky ending) | `BRAND_OTHER_TLD`, `IDN_DOMAIN`, `SHORTENER`, `FREE_HOSTING`, `RISKY_TLD`, `DEEP_SUBDOMAINS`, `NONSTANDARD_PORT`, `NO_HTTPS`, `MALFORMED_URL`, `REQUEST_WITH_LINK`, `BRAND_LINK_UNVERIFIED`, `BRAND_SHORT_LINK` |
+| `sender` | `SENDER_BRAND_MISMATCH`, `SENDER_LOOKALIKE`, `DISPLAY_NAME_SPOOF` | `REPLY_TO_MISMATCH` |
+| `content` | none (wording alone is never proof) | `CREDENTIAL_REQUEST`, `ACCOUNT_VERIFICATION`, `LOGIN_PROMPT`, `KYC_PENDING`, `PAYMENT_REQUEST`, `REMOTE_ACCESS`, `THREAT`, `MONEY_BAIT`, `URGENCY`, `CALLBACK_REQUEST`, `CLICK_PROMPT`, `GENERIC_GREETING` |
+
 ### Rules for every client
 
 1. Highlight only what `findings` returns, at `start_u16`/`end_u16` (or by matching `text` for header and link findings). Never add highlights or reasons of your own.
