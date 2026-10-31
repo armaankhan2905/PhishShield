@@ -1,0 +1,6 @@
+# Optional local GGUF runtime.
+#
+# Install this file only when the reasoning engine is configured to use GGUF.
+# On Windows, use Python 3.11 or 3.12, or install the Visual C++ build tools
+# and CMake so pip can build the package from source.
+llama-cpp-python>=0.3.36

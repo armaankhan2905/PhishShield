@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: phishshield
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-demo.txt
+    startCommand: python -m src.pipeline.demo
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PYTHON_VERSION
+        value: 3.12.7

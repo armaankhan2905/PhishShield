@@ -1,0 +1,77 @@
+# PhishShield .gitignore
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+wheels/
+pip-wheel-metadata/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ML models (large — git-lfs or local only)
+models/*
+!models/.gitkeep
+
+# Data (sensitive / large / generated)
+data/raw/
+data/processed/
+data/corpus/*.csv
+data/corpus/*.jsonl
+data/dlptest/*.csv
+data/dlptest/*.csv.gz
+
+# Config with secrets
+config.yaml
+config.local.yaml
+.env
+*.key
+*.pem
+
+# Test cache
+.pytest_cache/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Demo / video
+demo/__pycache__/
+video/demo.mp4
+video/*.tmp
+
+# OS / misc
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.log
+.DS_Store
+
+# Large generated artifacts (tracked via git-lfs)
+# /models/
+# /data/corpus/
+# /tmp/
+*.whl
+*.tar.gz
+*.zip

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" data-theme="5">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipeline · PhishShield</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="wrap">
+  <div id="top"></div>
+
+  <div class="page-head">
+    <h2>The pipeline</h2>
+    <p>Raw text never leaves the detection stage unredacted. Below is the architecture as built, followed by a live trace of one request through every stage.</p>
+  </div>
+
+  <section class="section">
+    <h2>Architecture</h2>
+    <p class="sub">Stages run left to right. Each card says whether that part is live in this build.</p>
+    <div class="arch" id="arch"></div>
+  </section>
+
+  <section class="section">
+    <h2>Live request trace</h2>
+    <p class="sub">Type below or pick a sample. The server runs the full pipeline and reports what each stage did, with timings, for this one request. Your text from the Live demo page carries over.</p>
+    <div class="trace-in">
+      <textarea id="input" spellcheck="false" placeholder="Paste text to trace…"></textarea>
+      <div class="samples" id="samples"></div>
+    </div>
+    <div class="chain" id="chain"></div>
+    <div class="err" id="err" hidden></div>
+  </section>
+
+  <section class="section">
+    <h2>Pattern detectors</h2>
+    <p class="sub">They run in priority order. When two matches overlap, the higher-priority one wins, so a URL containing an IP stays a URL.</p>
+    <div class="dets" id="dets"></div>
+  </section>
+
+  <section class="section">
+    <h2>Sanitized result</h2>
+    <div class="card"><div class="text" id="output"><span class="empty">Waiting for input…</span></div></div>
+  </section>
+
+  <div class="next" id="next"></div>
+  <footer id="foot"></footer>
+</div>
+
+<script src="/static/common.js"></script>
+<script>
+const ARCH = [
+  ["live", "Input capture", "Text pasted or typed: forms, chat messages, page text."],
+  ["live", "Pattern layer", "7 regex detectors with Luhn and IP-octet validation. Deterministic and fast."],
+  ["model", "NER model", "Fine-tuned BERT token classifier for names and context. Its spans must pass the same validators as the patterns (checksum, octet range, word boundaries)."],
+  ["live", "Merge", "Pattern and model spans are combined; on overlap the higher-priority detector wins."],
+  ["live", "Sanitizer", "Each span is replaced with [REDACTED:TYPE], keeping the text's structure."],
+  ["live", "Leak check", "The output is re-scanned for every detected value. Any hit blocks the response (fail-closed)."],
+  ["live", "Private RAG", "PDFs and messages are redacted before indexing; questions are redacted before search; a local LLM answers from sanitized text only."],
+  ["todo", "DOM structural layer", "Planned: use form-field types and labels (e.g. input[type=tel]) as extra signals."],
+];
+
+function renderArch(nerState) {
+  $("arch").innerHTML = ARCH.map(([s, h, p]) => {
+    let badge = '<span class="badge">live</span>';
+    if (s === "todo") badge = '<span class="badge todo">planned</span>';
+    if (s === "model") badge = nerState === "loaded" ? '<span class="badge">live</span>'
+      : nerState === "loading" ? '<span class="badge cond">loading…</span>' : '<span class="badge cond">not on this server</span>';
+    return `<div class="card">${badge}<h3>${h}</h3><p>${p}</p></div>`;
+  }).join("");
+}
+
+function renderTrace(t) {
+  const det = t.detectors || [];
+  const hits = det.reduce((a, d) => a + d.matches, 0);
+  const rejected = det.reduce((a, d) => a + d.rejected, 0);
+  const patMs = det.reduce((a, d) => a + d.ms, 0);
+  const m = t.model || {};
+  const modelOn = m.state === "loaded";
+  const nodes = [
+    { k: "Input", v: `${t.input.chars}`, d: `characters, ${t.input.lines} line${t.input.lines === 1 ? "" : "s"}`, hot: t.input.chars > 0 },
+    { k: "Pattern layer", v: hits, d: `${det.length} regex + checksum detectors${rejected ? `, ${rejected} rejected by validation` : ""}`, ms: patMs, hot: hits > 0 },
+    { k: "NER model", v: modelOn ? m.matches : m.state === "loading" ? "loading" : "off",
+      d: modelOn ? "fine-tuned BERT spans that passed validation" : m.state === "loading" ? "weights loading; patterns serve meanwhile" : "not running on this server, so the pattern layer serves alone",
+      ms: modelOn ? m.ms : null, hot: modelOn && m.matches > 0, off: !modelOn },
+    { k: "Merge", v: t.merge.kept, d: `${t.merge.candidates} candidates, ${t.merge.dropped_overlap} overlap${t.merge.dropped_overlap === 1 ? "" : "s"} dropped`, ms: t.merge.ms, hot: t.merge.kept > 0 },
+    { k: "Sanitize", v: t.sanitize.replaced, d: "spans replaced with [REDACTED:TYPE]", ms: t.sanitize.ms, hot: t.sanitize.replaced > 0 },
+    { k: "Leak check", v: `${t.leak_check.leaked} leaked`, d: `output re-scanned for ${t.leak_check.checked} values; any hit blocks the response`, ms: t.leak_check.ms, hot: false },
+  ];
+  $("chain").innerHTML = nodes.map((n, i) =>
+    `<div class="node${n.hot ? " hot" : ""}${n.off ? " off" : ""}"><div class="k"><span>${i + 1}→</span>${n.k}</div><div class="v">${n.v}</div><div class="d">${esc(n.d)}</div>${n.ms != null ? `<div class="ms">${ms(n.ms)}</div>` : ""}</div>`
+  ).join("");
+  $("dets").innerHTML = det.map((d, i) =>
+    `<div class="det${d.matches ? " hit" : ""}"><b>${i + 1}. ${d.label}</b> · ${d.matches} match${d.matches === 1 ? "" : "es"}${d.rejected ? `, ${d.rejected} rejected` : ""}<span class="m">${esc(d.method)}</span></div>`
+  ).join("");
+  renderArch(m.state);
+}
+
+const input = $("input");
+const run = liveSanitize(input, {
+  onResult: (res) => { $("err").hidden = true; renderTrace(res.trace); $("output").innerHTML = renderOutput(res.sanitized); },
+  onError: (e) => { $("err").textContent = e.message || "Backend unreachable"; $("err").hidden = false; $("output").innerHTML = '<span class="empty">Output withheld.</span>'; },
+});
+addSamples($("samples"), (text) => { input.value = text; run(true); });
+
+renderArch(null);
+input.value = lastInput.get() || SAMPLES["Checkout form"];
+run(true);
+</script>
+</body>
+</html>
