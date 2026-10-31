@@ -32,8 +32,10 @@
       wording. Both run on this server; their probabilities are calibrated on held-out data.</p></div></li>
     <li><div><h3>Score only what was found</h3><p>Proven technical evidence counts in full. Patterns count once each and are capped,
       so repeating "urgent" adds nothing. <b>Phishing</b> needs proven evidence. A model alone can reach <b>suspicious</b> but never
-      phishing. A message with nothing to act on (no link, number, app or payment) stays <b>safe</b>. A check that didn't run lowers
-      the confidence; it never counts as safety.</p></div></li>
+      phishing. A message with nothing to act on (no link, number, app or payment) stays <b>safe</b>. When an email's sender and all of
+      its links belong to the same organisation and it asks for nothing (no details, payment, login, call or app), the models count for
+      a quarter: they tend to over-flag ordinary newsletters and sign-in emails. A check that didn't run lowers the confidence; it never
+      counts as safety.</p></div></li>
     <li><div><h3>Explain it</h3><p>A plain summary is built from the reasons. On your own computer, a local AI model (Ollama) can
       rewrite it in plain words. It sees only the reasons and a copy of the message with personal data removed, and an answer that
       adds anything else is thrown away.</p></div></li>

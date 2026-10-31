@@ -68,6 +68,7 @@ BRANDS: List[Brand] = [
     Brand("Instagram", ("instagram",), ("instagram",), ("instagram.com",)),
     Brand("WhatsApp", ("whatsapp",), ("whatsapp",), ("whatsapp.com", "whatsapp.net", "wa.me")),
     Brand("LinkedIn", ("linkedin",), ("linkedin",), ("linkedin.com", "lnkd.in")),
+    Brand("OpenAI", ("openai", "chatgpt"), ("openai", "chatgpt"), ("openai.com", "chatgpt.com")),
     Brand("IRCTC", ("irctc",), ("irctc",), ("irctc.co.in", "irctctourism.com")),
     Brand("India Post", ("india post", "indiapost"), ("indiapost",), ("indiapost.gov.in",)),
     Brand("Income Tax Department", ("income tax", "income-tax", "incometax"), ("incometax", "incometaxindia"),

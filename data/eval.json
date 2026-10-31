@@ -153,26 +153,26 @@
     "positives": 0,
     "negatives": 4089,
     "tp": 0,
-    "fp": 22,
+    "fp": 23,
     "fn": 0,
-    "tn": 4067,
+    "tn": 4066,
     "precision": 0.0,
     "recall": null,
     "f1": null,
-    "fpr": 0.0054
+    "fpr": 0.0056
    },
    "system_flagged": {
     "n": 4089,
     "positives": 0,
     "negatives": 4089,
     "tp": 0,
-    "fp": 33,
+    "fp": 34,
     "fn": 0,
-    "tn": 4056,
+    "tn": 4055,
     "precision": 0.0,
     "recall": null,
     "f1": null,
-    "fpr": 0.0081
+    "fpr": 0.0083
    },
    "system_phishing": {
     "n": 4089,
@@ -192,13 +192,13 @@
     "positives": 0,
     "negatives": 4089,
     "tp": 0,
-    "fp": 61,
+    "fp": 62,
     "fn": 0,
-    "tn": 4028,
+    "tn": 4027,
     "precision": 0.0,
     "recall": null,
     "f1": null,
-    "fpr": 0.0149
+    "fpr": 0.0152
    }
   },
   "text_test_sms": {
@@ -660,19 +660,19 @@
   "url_test system metrics use a fixed sample of the URL test split; url_model metrics use all of it"
  ],
  "run": {
-  "commit": "1690e09",
-  "metrics_sha256": "9b5ff4ec33237882103c64fa1a5b6b969db7e0e36e262e4a0414e1e1deeb1194",
+  "commit": "a9174c0",
+  "metrics_sha256": "e3cf332db2b04269131555dccb22c4457ce9684d75721e5f46eb165b1d5de192",
   "ms_per_item": {
-   "text_test_sms": 4.14,
-   "text_test_email": 10.28,
-   "url_test": 7.46,
-   "openphish": 11.96,
-   "tranco": 7.83,
-   "uci_sms_ham": 1.53,
-   "uci_sms_spam": 4.03,
-   "curated": 5.27
+   "text_test_sms": 3.22,
+   "text_test_email": 11.34,
+   "url_test": 8.59,
+   "openphish": 12.38,
+   "tranco": 8.07,
+   "uci_sms_ham": 1.78,
+   "uci_sms_spam": 4.4,
+   "curated": 5.74
   },
-  "seconds": 125.2,
-  "generated": "2026-10-31T17:35:18"
+  "seconds": 133.7,
+  "generated": "2026-10-31T23:56:47"
  }
 }

@@ -11,8 +11,12 @@ to a finding ("contribution"), and every number below is a named constant.
      and just under SAFE_BELOW when the message gives you nothing to act on (no link,
      phone number or app to install).
   3. Consistency. When every link and the sender belong to the brand the
-     message names, heuristic points are halved. Confirmed and model evidence
-     is never discounted, and nothing is ever declared safe by domain alone.
+     message names, heuristic points are halved. When an email's sender and every
+     link belong to one organisation and the email asks for nothing (no details,
+     payment, login, call or app), model points count at FIRST_PARTY_ML_FACTOR:
+     both models over-flag ordinary newsletters and sign-in emails, and the phishing
+     they exist to catch sends you somewhere other than the sender. Confirmed
+     evidence is never discounted, and nothing is ever declared safe by domain alone.
   4. Confidence. Missing layers lower confidence; they never count as safety.
 
 Model-related values and SAFE_BELOW are tuned on validation data (see below); the
@@ -37,6 +41,7 @@ TEXT_FLOOR = 0.5               # same for the text model
 ML_CONFIDENT = 0.8             # model probability that can stand in for a confirmed finding
 HEURISTIC_ONLY_CAP = 60
 CONSISTENT_DISCOUNT = 0.5
+FIRST_PARTY_ML_FACTOR = 0.25   # model points in a sender-consistent email that asks for nothing
 # Messages with nothing to act on (no link, number, app or payment) always stay just under SAFE_BELOW.
 
 CATEGORIES = ("impersonation", "urgency", "credential_harvesting", "suspicious_link", "financial_scam")
@@ -50,6 +55,7 @@ DETECTION_LAYERS = ("rules", "anomaly", "url_model", "text_model")
 class Context:
     actionable: bool = True          # the message gives a way to act: link, phone number, app
     identity_consistent: bool = False  # every link and the sender belong to the brand it names
+    first_party: bool = False        # email whose sender owns every link, asking for nothing
 
 
 @dataclass
@@ -117,7 +123,7 @@ def fuse(findings: List[Finding], coverage: Dict[str, str], context: Optional[Co
         idx = [i for i, f in enumerate(findings) if f.tier == "ml" and f.source == source]
         if idx:
             top = max(idx, key=lambda i: findings[i].confidence or 0)
-            raw[top] = _ml_points(findings[top].confidence, ml_floor(source))
+            raw[top] = _ml_points(findings[top].confidence, ml_floor(source)) * (FIRST_PARTY_ML_FACTOR if ctx.first_party else 1.0)
 
     total = sum(raw.values())
     confirmed = any(findings[i].tier == "confirmed" and pts > 0 for i, pts in raw.items())

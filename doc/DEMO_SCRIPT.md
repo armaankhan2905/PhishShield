@@ -2,7 +2,7 @@
 
 **Presenter:** Atharvva (lead) · **Driver at the keyboard:** Ryan · Armaan and Govind take judge questions on detection and models.
 
-Every number below is from `data/eval.json` (`metrics_sha256 9b5ff4ec…`) and [MODEL_CARD.md](MODEL_CARD.md). Don't round them differently on stage.
+Every number below is from `data/eval.json` (`metrics_sha256 e3cf332d…`) and [MODEL_CARD.md](MODEL_CARD.md). Don't round them differently on stage.
 
 ## Before you go on (10 minutes before)
 
@@ -39,7 +39,7 @@ Every sample can also be opened directly: `/?sample=<name>`, where name is `sbi-
 
 Add between 1:25 and 1:50:
 - **Fake PayPal email** (`/?sample=fake-paypal-email`): sender `paypa1-security.com`, reply-to Gmail. Point at the **Proven** labels for the look-alike sender and the reply-to mismatch.
-- **Lookalike link** (`/?sample=lookalike-link`): `amaz0n-refund.in`. "Zero instead of o, plus 'refund'. We fold look-alike characters before comparing with 36 brands."
+- **Lookalike link** (`/?sample=lookalike-link`): `amaz0n-refund.in`. "Zero instead of o, plus 'refund'. We fold look-alike characters before comparing with 37 brands."
 
 Add after the Results page:
 - **The trade-off, honestly:** "The old weighted formula from our first plan catches more SMS: F1 0.92 vs 0.77. But it raised 198 false alarms on those 3,630 ordinary messages; we raise one. Our 'phishing' verdict needs proven technical evidence, so a model alone can only say 'suspicious'."

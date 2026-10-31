@@ -44,6 +44,21 @@ USER_CONTENT = {
     "godaddysites.com", "square.site", "ipfs.io", "dweb.link",
 }
 
+# Click-tracking hosts of bulk email services. Real newsletters wrap their links in these; they
+# say nothing about who sent the email, so they neither break nor prove a sender/link match.
+MAIL_TRACKERS = {
+    "sendgrid.net", "list-manage.com", "mailchi.mp", "mandrillapp.com", "mailgun.org", "sparkpostmail.com",
+    "amazonses.com", "awstrack.me", "hubspotlinks.com", "rs6.net", "mlsend.com", "sendibt3.com", "sendinblue.com",
+    "brevo.com", "postmarkapp.com", "cmail19.com", "cmail20.com", "createsend.com", "convertkit-mail.com",
+    "substack.com", "beehiiv.com", "klaviyo.com", "exct.net",
+}
+
+# Footer links nearly every newsletter carries (social profiles, app stores).
+FOOTER_HOSTS = {
+    "twitter.com", "x.com", "facebook.com", "instagram.com", "linkedin.com", "youtube.com", "threads.net",
+    "play.google.com", "apps.apple.com", "itunes.apple.com", "medium.com", "discord.gg", "discord.com",
+}
+
 FREEMAIL = {
     "gmail.com", "googlemail.com", "yahoo.com", "yahoo.co.in", "yahoo.in", "ymail.com", "rocketmail.com",
     "outlook.com", "hotmail.com", "live.com", "msn.com", "rediffmail.com", "aol.com", "icloud.com", "me.com",
@@ -199,6 +214,20 @@ def is_user_content(info: UrlInfo) -> bool:
 
 def is_freemail(domain: str) -> bool:
     return parse_host(domain).registered in FREEMAIL
+
+
+def same_org(a: UrlInfo, b: UrlInfo) -> bool:
+    """True when two hosts belong to the same organisation: the same registered domain
+    (tm.openai.com / openai.com) or the same name under another ending (unstop.news / unstop.com).
+    Never for shared hosts where anyone can publish."""
+    if not (a.valid and b.valid) or a.is_ip or b.is_ip or is_user_content(a) or is_user_content(b):
+        return False
+    return a.registered == b.registered or (bool(a.label) and a.label == b.label)
+
+
+def is_mail_infra(info: UrlInfo) -> bool:
+    """Email click-trackers and the usual footer links: neutral in a sender/link match."""
+    return host_matches(info, MAIL_TRACKERS) or host_matches(info, FOOTER_HOSTS)
 
 
 def find_urls(text: str) -> List[Tuple[str, int, int]]:

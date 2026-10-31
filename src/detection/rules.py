@@ -203,10 +203,14 @@ def analyze_rules(text: str) -> List[Finding]:
 
 # --- cross-checks -------------------------------------------------------------
 
-def correlate(findings: List[Finding], claimed: List[B.Brand], url_spots: List[tuple]) -> List[Finding]:
+def correlate(findings: List[Finding], claimed: List[B.Brand], url_spots: List[tuple],
+              sender: Optional[D.UrlInfo] = None) -> List[Finding]:
     """Evidence that only appears when content and links are looked at together.
 
     url_spots: (url, start, end, field) for every link in the message.
+    sender: the email's sender domain when nothing about the sender looks wrong. A link to
+    the sender's own site is not "unverified" just because the email mentions other brands
+    (a newsletter listing Flipkart and Amazon competitions); requests are still checked.
     """
     out = []
     asks = any(f.label in REQUEST_LABELS for f in findings)
@@ -215,6 +219,7 @@ def correlate(findings: List[Finding], claimed: List[B.Brand], url_spots: List[t
         info = D.parse_url(url)
         if not info.valid or B.official_for(info):
             continue
+        own = sender is not None and (D.same_org(info, sender) or D.is_mail_infra(info))
         short = D.is_shortener(info)
         if asks and claimed:
             out.append(_link("REQUEST_TO_UNOFFICIAL_LINK", url, s, e, field,
@@ -224,6 +229,8 @@ def correlate(findings: List[Finding], claimed: List[B.Brand], url_spots: List[t
             out.append(_link("REQUEST_WITH_LINK", url, s, e, field,
                              f"Asks for details or payment through a link to {info.registered}", 15, "heuristic",
                              "credential_harvesting"))
+        elif own:
+            continue
         elif claimed and short:
             out.append(_link("BRAND_SHORT_LINK", url, s, e, field,
                              f"Mentions {names} but uses a shortened link ({info.registered})", 10, "heuristic",

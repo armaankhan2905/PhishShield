@@ -54,6 +54,9 @@ _CONTACT_RX = re.compile(
     r"\b(?:call|ring|dial|whatsapp|contact|phone)\b[^.\n]{0,25}?\+?\d[\d\s-]{8,}\d",
     re.I)
 _SEND_RX = re.compile(r"(?:share|send|tell|give|forward|reply|read\s+out)\b", re.I)
+# Anything that asks you to hand over details, pay, log in, call or install. An email that does any of
+# these never gets the first-party model discount, whoever sent it.
+_ASK_LABELS = rules.REQUEST_LABELS | {"REMOTE_ACCESS", "CALLBACK_REQUEST", "REQUEST_WITH_LINK"}
 
 
 def _ml_severity(p: float) -> str:
@@ -126,8 +129,12 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
         claimed += [b for b in B.brands_in_text(email.get("subject") or "") if b not in claimed]
         name = (email.get("from") or "").split("<")[0]
         claimed += [b for b in B.brands_in_text(name) if b not in claimed]
+    sender = D.parse_host(email["from"].rsplit("@", 1)[-1].strip(" >").lower()) if email and "@" in (email.get("from") or "") else None
+    # A sender we can lean on: a real organisation's domain (not free mail) with nothing wrong found about it.
+    clean_sender = sender if sender is not None and sender.valid and not D.is_freemail(sender.registered) and \
+        coverage["anomaly"] == RAN and not any(f.source == "anomaly" and f.family == "sender" for f in findings) else None
     if coverage["rules"] == RAN:
-        findings += _layer("rules", coverage, rules.correlate, findings, claimed, spots)
+        findings += _layer("rules", coverage, rules.correlate, findings, claimed, spots, clean_sender)
 
     url_probs = _model_layer("url_model", coverage, _url_model, spots)
     findings += [f for f in _model_layer("text_model", coverage, _text_model, text, kind) or []]
@@ -138,7 +145,6 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
                                     "url-model", 0, "suspicious_link", "ml", "ml", fld, _ml_severity(p), round(p, 4)))
 
     infos = [D.parse_url(u) for u, *_ in spots]
-    sender = D.parse_host(email["from"].rsplit("@", 1)[-1].strip(" >").lower()) if email and "@" in (email.get("from") or "") else None
     names = {b.name for b in claimed}
     # Consistency needs something to check: at least one link or a sender, all belonging to the named brand.
     consistent = bool(names) and bool(infos or sender) and all(B.official_for(i) & names for i in infos) and \
@@ -150,6 +156,12 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
     actionable = kind == "email" or bool(spots) or bool(PHONE_RX.search(text)) or bool(_CONTACT_RX.search(text)) or \
         any(f.label in ("REMOTE_ACCESS", "CALLBACK_REQUEST", "PAYMENT_REQUEST") for f in findings) or \
         any(f.label == "CREDENTIAL_REQUEST" and _SEND_RX.match(f.text) for f in findings)
+    # First-party email: the sender is clean and every link goes to the sender's own organisation (or to
+    # mail trackers and footer links), no proven trick was found, and it asks for nothing.
+    first_party = clean_sender is not None and \
+        all(D.same_org(i, clean_sender) or D.is_mail_infra(i) for i in infos) and \
+        not any(f.tier == "confirmed" for f in findings) and \
+        not any(f.label in _ASK_LABELS for f in findings)
 
     flags_by_url: Dict[str, List[str]] = {}
     for f in findings:
@@ -157,4 +169,4 @@ def run(text: str, kind: str, email: Optional[dict], links: List[dict], max_urls
             flags_by_url.setdefault(f.text, []).append(f.label.lower())
     url_rows = [{"url": u, "score": None if url_probs is None else round(url_probs[u], 4), "flags": flags_by_url.get(u, [])}
                 for u, *_ in spots]
-    return Detection(findings, url_rows, Context(actionable, consistent), coverage, [b.name for b in claimed])
+    return Detection(findings, url_rows, Context(actionable, consistent, first_party), coverage, [b.name for b in claimed])

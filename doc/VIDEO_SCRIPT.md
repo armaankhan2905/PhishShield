@@ -22,7 +22,7 @@
 | 8 | 2:30–2:45 | `/how-it-works` → Privacy, then the logo | "Explainable, measured, and private by default. PhishShield." | github.com/armaankhan2905/PhishShield |
 
 **After recording:**
-- Every number in the voice-over must match `/results` (`metrics_sha256 9b5ff4ec…`).
+- Every number in the voice-over must match `/results` (`metrics_sha256 e3cf332d…`).
 - Don't show real personal emails or the test inbox's address book.
 - Export as MP4 (H.264), under 100 MB.
 

@@ -86,7 +86,7 @@ Reuse `URL_RX`, `EMAIL_RX`, `PHONE_RX`, `OTP_RX` from `src/detection/main.py`.
   - bare domains in SMS text (`sbi-kyc.xyz/login`);
   - Gmail `google.com/url?q=` unwrapping;
   - URLs are only parsed, never fetched.
-- **Brand registry** (`src/detection/brands.py`): 36 brands with their aliases, name tokens and official domains, plus the `.sbi` brand TLD and `<bank>.bank.in`. Impersonation checks:
+- **Brand registry** (`src/detection/brands.py`): 37 brands with their aliases, name tokens and official domains, plus the `.sbi` brand TLD and `<bank>.bank.in`. Impersonation checks:
   - homograph and typosquat domains, aimed only at labels that carry a brand name;
   - brand name plus a phishing word (`paypalsecure`, `sbi-kyc`, `amaz0n-refund`);
   - brand in a subdomain (payment gateways such as `payu.in` and `billdesk.com` are exempt);
@@ -294,7 +294,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
   - **133 Python tests**, including the full fallback matrix: rules only, each model missing, Ollama down or erroring, bad AI answers, empty / oversized / malformed input, HTML email, unsupported and broken files, no message text in logs, removed endpoints;
   - **5 extension tests**.
 - **Final measurement:**
-  - two runs give identical `metrics_sha256 = 9b5ff4ec33237882`;
+  - two runs give identical `metrics_sha256 = e3cf332db2b04269`;
   - the system's numbers are unchanged from P3;
   - the old-formula comparison was fixed: it had treated "no wording to read" on bare links as a 0 score. The fair numbers are in the model card.
 

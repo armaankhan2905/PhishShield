@@ -11,7 +11,7 @@
 | Analyse emails, SMS, URLs, message content | Web app tabs: message / email / link / file upload (`.eml`, PDF, `.txt`); extension reads opened Gmail emails and page links |
 | Flag phishing attempts | Verdict safe / suspicious / phishing with score and confidence |
 | Suspicious links | Public Suffix List domain checks, look-alikes, shorteners, IP links, link-text vs real-link; URL model |
-| Impersonation | 36-brand registry: sender and link domain vs brand, display-name spoofing, look-alike characters |
+| Impersonation | 37-brand registry: sender and link domain vs brand, display-name spoofing, look-alike characters |
 | Social-engineering patterns | Requests for OTP / PIN / payment / remote access, threats, prizes, urgency (warnings like "never share" are not flagged) |
 | AI: NLP | Text model (TF-IDF + logistic regression); local LLM explanations (Ollama) grounded in findings |
 | AI: URL classification | URL model (gradient-boosted trees, 54 lexical features), calibrated |
@@ -36,7 +36,7 @@
 ## Before you press submit
 - [ ] `python -m pytest tests -q` → 133 passed; `node --test extension/test/*.test.js` → 5 passed
 - [ ] Fresh clone works: `pip install -r requirements-demo.txt`, `python -m src.pipeline.demo`, and the header shows **Models ready**
-- [ ] Every number in slides, video and README matches `/results` (`metrics_sha256 9b5ff4ec…`)
+- [ ] Every number in slides, video and README matches `/results` (`metrics_sha256 e3cf332d…`)
 - [ ] Hosted URL (if any) shows the "hosted demo" notice
 - [ ] Video uploaded, link set to "anyone with the link"
 - [ ] Repository is public (or judges were given access)

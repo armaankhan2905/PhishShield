@@ -59,7 +59,7 @@ model as evidence of safety.
 
 Positive = **flagged** (suspicious or phishing, score ≥ 30). The **system** column
 is the full product: rules + both models + scoring. Run twice with identical
-results (`metrics_sha256 = 9b5ff4ec33237882`).
+results (`metrics_sha256 = e3cf332db2b04269`).
 
 | Test set | n | System P | System R | System F1 | System FPR | Model alone F1 / FPR | Old 35/30/35 formula F1 / FPR |
 |---|---|---|---|---|---|---|---|
@@ -67,7 +67,7 @@ results (`metrics_sha256 = 9b5ff4ec33237882`).
 | SMS | 424 | 1.000 | 0.622 | **0.767** | 0.0% (0) | text 0.908 / 7.3% | 0.916 / 4.05% |
 | URLs (fixed 6,000 sample) | 6,000 | 0.978 | 0.607 | **0.749** | 0.8% (30) | URL 0.837 / 6.1% (all 31,767) | 0.805 / 1.8% |
 | OpenPhish (recent, unseen domains) | 276 | 1.000 | 0.685 | 0.813 | n/a | URL 0.913 | 0.871 |
-| Tranco top sites (benign) | 4,089 | n/a | n/a | n/a | **0.8%** (33) | URL FPR 5.6% | 1.5% |
+| Tranco top sites (benign) | 4,089 | n/a | n/a | n/a | **0.8%** (34) | URL FPR 5.6% | 1.5% |
 | UCI SMS ham (unseen source) | 3,630 | n/a | n/a | n/a | **0.03%** (1) | text FPR 9.5% | 5.5% (198) |
 | UCI SMS spam (spam ≠ phishing, information only) | 151 | 1.000 | 0.755 | 0.860 | n/a | text 0.973 | 0.966 |
 | Hand-written Indian set (synthetic) | 36 | 1.000 | 1.000 | 1.000 | 0.0% | text 0.941 / 10% | 0.970 / 5% |
