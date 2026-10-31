@@ -37,7 +37,7 @@ function renderHeader() {
   const here = location.pathname.replace(/\/$/, "") || "/";
   const status = h("div", { class: "status", id: "status", "aria-live": "polite" }, h("span", { class: "chip", text: "Connecting…" }));
   document.getElementById("top").replaceChildren(h("div", { class: "wrap" },
-    h("a", { class: "brand", href: "/" }, h("img", { src: "/static/icon48.png", alt: "" }), h("b", { text: "PhishShield" })),
+    h("a", { class: "brand", href: "/" }, h("b", { text: "PhishShield" })),
     h("nav", { "aria-label": "Pages" }, PAGES.map(([href, name]) =>
       h("a", { href, "aria-current": href === here ? "page" : null, text: name }))),
     status));

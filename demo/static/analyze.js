@@ -147,16 +147,17 @@ function render(result, text) {
   const box = $("result");
   const parts = [];
 
-  const marker = h("i", { style: "left:" + Math.max(0, Math.min(100, result.score)) + "%" });
+  const score = Math.max(0, Math.min(100, result.score));
   parts.push(h("div", { class: "verdict " + p.tone },
-    h("div", { class: "title" }, h("b", { text: p.title.replace(/ · \d+\/100$/, "") }),
-      h("span", { class: "muted", text: "Score " + result.score + "/100 · confidence " + result.confidence })),
-    h("p", { text: p.subtitle }),
-    h("div", { class: "meter", role: "img", "aria-label": "Risk score " + result.score + " out of 100" }, marker),
-    h("div", { class: "scale" }, h("span", { text: "0 safe" }), h("span", { text: "30" }), h("span", { text: "70" }), h("span", { text: "100 phishing" })),
-    h("div", { class: "checks" }, Object.entries(result.coverage).map(([k, v]) =>
-      h("span", { class: "chip " + (v === "ran" ? "ok" : v === "failed" ? "bad" : "off"), title: v,
-                  text: (CHECK_NAMES[k] || k) + (v === "ran" ? "" : " · " + v) })))));
+    h("div", { class: "ringbox", role: "img", "aria-label": "Risk score " + result.score + " out of 100" },
+      h("div", { class: "ring", style: "--to:" + score }), h("b", { text: String(result.score) })),
+    h("div", { class: "words" },
+      h("div", { class: "title" }, h("b", { text: p.title.replace(/ · \d+\/100$/, "") })),
+      h("p", { text: p.subtitle }),
+      h("div", { class: "meta", text: "Score " + result.score + "/100 · confidence " + result.confidence }),
+      h("div", { class: "checks" }, Object.entries(result.coverage).map(([k, v]) =>
+        h("span", { class: "chip " + (v === "ran" ? "ok" : v === "failed" ? "bad" : "off"), title: v,
+                    text: (CHECK_NAMES[k] || k) + (v === "ran" ? "" : " · " + v) }))))));
 
   if (PS.hostedNote(result)) parts.push(h("p", { class: "notice", text: PS.hostedNote(result) }));
   if (result.file) parts.push(h("p", { class: "muted small", text: "File: " + result.file.name + " (" + result.file.type +
