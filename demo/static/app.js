@@ -2,7 +2,7 @@
    All text from the API is inserted with textContent, never as HTML. */
 "use strict";
 
-const PAGES = [["/", "Check a message"], ["/results", "Results"], ["/how-it-works", "How it works"]];
+const PAGES = [["/", "Check a message"], ["/results", "Results"], ["/how-it-works", "How it works"], ["/extension", "Get the extension"]];
 
 function h(tag, attrs, ...kids) {
   const n = document.createElement(tag);

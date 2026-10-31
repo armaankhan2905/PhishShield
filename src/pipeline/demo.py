@@ -12,6 +12,9 @@ Endpoints:
   POST /api/sanitize          {"text"} -> personal data redacted
   GET  /api/eval              data/eval.json and calibration summary, for the results page
   GET  /api/health            {"ok", "mode", "models", "explainer"}
+  GET  /extension             install page for the Chrome extension (demo/extension.html)
+  GET  /api/extension         {"version", "download", "store_url"}
+  GET  /download/phishshield-extension.zip   the extension, ready for "Load unpacked"
 
 Modes (PHISHSHIELD_MODE): "local" (default, the server runs on the user's machine) or
 "hosted" (messages arrive over the network: the UI says so, explanations use the template).
@@ -24,18 +27,20 @@ Run (from repo root):
 """
 from __future__ import annotations
 
+import io
 import json
 import logging
 import os
 import re
 import sys
 import threading
+import zipfile
 from pathlib import Path
 from typing import List, Literal, Optional
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -50,7 +55,7 @@ logger = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[2]
 DEMO = ROOT / "demo"
 DATA = ROOT / "data"
-PAGES = {"results": "results.html", "how-it-works": "how.html"}
+PAGES = {"results": "results.html", "how-it-works": "how.html", "extension": "extension.html"}
 OLD_PAGES = {"evaluation": "/results", "training": "/results", "pipeline": "/how-it-works", "ask": "/"}
 MAX_CHARS = 20_000
 
@@ -195,6 +200,37 @@ def api_eval() -> dict:
             m = json.loads(meta.read_text(encoding="utf-8"))
             out["model_cards"][kind] = {k: m.get(k) for k in ("version", "train_n", "val_n", "val_calibrated", "C", "iterations")}
     return out
+
+
+EXTENSION = ROOT / "extension"
+EXTENSION_SKIP = {"dev", "test"}  # test pages and unit tests aren't part of the installed extension
+
+
+def _extension_version() -> str:
+    return json.loads((EXTENSION / "manifest.json").read_text(encoding="utf-8"))["version"]
+
+
+@app.get("/api/extension")
+def api_extension() -> dict:
+    """What the install page needs. PHISHSHIELD_EXTENSION_STORE_URL, once the extension is on the
+    Chrome Web Store, turns the page's download button into a one-click "Add to Chrome"."""
+    store = os.environ.get("PHISHSHIELD_EXTENSION_STORE_URL", "").strip()
+    return {"version": _extension_version(), "download": "/download/phishshield-extension.zip",
+            "store_url": store if store.startswith("https://chromewebstore.google.com/") else None}
+
+
+@app.get("/download/phishshield-extension.zip")
+def download_extension() -> Response:
+    """The extension folder as a zip with one top-level folder, ready for chrome://extensions > Load unpacked."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        for path in sorted(EXTENSION.rglob("*")):
+            rel = path.relative_to(EXTENSION)
+            if path.is_file() and rel.parts[0] not in EXTENSION_SKIP:
+                z.write(path, "phishshield-extension/" + rel.as_posix())
+    name = f"phishshield-extension-{_extension_version()}.zip"
+    return Response(buf.getvalue(), media_type="application/zip",
+                    headers={"Content-Disposition": f'attachment; filename="{name}"'})
 
 
 def main() -> None:

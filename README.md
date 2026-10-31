@@ -63,7 +63,7 @@ python -m src.pipeline.demo            # http://localhost:8000
 - **Results:** every measured number, read from `data/eval.json`.
 - **How it works:** the checks and the privacy facts for the current mode.
 - **Plain-English AI explanations** (optional): install [Ollama](https://ollama.com), then `ollama pull qwen2.5:3b`. Without it, a summary built from the findings is shown.
-- **Chrome extension:** load `extension/` unpacked. Steps in [extension/README.md](extension/README.md).
+- **Chrome extension:** open **Get the extension** in the app (http://localhost:8000/extension). It downloads the extension, walks through the four steps and confirms once it's installed. Details in [extension/README.md](extension/README.md).
 
 The trained models are in the repo (about 4 MB), so nothing needs training. To rebuild everything from public data:
 

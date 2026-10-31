@@ -212,6 +212,8 @@ stays fast for the extension.
 | Endpoint | Use |
 |---|---|
 | `GET /api/health` | `{"ok": true, "mode": "local"\|"hosted", "models": {"url": state, "text": state}, "explainer": {"available", "model"?, "detail"}}`. Model states: `unloaded` (not loaded yet), `loaded`, `missing`, `disabled`, `error` |
+| `GET /api/extension` | `{"version", "download", "store_url"}` for the **Get the extension** page. `store_url` is set from `PHISHSHIELD_EXTENSION_STORE_URL` (Chrome Web Store links only) |
+| `GET /download/phishshield-extension.zip` | The extension as a zip with one `phishshield-extension/` folder, ready for *Load unpacked* (test pages excluded) |
 | `GET /api/eval` | `data/eval.json` plus the scoring calibration and model metadata, for the Results page |
 | `POST /api/sanitize` | Redact personal data from text (PrivacyLens) |
 

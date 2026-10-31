@@ -5,7 +5,18 @@ using your local PhishShield server. Nothing is analysed inside the extension
 itself: it sends the message to the server you choose (by default
 `http://localhost:8000`, on your own computer) and shows the result.
 
-## Install (unpacked)
+## Install
+
+**Easiest:** start the server (`python -m src.pipeline.demo`), open http://localhost:8000/extension
+(**Get the extension** in the app), and follow its four steps. It downloads the extension as a zip,
+shows exactly where to click, and confirms by itself once the extension is installed (or tells you
+when a newer version is available).
+
+Browsers don't let a website install an extension by itself. One-click installs only come from the
+Chrome Web Store: after publishing there, set `PHISHSHIELD_EXTENSION_STORE_URL` to the store page and
+the app's button becomes **Add to Chrome**.
+
+### By hand (unpacked)
 
 1. Start the server from the repo root:
    ```bash
@@ -41,6 +52,7 @@ itself: it sends the message to the server you choose (by default
 | `content/ui.js` | Banner in a closed Shadow DOM. All API text inserted with `textContent`, never HTML |
 | `content/gmail.js` | Finds opened emails (Gmail selectors in one `SEL` object), extracts sender, subject, text and links (unwrapping `google.com/url?q=`), shows the banner |
 | `content/links.js` | Outlines risky outgoing links on other sites |
+| `content/app-bridge.js` | On the PhishShield app's own pages only: marks the page with the installed version so **Get the extension** can confirm the install |
 | `popup/`, `options/` | Toolbar popup and settings page |
 
 Reply-To isn't visible in Gmail's page, so it isn't sent; the server's reply-to check only applies to `.eml` uploads.

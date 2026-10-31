@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get the PhishShield extension</title>
+<link rel="icon" href="/static/favicon.png">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header class="top" id="top"></header>
+<main class="wrap stack">
+  <div>
+    <h1>Get the PhishShield extension</h1>
+    <p class="lede">Warns you inside Gmail and outlines risky links on any website, using this PhishShield server.
+      Works in Google Chrome and Microsoft Edge.</p>
+  </div>
+
+  <section class="card install" id="installStatus" aria-live="polite">
+    <p class="muted">Checking whether the extension is installed…</p>
+  </section>
+
+  <section class="card" id="steps">
+    <h2>Install in four steps</h2>
+    <ol class="steps">
+      <li><div><h3>Download and unzip</h3>
+        <p>Get <span class="mono" id="zipName">phishshield-extension.zip</span>, then unzip it
+          (Windows: right-click → <b>Extract All</b>). You'll get a folder called <span class="mono">phishshield-extension</span>.</p>
+        <div class="row" style="margin-top:10px"><a class="btn" id="downloadBtn" href="/download/phishshield-extension.zip">Download extension</a>
+          <span class="muted small" id="versionNote"></span></div></div></li>
+      <li><div><h3>Open the extensions page</h3>
+        <p>Websites can't open this page for you. Copy the address, paste it into a new tab and press Enter.</p>
+        <div class="row" style="margin-top:10px">
+          <code class="copyable" id="extUrl">chrome://extensions</code>
+          <button class="samples-more" type="button" id="copyBtn">Copy</button>
+          <span class="muted small" id="copied" role="status"></span></div></div></li>
+      <li><div><h3>Turn on Developer mode</h3>
+        <p>The switch is in the top-right corner of the extensions page.</p></div></li>
+      <li><div><h3>Click “Load unpacked”</h3>
+        <p>Choose the <span class="mono">phishshield-extension</span> folder from step 1. Then come back to this tab: it updates by itself
+          once the extension is on.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Why isn't this one click?</h2>
+    <p class="muted">For your safety, Chrome and Edge only allow one-click installs from their extension stores. Websites can't
+      install extensions on their own. When PhishShield is published to the Chrome Web Store, the button above becomes
+      <b>Add to Chrome</b> and installs it in one click.</p>
+  </section>
+</main>
+<footer class="wrap">The extension sends messages only to the PhishShield server you choose in its settings (by default this computer).</footer>
+<script src="/static/app.js"></script>
+<script src="/static/extension.js"></script>
+</body>
+</html>

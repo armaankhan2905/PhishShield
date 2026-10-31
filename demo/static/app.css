@@ -152,3 +152,11 @@ td.url { width: 38%; min-width: 16ch; }
 dl.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0; font-size: 14px; }
 dl.kv dt { color: var(--muted); } dl.kv dd { margin: 0; font-variant-numeric: tabular-nums; }
 footer { color: var(--muted); font-size: 12.5px; padding-block: 0 32px; }
+
+/* extension page */
+.install { border-left: 4px solid var(--grey-line); }
+.install.ok { border-left-color: var(--safe); background: var(--safe-bg); }
+.install.warn { border-left-color: var(--warn); background: var(--warn-bg); }
+.install p { margin: 0 0 10px; }
+a.btn { display: inline-block; text-decoration: none; }
+.copyable { background: var(--field); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; user-select: all; }
