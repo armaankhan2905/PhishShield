@@ -1,6 +1,6 @@
 # PhishShield project progress
 
-**Updated:** 2026-10-31, after Phase 5 was completed (tag `v1.0`).
+**Updated:** 2026-10-31, after Phase 6 materials were completed (code at tag `v1.0`).
 
 | Phase | Lead | Status |
 |---|---|---|
@@ -9,7 +9,7 @@
 | P3 Machine learning | Govind | ✅ Done: see [doc/MODEL_CARD.md](doc/MODEL_CARD.md) and the P3 section of [doc/HANDOFF.md](doc/HANDOFF.md) |
 | P4 Browser extension | Atharvva | ✅ Done: see [extension/README.md](extension/README.md). Real-Gmail check still to do |
 | P5 Integration + deployment | Ryan | ✅ Done: web app, local-AI explanations, .eml/PDF upload, hosted mode, fallback tests. Render deploy not done (needs an account) |
-| P6 Demo + submission | Atharvva | ⏳ Next |
+| P6 Demo + submission | Atharvva | ✅ Materials done: demo script, Q&A, video script, slides, README, screenshots, checklist ([doc/SUBMISSION.md](doc/SUBMISSION.md)). Recording, rehearsals and portal submission are for the team |
 
 ## Phase 3 summary
 - **Models:** URL model (`url-hgb-1`) and text model (`text-tfidf-lr-1`), calibrated, committed in `models/`.
@@ -31,11 +31,14 @@
 ## Phase 3 interruptions (resolved)
 - The first evaluation pair was interrupted by the user. It was restarted once, then stopped again by me after the hand-written test set was found to overlap synthetic training templates. It was re-run after the fix and the reproducibility check passed.
 
-## Next
-P6 (demo + submission): see the P5 → P6 section of doc/HANDOFF.md.
-Before the demo:
-- load the extension in real Chrome and check it against real Gmail;
-- optionally deploy to Render (New → Blueprint).
+## Next (people, not code)
+See [doc/SUBMISSION.md](doc/SUBMISSION.md):
+1. Load the extension in real Chrome and check it against real Gmail.
+2. Record the video ([doc/VIDEO_SCRIPT.md](doc/VIDEO_SCRIPT.md)).
+3. Optionally deploy to Render (New → Blueprint).
+4. Share the slides.
+5. Do two rehearsals ([doc/DEMO_SCRIPT.md](doc/DEMO_SCRIPT.md)).
+6. Submit on the portal.
 
 Latest evaluation: `metrics_sha256 = 9b5ff4ec33237882` (two identical runs).
 

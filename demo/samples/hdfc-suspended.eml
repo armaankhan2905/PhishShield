@@ -1,0 +1,24 @@
+From: "HDFC Bank" <alerts@hdfc-netbanking-secure.com>
+Reply-To: hdfc.support.desk@gmail.com
+To: customer@example.com
+Subject: Your NetBanking access is suspended
+Date: Fri, 31 Oct 2026 09:12:00 +0530
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="b0"
+
+--b0
+Content-Type: text/html; charset=utf-8
+
+<html><body>
+<p>Dear Customer,</p>
+<p>Your NetBanking access has been suspended due to incomplete KYC. Login at
+<a href="http://hdfc-netbanking-secure.com/login">https://www.hdfcbank.com/login</a> to unlock within 24 hours.</p>
+<div style="display:none">hdfc bank official genuine safe message</div>
+<p>Regards,<br>HDFC Bank</p>
+</body></html>
+--b0
+Content-Type: application/octet-stream; name="statement.html"
+Content-Disposition: attachment; filename="statement.html"
+
+PGgxPlN0YXRlbWVudDwvaDE+
+--b0--

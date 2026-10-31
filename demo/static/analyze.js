@@ -222,4 +222,10 @@ document.addEventListener("DOMContentLoaded", () => {
   drop.addEventListener("drop", (e) => { if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
   $("samples").replaceChildren(...SAMPLES.map((s) => h("button", { type: "button", onclick: () => loadSample(s) },
     s.name + " ", h("small", { text: s.tag }))));
+  // Presenter aid: /?sample=sbi-kyc-sms opens the page with that sample already checked.
+  const wanted = new URLSearchParams(location.search).get("sample");
+  const sample = SAMPLES.find((s) => slug(s.name) === wanted);
+  if (sample) loadHealth().then(() => loadSample(sample));
 });
+
+function slug(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }

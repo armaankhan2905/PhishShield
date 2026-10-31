@@ -1,0 +1,13 @@
+From: "SBI Alerts" <alert@sbi-kyc.xyz>
+To: customer@example.com
+Subject: Account blocked: complete KYC
+Date: Fri, 31 Oct 2026 10:05:00 +0530
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+Dear customer,
+
+Your SBI KYC is pending and your account will be blocked within 24 hours.
+Verify your details now at http://sbi-kyc.xyz/login to avoid suspension.
+
+Regards, SBI Team

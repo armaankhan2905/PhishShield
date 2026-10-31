@@ -126,6 +126,7 @@ th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--lin
 th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .url { font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; }
+td.url { width: 38%; min-width: 16ch; }
 .risk { font-weight: 700; } .risk.risky { color: var(--danger); } .risk.caution { color: var(--warn); } .risk.ok { color: var(--safe); }
 .explain { background: var(--field); border-radius: 8px; padding: 10px 12px; }
 .explain p { margin: 0; }

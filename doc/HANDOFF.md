@@ -330,3 +330,23 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
 - Every number on screen or in the slides traces to `data/eval.json` / the model card.
 - Privacy statements match the mode shown.
 - Two rehearsals done.
+
+---
+
+## P6 Demo and submission: materials ready
+
+**From:** Atharvva · **To:** the whole team
+
+- **Demo:**
+  - [DEMO_SCRIPT.md](DEMO_SCRIPT.md): a 3-minute and a 5-minute run, a pre-flight checklist, recovery steps, and what not to say.
+  - Every sample opens directly with `/?sample=<name>`.
+  - [demo/samples](../demo/samples) has 5 sample emails (3 scams, 2 legitimate), each checked: 100 / 100 / 100 phishing; 2 and 9 safe.
+- **Judge prep:** [QA.md](QA.md), with an owner for each answer.
+- **Video:** [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md), 8 shots in 2:45, with voice-over and captions.
+- **Slides:** 12 slides at https://claude.ai/artifact/3nDzxi9nBKtScsJJX6M8uj (private until shared). Every number is taken from `data/eval.json`.
+- **README:** rewritten as the submission front page, with screenshots in `doc/screenshots/`.
+- **Consistency check:** every quoted number was checked against `data/eval.json`, and 2 rounding mismatches were fixed.
+- **Checklist:** [SUBMISSION.md](SUBMISSION.md), which maps every requirement in the problem statement to where it lives.
+- **Removed leftovers:** the `video/` stub and `requirements-gguf.txt`.
+
+**Left for people:** the real Chrome + Gmail check, recording, an optional Render deploy, sharing the deck, rehearsals, and submitting.

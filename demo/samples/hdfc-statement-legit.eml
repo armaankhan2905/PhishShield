@@ -1,0 +1,12 @@
+From: "HDFC Bank" <alerts@hdfcbank.net>
+To: customer@example.com
+Subject: Your account statement is ready
+Date: Fri, 31 Oct 2026 08:00:00 +0530
+MIME-Version: 1.0
+Content-Type: text/html; charset=utf-8
+
+<html><body>
+<p>Dear Customer,</p>
+<p>Your statement for October is ready. <a href="https://www.hdfcbank.com/personal/statement">View statement</a> in NetBanking.</p>
+<p>Never share your OTP, PIN or password with anyone. HDFC Bank never asks for them.</p>
+</body></html>
