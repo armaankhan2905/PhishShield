@@ -1,6 +1,6 @@
 /* PhishShield on ordinary web pages: outlines risky links and explains them on hover.
  *
- * Owner: Atharvva. Only links to other sites are checked (a page's own links are the
+ * Owner: Atharva. Only links to other sites are checked (a page's own links are the
  * site's business), at most MAX_LINKS per page. Sending a page's links anywhere is a
  * privacy decision, so "auto" only scans when the API runs on this machine; with a
  * hosted API it stays off unless switched on in the options page.

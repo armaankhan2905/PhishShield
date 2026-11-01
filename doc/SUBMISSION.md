@@ -22,14 +22,14 @@
 | Item | Status | Owner |
 |---|---|---|
 | Source code, tagged `v1.0` | ✅ pushed | Ryan |
-| README with setup, screenshots, results | ✅ `README.md` | Atharvva |
+| README with setup, screenshots, results | ✅ `README.md` | Atharva |
 | Model card (data, results, limits, disclosures) | ✅ `doc/MODEL_CARD.md` | Govind |
 | API reference | ✅ `doc/API.md` | Ryan |
-| Demo script (3 and 5 min) | ✅ `doc/DEMO_SCRIPT.md` | Atharvva |
+| Demo script (3 and 5 min) | ✅ `doc/DEMO_SCRIPT.md` | Atharva |
 | Judge Q&A | ✅ `doc/QA.md` | everyone |
-| Slides (12) | ✅ https://claude.ai/artifact/3nDzxi9nBKtScsJJX6M8uj (private until shared from its Share menu; download as PDF / PPTX there) | Atharvva |
-| Video (≤ 3 min) | ⏳ **record**: script in `doc/VIDEO_SCRIPT.md` | Atharvva |
-| Extension checked in real Chrome + Gmail | ⏳ **do before recording**: `extension/README.md` | Atharvva |
+| Slides (12) | ✅ https://claude.ai/artifact/3nDzxi9nBKtScsJJX6M8uj (private until shared from its Share menu; download as PDF / PPTX there) | Atharva |
+| Video (≤ 3 min) | ⏳ **record**: script in `doc/VIDEO_SCRIPT.md` | Atharva |
+| Extension checked in real Chrome + Gmail | ⏳ **do before recording**: `extension/README.md` | Atharva |
 | Hosted demo URL (optional) | ⏳ Render → New → Blueprint → this repo | Ryan |
 | Two rehearsals | ⏳ | everyone |
 

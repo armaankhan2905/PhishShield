@@ -1,6 +1,6 @@
 /* PhishShield background service worker: the only part of the extension that talks to the API.
  *
- * Owner: Atharvva. Content scripts on mail.google.com can't call the API themselves (Gmail's
+ * Owner: Atharva. Content scripts on mail.google.com can't call the API themselves (Gmail's
  * origin would be blocked by CORS), so they send {type: "analyze" | "links" | "health"}
  * messages here. host_permissions cover the local server; any other API address must be
  * granted from the options page.

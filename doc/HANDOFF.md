@@ -61,7 +61,7 @@ Reuse `URL_RX`, `EMAIL_RX`, `PHONE_RX`, `OTP_RX` from `src/detection/main.py`.
 ### Not done in P1 (side tasks, owners unchanged)
 - Armaan: rule list and brand list (official registered domains per brand).
 - Govind: dataset downloads and environment setup.
-- Atharvva: 20 demo samples (`data/demo_samples.json`), extension skeleton, test Gmail inbox.
+- Atharva: 20 demo samples (`data/demo_samples.json`), extension skeleton, test Gmail inbox.
 - Everyone: start collecting redacted legitimate banking or service messages for the false-positive test set.
 
 ### Known gaps / notes
@@ -127,7 +127,7 @@ These are unit-test fixtures, **not an accuracy measurement**.
 - `fuse.py` already scores `ml` findings: 0 points below p = 0.5, up to `ML_MAX = 25` at p = 1. A confident model (p ≥ `ML_CONFIDENT = 0.8`) can lift a message to phishing only together with a heuristic from another family.
 - Calibrate on validation data (revised plan §5): `SAFE_BELOW`, `PHISHING_FROM`, `FAMILY_CAPS`, `ML_MAX`, `ML_CONFIDENT`, `HEURISTIC_ONLY_CAP`, `NO_ACTION_CAP`. Compare against the 35/30/35 baseline from P1 (git `85652ce`).
 
-### Acceptance test for your handover to Atharvva (revised plan §10)
+### Acceptance test for your handover to Atharva (revised plan §10)
 - The eval script reproduces `eval.json` exactly (fixed seeds).
 - A script check shows no registered domain appears in both train and test.
 - Each model can be disabled in turn without a crash; coverage shows it as unavailable or failed.
@@ -146,7 +146,7 @@ These are unit-test fixtures, **not an accuracy measurement**.
 
 ## P3 Machine learning → P4 Browser extension
 
-**From:** Govind · **To:** Atharvva
+**From:** Govind · **To:** Atharva
 
 ### What works
 - **Two calibrated models** are plugged into the detection engine (details and limits in [MODEL_CARD.md](MODEL_CARD.md)):
@@ -202,7 +202,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
 
 ## P4 Browser extension → P5 Integration and deployment
 
-**From:** Atharvva · **To:** Ryan
+**From:** Atharva · **To:** Ryan
 
 ### What works
 - **Chrome extension (Manifest V3)** in `extension/`; install steps in [extension/README.md](../extension/README.md).
@@ -246,7 +246,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
   If Gmail's markup differs, fix the selectors in `SEL` at the top of `content/gmail.js`.
 - **Real Chrome-only paths:** the badge, options-page permission requests and the service worker's message passing only run inside real Chrome.
 
-### Acceptance test for your handover to Atharvva (P5 → P6, revised plan §10)
+### Acceptance test for your handover to Atharva (P5 → P6, revised plan §10)
 - **Fallback matrix passes:** rules-only, no URL model, no text model, Ollama down, API down, unsupported file, malformed URL, empty / oversized input, HTML email.
 - Hosted disclosure visible; logs contain no message text.
 - Metrics shown in the UI match `data/eval.json`.
@@ -261,7 +261,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
 
 ## P5 Integration and deployment → P6 Demo and submission
 
-**From:** Ryan · **To:** Atharvva
+**From:** Ryan · **To:** Atharva
 
 ### What works (tag `v1.0`)
 - **Web app** at http://localhost:8000:
@@ -335,7 +335,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
 
 ## P6 Demo and submission: materials ready
 
-**From:** Atharvva · **To:** the whole team
+**From:** Atharva · **To:** the whole team
 
 - **Demo:**
   - [DEMO_SCRIPT.md](DEMO_SCRIPT.md): a 3-minute and a 5-minute run, a pre-flight checklist, recovery steps, and what not to say.

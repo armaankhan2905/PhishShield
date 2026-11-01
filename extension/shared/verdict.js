@@ -1,6 +1,6 @@
 /* PhishShield shared logic: turns an /api/analyze response into what the UI shows.
  *
- * Owner: Atharvva. Loaded as a classic script by the content scripts and the popup
+ * Owner: Atharva. Loaded as a classic script by the content scripts and the popup
  * (defines globalThis.PS), and require()-able from Node for tests.
  * Rules from doc/API.md this file enforces:
  *   - reasons and highlights come only from the response's findings

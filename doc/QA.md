@@ -1,7 +1,7 @@
 # Judge Q&A
 
 Short, honest answers. Numbers from `data/eval.json` and [MODEL_CARD.md](MODEL_CARD.md).
-Who answers: **A** Armaan (rules, scoring) · **G** Govind (models, evaluation) · **R** Ryan (app, privacy, deploy) · **At** Atharvva (extension, demo).
+Who answers: **A** Armaan (rules, scoring) · **G** Govind (models, evaluation) · **R** Ryan (app, privacy, deploy) · **At** Atharva (extension, demo).
 
 ## Accuracy
 

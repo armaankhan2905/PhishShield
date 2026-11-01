@@ -1,6 +1,6 @@
 /* PhishShield for Gmail: checks each opened email and shows a banner above it.
  *
- * Owner: Atharvva. Gmail is a single-page app that swaps messages without reloading,
+ * Owner: Atharva. Gmail is a single-page app that swaps messages without reloading,
  * so a MutationObserver looks for message bodies we haven't checked yet.
  * Selectors (Gmail's own class names) live in SEL; if Gmail changes them, fix them
  * here. Reply-To isn't shown in Gmail's page, so it isn't sent.

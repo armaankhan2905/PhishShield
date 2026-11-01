@@ -7,9 +7,9 @@
 | P1 Foundation | Ryan | ✅ Done |
 | P2 Core detection | Armaan | ✅ Done |
 | P3 Machine learning | Govind | ✅ Done: see [doc/MODEL_CARD.md](doc/MODEL_CARD.md) and the P3 section of [doc/HANDOFF.md](doc/HANDOFF.md) |
-| P4 Browser extension | Atharvva | ✅ Done: see [extension/README.md](extension/README.md). Real-Gmail check still to do |
+| P4 Browser extension | Atharva | ✅ Done: see [extension/README.md](extension/README.md). Real-Gmail check still to do |
 | P5 Integration + deployment | Ryan | ✅ Done: web app, local-AI explanations, .eml/PDF upload, hosted mode, fallback tests. Render deploy not done (needs an account) |
-| P6 Demo + submission | Atharvva | ✅ Materials done: demo script, Q&A, video script, slides, README, screenshots, checklist ([doc/SUBMISSION.md](doc/SUBMISSION.md)). Recording, rehearsals and portal submission are for the team |
+| P6 Demo + submission | Atharva | ✅ Materials done: demo script, Q&A, video script, slides, README, screenshots, checklist ([doc/SUBMISSION.md](doc/SUBMISSION.md)). Recording, rehearsals and portal submission are for the team |
 
 ## Phase 3 summary
 - **Models:** URL model (`url-hgb-1`) and text model (`text-tfidf-lr-1`), calibrated, committed in `models/`.

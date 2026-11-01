@@ -1,6 +1,6 @@
 /* PhishShield page UI: the warning banner and in-page highlights.
  *
- * Owner: Atharvva. The banner lives in a closed Shadow DOM so the host page's CSS can't
+ * Owner: Atharva. The banner lives in a closed Shadow DOM so the host page's CSS can't
  * restyle or read it, and every string from the API is inserted with textContent,
  * never as HTML. Highlights wrap existing text nodes; they never rewrite the page's markup.
  */

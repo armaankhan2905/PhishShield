@@ -1,6 +1,6 @@
 # PhishShield API contract · v1.1
 
-Agreed in Phase 1. The web app (Ryan), the extension (Atharvva), the detection
+Agreed in Phase 1. The web app (Ryan), the extension (Atharva), the detection
 layer (Armaan) and the models (Govind) all build against this. Change it only
 by telling the whole team and updating this file in the same commit.
 

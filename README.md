@@ -146,7 +146,7 @@ SMS / email / link / .eml / Gmail page
 | Ryan | Foundation, server, web app, local-AI explanations, uploads, hosted mode | P1 Foundation, P5 Integration |
 | Armaan | Rules, domain and brand checks, sender checks, evidence-gated scoring | P2 Core detection |
 | Govind | Datasets, URL and text models, calibration, evaluation | P3 Machine learning |
-| Atharvva | Chrome extension, demo, video, submission | P4 Extension, P6 Demo |
+| Atharva | Chrome extension, demo, video, submission | P4 Extension, P6 Demo |
 
 Built on our earlier PrivacyLens project (personal-data redaction), whose sanitizer and server skeleton are reused.
 The build ran as a relay; every handover is in [doc/HANDOFF.md](doc/HANDOFF.md).
