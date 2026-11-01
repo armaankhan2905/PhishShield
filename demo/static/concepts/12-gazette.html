@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 12 · Gazette</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700;6..72,800&family=Libre+Franklin:wght@400;600;700;800&display=swap">
+<style>
+/* Concept 12, Gazette. The result is front-page news: masthead, a banner headline that changes
+   with the verdict, the message quoted as the lead story, evidence in newspaper columns.
+   Cool newsprint and black ink; hints of the brief in a teal kicker, a gold drop cap and
+   orange highlighter on the quoted message. */
+:root {
+  --paper: #f1f0ec; --paper2: #e6e4dd; --ink: #141414; --muted: #555; --rule: #1a1a1a; --teal: #17706b; --gold: #b0873a; --orange: #ff5f1f; --safe: #17706b;
+  --serif: "Newsreader", Georgia, serif; --sans: "Libre Franklin", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper2); color: var(--ink); font: 16px/1.55 var(--serif); }
+.page { max-width: 1160px; margin: 18px auto 70px; background: var(--paper); padding: 26px max(22px, env(safe-area-inset-left)) 40px; box-shadow: 0 10px 40px #0002; }
+.top { display: flex; justify-content: space-between; gap: 12px; font: 600 12px var(--sans); text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--rule); padding-bottom: 8px; flex-wrap: wrap; }
+.top nav { display: flex; gap: 16px; flex-wrap: wrap; } .top a { color: var(--ink); text-decoration: none; } .top a.on { color: var(--teal); }
+.mast { text-align: center; padding: 14px 0 10px; border-bottom: 4px double var(--rule); }
+.mast h1 { font: 800 clamp(44px, 7vw, 84px)/1 var(--serif); margin: 0; letter-spacing: -.02em; }
+.mast p { font: 600 12px var(--sans); letter-spacing: .2em; text-transform: uppercase; margin: 6px 0 0; color: var(--muted); }
+.ask { display: grid; grid-template-columns: minmax(0, 1fr) auto; border: 2px solid var(--rule); margin: 18px 0; background: #fff; }
+.ask input { border: 0; padding: 12px 14px; font: 16px var(--serif); min-width: 0; background: none; } .ask input:focus { outline: none; }
+.ask button { font: 800 14px var(--sans); text-transform: uppercase; letter-spacing: .1em; background: var(--rule); color: var(--paper); border: 0; padding: 0 22px; cursor: pointer; }
+.kicker { font: 800 13px var(--sans); text-transform: uppercase; letter-spacing: .18em; color: var(--teal); margin: 20px 0 6px; }
+.head { font: 800 clamp(40px, 6vw, 76px)/0.98 var(--serif); margin: 0; letter-spacing: -.02em; }
+.head .hot { color: var(--tone); }
+.deck { font: 500 22px/1.4 var(--serif); color: var(--muted); margin: 12px 0 18px; max-width: 52ch; }
+.byline { font: 600 12px var(--sans); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 8px 0;
+          display: flex; gap: 18px; flex-wrap: wrap; }
+.byline b { color: var(--ink); }
+.cols { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: 34px; margin-top: 22px; }
+@media (max-width: 880px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.story { columns: 2 260px; column-gap: 26px; column-rule: 1px solid #c8c6bf; font-size: 17px; }
+.story p { margin: 0 0 12px; }
+.story p:first-child::first-letter { float: left; font: 800 64px/0.8 var(--serif); color: var(--gold); padding: 6px 8px 0 0; }
+blockquote { margin: 0 0 14px; padding: 12px 14px; border-left: 4px solid var(--rule); background: #fff; font: italic 500 19px/1.6 var(--serif); break-inside: avoid; }
+mark { background: linear-gradient(transparent 15%, #ff5f1fd9 15%, #ff5f1fd9 90%, transparent 90%); color: #140802; padding: 0 2px; }
+.box { border: 2px solid var(--rule); padding: 16px; background: #fff; }
+.box h3 { font: 800 13px var(--sans); text-transform: uppercase; letter-spacing: .12em; margin: 0 0 10px; border-bottom: 1px solid var(--rule); padding-bottom: 6px; }
+.score { font: 800 92px/0.9 var(--serif); color: var(--tone); } .score small { font: 600 18px var(--sans); color: var(--muted); }
+.box ul { list-style: none; margin: 10px 0 0; padding: 0; font: 15px/1.45 var(--sans); }
+.box li { padding: 8px 0; border-top: 1px dotted #999; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.box li b { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); display: block; }
+.box li em { font-style: normal; font-weight: 700; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; border: 2px solid var(--rule); background: var(--paper); z-index: 5; }
+.toggle button { font: 800 12px var(--sans); text-transform: uppercase; letter-spacing: .1em; background: none; border: 0; padding: 7px 12px; cursor: pointer; }
+.toggle button.on { background: var(--rule); color: var(--paper); }
+body[data-state="phishing"] { --tone: var(--orange); } body[data-state="safe"] { --tone: var(--safe); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+</style>
+</head>
+<body data-state="phishing">
+<div class="page">
+  <div class="top"><span>Saturday, 31 October 2026 · Checked on this computer</span><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></div>
+  <div class="mast"><h1>The PhishShield Gazette</h1><p>Every suspicious message, investigated</p></div>
+  <div class="ask"><input aria-label="Message" value="URGENT: Dear customer, your SBI KYC is pending… Verify at http://sbi-kyc.xyz/login"><button>Investigate</button></div>
+  <p class="kicker only-phish">Breaking · Bank impersonation</p><p class="kicker only-safe">All clear · Bank alert</p>
+  <h2 class="head only-phish">“SBI” message is a <span class="hot">phishing scam</span></h2>
+  <h2 class="head only-safe">HDFC OTP alert is <span class="hot">genuine</span></h2>
+  <p class="deck only-phish">Link leads to a domain SBI doesn't own. Readers advised not to click, reply or share any code.</p>
+  <p class="deck only-safe">The message warns against sharing the code and asks for nothing. No action needed.</p>
+  <div class="byline"><span>Risk <b class="only-phish">100/100</b><b class="only-safe">0/100</b></span><span>Confidence <b>high</b></span><span>Checks <b>4 of 4</b></span><span>Filed in <b>23 ms</b></span></div>
+  <div class="cols">
+    <div class="story only-phish">
+      <p>A text message claiming to come from SBI asks customers to “verify” a pending KYC before their account is blocked. PhishShield's checks found the link points to sbi-kyc.xyz, a domain that has nothing to do with the bank.</p>
+      <blockquote><mark>URGENT</mark>: Dear customer, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></blockquote>
+      <p>Both of PhishShield's models agreed independently: the wording and the link each scored 100% likely phishing. The message also leans on pressure, with a deadline of “today” and a threat to block the account.</p>
+      <p>“It pretends to be SBI to rush you into clicking,” the local AI explainer summarised. “Don't click; check in the YONO app.”</p>
+    </div>
+    <div class="story only-safe"><p>A one-time password alert from HDFC Bank for a ₹500 Amazon purchase. It tells the reader not to share the code, contains no link, and asks for no reply. PhishShield found nothing to flag.</p></div>
+    <aside class="box"><h3>By the numbers</h3>
+      <div class="score"><span class="only-phish">100</span><span class="only-safe">0</span><small> / 100</small></div>
+      <ul class="only-phish">
+        <li><span><b>Proven</b>sbi-kyc.xyz isn't an SBI domain</span><em>+19.5</em></li>
+        <li><span><b>Proven</b>Asks for details through that link</span><em>+19.5</em></li>
+        <li><span><b>Model</b>Wording 100% likely phishing</span><em>+19.5</em></li>
+        <li><span><b>Model</b>Link 100% likely phishing</span><em>+19.2</em></li>
+        <li><span><b>Pattern</b>Threat and urgency</span><em>+7.2</em></li>
+      </ul>
+      <ul class="only-safe"><li><span><b>Noted</b>“Do not share” is a warning</span><em>+0</em></li></ul>
+    </aside>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

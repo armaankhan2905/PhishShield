@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 9 · Spotlight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Concept 9, Spotlight. Cinematic split screen: on the left, the message sits on a dark teal
+   stage under a warm champagne spotlight that follows the pointer; on the right, a champagne
+   panel delivers the verdict like a title card. Electric orange marks only what's flagged. */
+:root {
+  --stage: #072325; --stage2: #0c3436; --teal: #1c6b68; --teal-lt: #bfe0da; --cham: #f3e6c8; --cham-2: #e6d2a4; --gold: #b8955a; --gold-dk: #7d6232;
+  --ink: #142624; --muted: #5d6a64; --orange: #ff5f1f;
+  --display: "Cormorant Garamond", Georgia, serif; --body: "DM Sans", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { font: 16px/1.55 var(--body); color: var(--ink); background: var(--cham); }
+.split { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); min-height: 100vh; }
+@media (max-width: 960px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.left { position: relative; overflow: hidden; color: #e9efe9; padding: 26px max(20px, env(safe-area-inset-left)) 40px;
+        background: radial-gradient(420px 320px at var(--x, 55%) var(--y, 48%), #f3e6c833, transparent 70%), linear-gradient(160deg, var(--stage2), var(--stage)); }
+.left header { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.brand { font: 700 28px var(--display); color: var(--cham-2); letter-spacing: .02em; }
+nav { display: flex; gap: 18px; flex-wrap: wrap; }
+nav a { color: #9fbdb8; font-size: 14px; text-decoration: none; } nav a.on { color: var(--cham); border-bottom: 1px solid var(--gold); }
+.left h1 { font: 600 54px/1.04 var(--display); color: var(--cham); margin: 54px 0 10px; max-width: 13ch; }
+.left .lede { color: #a7c3be; max-width: 44ch; margin: 0 0 28px; }
+.card { background: #0a2d2fcc; border: 1px solid #b8955a55; border-radius: 18px; padding: 20px; max-width: 560px; box-shadow: 0 30px 60px #0007; }
+.card .from { font-size: 13px; color: #9fbdb8; margin-bottom: 8px; letter-spacing: .04em; }
+.card .text { font: 500 21px/1.65 var(--body); color: #f2efe6; }
+mark { background: none; color: var(--orange); text-shadow: 0 0 18px #ff5f1f66; border-bottom: 2px solid var(--orange); }
+.input { margin-top: 18px; display: flex; gap: 8px; max-width: 560px; }
+.input input { flex: 1; min-width: 0; background: #ffffff10; border: 1px solid #b8955a55; border-radius: 12px; padding: 12px 14px; color: #f2efe6; font: 15px var(--body); }
+.input button { font: 700 15px var(--body); background: var(--cham-2); color: var(--stage); border: 0; border-radius: 12px; padding: 0 20px; cursor: pointer; }
+.right { padding: 26px max(20px, env(safe-area-inset-right)) 40px 48px; display: flex; flex-direction: column; gap: 18px; background: linear-gradient(180deg, var(--cham), #efe0bd); }
+@media (max-width: 960px) { .right { padding-left: max(20px, env(safe-area-inset-left)); } }
+.status { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+.status span { font: 500 12px var(--body); color: var(--teal); border: 1px solid #1c6b6855; border-radius: 999px; padding: 4px 10px; }
+.titlecard { margin-top: 30px; }
+.titlecard small { font: 700 12px var(--body); letter-spacing: .26em; text-transform: uppercase; color: var(--gold-dk); }
+.titlecard .score { font: 700 132px/0.9 var(--display); color: var(--word); letter-spacing: -.02em; }
+.titlecard .score span { font-size: 36px; color: var(--muted); }
+.titlecard h2 { font: 600 46px/1.05 var(--display); margin: 8px 0 8px; color: var(--word2); }
+.titlecard p { margin: 0; font-size: 17px; color: var(--muted); max-width: 40ch; }
+.line { height: 1px; background: linear-gradient(90deg, var(--gold), transparent); margin: 6px 0; }
+.ev { display: grid; gap: 2px; }
+.ev div { display: grid; grid-template-columns: 90px minmax(0, 1fr) 56px; gap: 12px; padding: 11px 0; border-bottom: 1px solid #b8955a40; }
+.ev i { font: 700 11px var(--body); font-style: normal; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); }
+.ev em { font-style: normal; text-align: right; color: var(--gold-dk); font-weight: 700; }
+.ai { font: italic 600 22px/1.4 var(--display); color: var(--stage); }
+.ai small { display: block; font: 500 12px var(--body); font-style: normal; color: var(--muted); margin-top: 6px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--stage); border-radius: 12px; padding: 4px; z-index: 5; }
+.toggle button { font: 700 13px var(--body); background: none; border: 0; padding: 7px 14px; border-radius: 9px; cursor: pointer; color: #9fbdb8; }
+.toggle button.on { background: var(--cham-2); color: var(--stage); }
+body[data-state="phishing"] { --word: var(--orange); --word2: var(--stage); } body[data-state="safe"] { --word: var(--teal); --word2: var(--teal); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+</style>
+</head>
+<body data-state="phishing">
+<div class="split">
+  <section class="left" id="stage">
+    <header><div class="brand">PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></header>
+    <h1>Every message, under the light.</h1>
+    <p class="lede">Paste what you received. PhishShield looks at the sender, the links and the wording, and shows you exactly what it found.</p>
+    <div class="card"><div class="from only-phish">VM-SBIINB · SMS · today 10:42</div><div class="from only-safe">HDFCBK · SMS · today 10:42</div>
+      <div class="text only-phish"><mark>URGENT</mark>: Dear customer, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. Verify at <mark>http://sbi-kyc.xyz/login</mark></div>
+      <div class="text only-safe">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</div></div>
+    <div class="input"><input aria-label="Message" value="Paste a message, email or link…"><button>Check</button></div>
+  </section>
+  <section class="right">
+    <div class="status"><span>Running on this computer</span><span>Models ready</span><span>Local AI</span></div>
+    <div class="titlecard"><small>The verdict</small>
+      <div class="score"><b class="only-phish">100</b><b class="only-safe">0</b><span>/100</span></div>
+      <h2 class="only-phish">This is phishing.</h2><h2 class="only-safe">This looks genuine.</h2>
+      <p class="only-phish">It borrows SBI's name and sends you somewhere SBI doesn't own. Don't click, reply or share codes.</p>
+      <p class="only-safe">“Do not share” is a warning, not a request, and there's nothing to act on.</p></div>
+    <div class="line"></div>
+    <div class="ev only-phish">
+      <div><i>Proven</i><span>sbi-kyc.xyz isn't one of SBI's domains</span><em>+19.5</em></div>
+      <div><i>Proven</i><span>Asks for details through that link</span><em>+19.5</em></div>
+      <div><i>Model</i><span>Wording reads 100% like phishing</span><em>+19.5</em></div>
+      <div><i>Pattern</i><span>Threatens to block your account</span><em>+4.3</em></div>
+    </div>
+    <p class="ai only-phish">“It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.”<small>Local AI · from the findings above only · confidence high · 23 ms</small></p>
+  </section>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+// The spotlight follows the pointer on the stage (static where motion is reduced).
+const stage = document.getElementById("stage");
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) stage.addEventListener("pointermove", (e) => {
+  const r = stage.getBoundingClientRect();
+  stage.style.setProperty("--x", ((e.clientX - r.left) / r.width * 100) + "%");
+  stage.style.setProperty("--y", ((e.clientY - r.top) / r.height * 100) + "%");
+});
+</script>
+</body>
+</html>

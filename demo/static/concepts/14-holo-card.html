@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 14 · Holo Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Concept 14, Holo Card. Every check produces a collectible verdict card with a holographic
+   foil that shifts as you move the pointer. Click the card to flip it and read the evidence on
+   the back. Charcoal stage; the foil carries hints of teal and champagne gold; orange marks only
+   the flagged words and the scam card's rating. */
+:root {
+  --stage: #121317; --stage2: #1b1d24; --line: #2c2f3a; --text: #ecedf2; --muted: #9a9daa; --orange: #ff6126; --teal: #39c6b4; --gold: #e3c487; --safe: #3fd39a;
+  --display: "Syne", "Segoe UI", sans-serif; --body: "Manrope", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--text); font: 16px/1.55 var(--body); min-height: 100vh;
+       background: radial-gradient(700px 500px at 50% 20%, #23262f, var(--stage)); }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); }
+header { display: flex; align-items: center; gap: 20px; padding: 18px 0; flex-wrap: wrap; }
+.brand { font: 800 22px var(--display); }
+nav { display: flex; gap: 16px; flex: 1; flex-wrap: wrap; } nav a { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 14px; } nav a.on { color: var(--text); }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px minmax(0, 1fr); gap: 36px; align-items: center; padding: 26px 0 70px; }
+@media (max-width: 1080px) { .layout { grid-template-columns: minmax(0, 1fr); justify-items: center; } }
+h1 { font: 800 44px/1.02 var(--display); margin: 0 0 12px; letter-spacing: -.02em; }
+.lede { color: var(--muted); margin: 0 0 18px; }
+textarea { width: 100%; min-height: 130px; background: var(--stage2); border: 1px solid var(--line); border-radius: 14px; color: var(--text); padding: 12px; font: 15px/1.55 var(--body); resize: vertical; }
+.btn { margin-top: 10px; font: 700 15px var(--display); background: var(--text); color: var(--stage); border: 0; border-radius: 12px; padding: 11px 22px; cursor: pointer; }
+.hint { font-size: 13px; color: var(--muted); margin-top: 10px; }
+.scene { perspective: 1200px; width: 360px; max-width: 100%; }
+.card { position: relative; width: 100%; aspect-ratio: 5 / 7; transform-style: preserve-3d; transition: transform .8s cubic-bezier(.2,.8,.2,1); cursor: pointer;
+        transform: rotateY(calc(var(--flip, 0) * 180deg)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); }
+.face { position: absolute; inset: 0; border-radius: 22px; backface-visibility: hidden; overflow: hidden; padding: 22px; display: flex; flex-direction: column;
+        background: linear-gradient(160deg, #23262f, #15161b); border: 1px solid #ffffff22; box-shadow: 0 40px 80px #000a; }
+.face::before { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: color-dodge; opacity: .5;
+  background: linear-gradient(115deg, transparent 20%, #39c6b466 35%, #e3c48766 50%, #9b8cff55 62%, transparent 78%) calc(var(--mx, 50) * 1%) 0 / 250% 100%; }
+.face::after { content: ""; position: absolute; inset: 10px; border-radius: 16px; border: 1px solid #e3c48744; pointer-events: none; }
+.back { transform: rotateY(180deg); }
+.top { display: flex; justify-content: space-between; font: 700 12px var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); position: relative; }
+.art { flex: 1; display: grid; place-items: center; position: relative; }
+.rating { font: 800 120px/0.9 var(--display); color: var(--tone); text-shadow: 0 0 40px var(--glow); letter-spacing: -.04em; }
+.rating small { display: block; font: 700 13px var(--body); letter-spacing: .2em; color: var(--muted); text-align: center; text-shadow: none; }
+.name { position: relative; }
+.name h2 { font: 800 30px/1.05 var(--display); margin: 0 0 6px; }
+.name p { margin: 0; color: var(--muted); font-size: 14px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; position: relative; }
+.stats div { background: #ffffff0d; border-radius: 10px; padding: 8px; text-align: center; }
+.stats b { display: block; font: 800 16px var(--display); } .stats span { font-size: 11px; color: var(--muted); }
+.back h3 { font: 800 20px var(--display); margin: 14px 0 10px; position: relative; }
+.ev { position: relative; display: grid; gap: 8px; }
+.ev div { background: #ffffff0d; border-radius: 12px; padding: 10px 12px; font-size: 14px; }
+.ev small { display: flex; justify-content: space-between; font: 700 11px var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--teal); }
+.ev small.g { color: var(--gold); }
+.side h3 { font: 700 13px var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.msg { background: var(--stage2); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; font-size: 17px; line-height: 1.7; }
+mark { background: #ff612629; color: #ffb08e; border-bottom: 2px solid var(--orange); padding: 0 2px; }
+.ai { margin-top: 16px; border-left: 3px solid var(--gold); padding: 4px 0 4px 14px; color: var(--text); }
+.ai small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--stage2); border: 1px solid var(--line); border-radius: 12px; padding: 4px; z-index: 5; }
+.toggle button { font: 700 13px var(--body); background: none; border: 0; padding: 7px 14px; border-radius: 9px; cursor: pointer; color: var(--muted); }
+.toggle button.on { background: var(--text); color: var(--stage); }
+body[data-state="phishing"] { --tone: var(--orange); --glow: #ff612666; } body[data-state="safe"] { --tone: var(--safe); --glow: #3fd39a55; }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } }
+</style>
+</head>
+<body data-state="phishing">
+<div class="wrap">
+  <header><div class="brand">PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></header>
+  <div class="layout">
+    <div>
+      <h1>Every message gets a verdict card.</h1>
+      <p class="lede">Paste what you received. Move over the card to see the foil; click it to flip and read the evidence.</p>
+      <textarea class="only-phish" aria-label="Message">URGENT: Dear customer, your SBI KYC is pending and your account will be blocked today. Verify at http://sbi-kyc.xyz/login</textarea>
+      <textarea class="only-safe" aria-label="Message">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</textarea>
+      <button class="btn">Deal a card</button>
+      <p class="hint">SMS · Email · Link · Upload file</p>
+    </div>
+    <div class="scene"><div class="card" id="card" role="button" tabindex="0" aria-label="Verdict card, press to flip">
+      <div class="face front">
+        <div class="top"><span>PhishShield</span><span class="only-phish">Scam card</span><span class="only-safe">Safe card</span></div>
+        <div class="art"><div class="rating"><span class="only-phish">100</span><span class="only-safe">0</span><small>RISK</small></div></div>
+        <div class="name"><h2 class="only-phish">The SBI Impostor</h2><h2 class="only-safe">The Honest OTP</h2>
+          <p class="only-phish">Borrows SBI's name, sends you to sbi-kyc.xyz.</p><p class="only-safe">Warns you not to share the code. Asks for nothing.</p></div>
+        <div class="stats"><div><b>High</b><span>confidence</span></div><div><b>4/4</b><span>checks</span></div><div><b>23ms</b><span>local</span></div></div>
+      </div>
+      <div class="face back">
+        <div class="top"><span>Evidence</span><span>tap to flip back</span></div>
+        <h3 class="only-phish">Why it's a scam</h3><h3 class="only-safe">Why it's fine</h3>
+        <div class="ev only-phish">
+          <div><small><span>Proven</span><span>+19.5</span></small>sbi-kyc.xyz isn't an SBI domain</div>
+          <div><small><span>Proven</span><span>+19.5</span></small>Asks for details through that link</div>
+          <div><small class="g"><span>Model</span><span>+19.5</span></small>Wording 100% likely phishing</div>
+          <div><small class="g"><span>Model</span><span>+19.2</span></small>Link 100% likely phishing</div>
+          <div><small><span>Pattern</span><span>+4.3</span></small>Threatens to block your account</div>
+        </div>
+        <div class="ev only-safe"><div><small><span>Noted</span><span>+0</span></small>“Do not share” is a warning, not a request</div></div>
+      </div>
+    </div></div>
+    <div class="side">
+      <h3>The message</h3>
+      <div class="msg only-phish"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></div>
+      <div class="msg only-safe">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</div>
+      <p class="ai only-phish">It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.<small>Local AI · from the card's evidence only</small></p>
+    </div>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+const card = document.getElementById("card");
+let flipped = 0;
+const flip = () => { flipped = 1 - flipped; card.style.setProperty("--flip", flipped); };
+card.addEventListener("click", flip);
+card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); } });
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  card.addEventListener("pointermove", (e) => {
+    const r = card.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    card.style.setProperty("--ry", ((x - .5) * 14) + "deg"); card.style.setProperty("--rx", ((.5 - y) * 14) + "deg");
+    card.querySelectorAll(".face").forEach((f) => f.style.setProperty("--mx", x * 100));
+  });
+  card.addEventListener("pointerleave", () => { card.style.setProperty("--ry", "0deg"); card.style.setProperty("--rx", "0deg"); });
+}
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+  flipped = 0; card.style.setProperty("--flip", 0);
+}));
+</script>
+</body>
+</html>

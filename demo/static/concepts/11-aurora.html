@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 11 · Aurora Timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Concept 11, Aurora Timeline. Midnight sky with a slow teal-and-violet aurora. One command bar,
+   and the result unfolds as a vertical timeline of how PhishShield decided: sender → link →
+   wording → models → verdict. Hints of the brief: teal aurora, a gold thread down the timeline,
+   orange only on what's flagged. */
+:root {
+  --night: #070b1d; --night2: #0d1430; --card: #121a3acc; --line: #2a3566; --text: #e8ecff; --muted: #9aa5cf;
+  --teal: #2ee6c8; --violet: #8b7bff; --gold: #e8c98c; --orange: #ff6a2b; --safe: #45e0a8;
+  --display: "Unbounded", "Segoe UI", sans-serif; --body: "Figtree", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--text); font: 16px/1.55 var(--body); background: var(--night); min-height: 100vh; overflow-x: hidden; }
+.sky { position: fixed; inset: 0; z-index: -1; background:
+  radial-gradient(40% 30% at 20% 10%, #2ee6c833, transparent 70%),
+  radial-gradient(35% 30% at 80% 0%, #8b7bff40, transparent 70%),
+  radial-gradient(60% 40% at 50% 110%, #2ee6c81f, transparent 70%), var(--night); }
+.sky::after { content: ""; position: absolute; left: -20%; right: -20%; top: 4%; height: 220px; filter: blur(40px); opacity: .55;
+  background: linear-gradient(90deg, transparent, #2ee6c8aa, #8b7bffaa, #2ee6c866, transparent); animation: drift 14s ease-in-out infinite alternate; transform-origin: center; }
+@keyframes drift { from { transform: translateX(-6%) skewY(-3deg); } to { transform: translateX(6%) skewY(3deg); } }
+.wrap { max-width: 980px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); }
+header { display: flex; align-items: center; gap: 20px; padding: 20px 0; flex-wrap: wrap; }
+.brand { font: 700 18px var(--display); letter-spacing: .02em; }
+.brand span { color: var(--teal); }
+nav { display: flex; gap: 16px; flex: 1; justify-content: flex-end; flex-wrap: wrap; }
+nav a { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 14px; } nav a.on { color: var(--text); }
+h1 { font: 700 clamp(34px, 5vw, 54px)/1.08 var(--display); text-align: center; margin: 46px auto 10px; max-width: 18ch; letter-spacing: -.01em; }
+h1 em { font-style: normal; background: linear-gradient(90deg, var(--teal), var(--violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sub { text-align: center; color: var(--muted); margin: 0 0 28px; }
+.bar { display: flex; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 8px; backdrop-filter: blur(12px);
+       box-shadow: 0 0 0 4px #2ee6c80f, 0 30px 60px #0008; }
+.bar input { flex: 1; min-width: 0; background: none; border: 0; color: var(--text); font: 16px var(--body); padding: 12px 14px; }
+.bar input:focus { outline: none; }
+.bar button { font: 700 14px var(--display); color: var(--night); background: linear-gradient(90deg, var(--teal), #a6f5e8); border: 0; border-radius: 13px; padding: 0 22px; cursor: pointer; }
+.kinds { display: flex; gap: 8px; justify-content: center; margin: 12px 0 0; flex-wrap: wrap; }
+.kinds span { font-size: 13px; color: var(--muted); border: 1px solid var(--line); padding: 4px 12px; border-radius: 999px; }
+.kinds span.on { color: var(--text); border-color: var(--teal); }
+.summary { margin: 40px 0 10px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: center; background: var(--card); border: 1px solid var(--line);
+           border-radius: 24px; padding: 24px; backdrop-filter: blur(12px); }
+@media (max-width: 620px) { .summary { grid-template-columns: minmax(0, 1fr); } }
+.orb { width: 128px; height: 128px; border-radius: 50%; display: grid; place-items: center; font: 700 44px var(--display); color: var(--tone);
+       background: radial-gradient(circle at 35% 30%, #ffffff22, transparent 45%), radial-gradient(circle, var(--glow), transparent 70%); box-shadow: 0 0 60px var(--glow); border: 1px solid var(--tone); }
+.summary h2 { font: 700 30px/1.1 var(--display); margin: 0 0 8px; color: var(--tone); }
+.summary p { margin: 0; color: var(--text); }
+.summary small { color: var(--muted); display: block; margin-top: 8px; }
+.tl { position: relative; margin: 30px 0 70px; padding-left: 40px; }
+.tl::before { content: ""; position: absolute; left: 13px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--gold), #e8c98c22); }
+.step { position: relative; margin-bottom: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; animation: up .5s both; }
+.step:nth-child(2) { animation-delay: .1s } .step:nth-child(3) { animation-delay: .2s } .step:nth-child(4) { animation-delay: .3s } .step:nth-child(5) { animation-delay: .4s }
+@keyframes up { from { opacity: 0; transform: translateY(10px); } }
+.step::before { content: ""; position: absolute; left: -34px; top: 18px; width: 14px; height: 14px; border-radius: 50%; background: var(--night); border: 2px solid var(--gold); }
+.step.hit::before { background: var(--orange); border-color: var(--orange); box-shadow: 0 0 14px var(--orange); }
+.step.ok::before { background: var(--safe); border-color: var(--safe); }
+.step h3 { font: 600 13px var(--display); letter-spacing: .04em; margin: 0 0 6px; color: var(--gold); display: flex; justify-content: space-between; gap: 10px; }
+.step h3 em { font: 600 13px var(--body); font-style: normal; color: var(--muted); }
+.step p { margin: 0; }
+.step .tag { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-right: 6px; background: #2ee6c81f; color: var(--teal); }
+.step .tag.m { background: #8b7bff26; color: #b9afff; }
+mark { background: none; color: var(--orange); border-bottom: 2px solid var(--orange); }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 4px; z-index: 5; backdrop-filter: blur(10px); }
+.toggle button { font: 700 13px var(--body); background: none; border: 0; padding: 7px 14px; border-radius: 9px; cursor: pointer; color: var(--muted); }
+.toggle button.on { background: var(--teal); color: var(--night); }
+body[data-state="phishing"] { --tone: var(--orange); --glow: #ff6a2b55; } body[data-state="safe"] { --tone: var(--safe); --glow: #45e0a844; }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+@media (prefers-reduced-motion: reduce) { .sky::after, .step { animation: none; } }
+</style>
+</head>
+<body data-state="phishing">
+<div class="sky" aria-hidden="true"></div>
+<div class="wrap">
+  <header><div class="brand">Phish<span>Shield</span></div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></header>
+  <h1>Ask before you <em>tap the link</em>.</h1>
+  <p class="sub">Paste a message. Watch how PhishShield decides, one check at a time.</p>
+  <div class="bar"><input aria-label="Message" value="URGENT: Dear customer, your SBI KYC is pending… Verify at http://sbi-kyc.xyz/login"><button>Check</button></div>
+  <div class="kinds"><span class="on">SMS</span><span>Email</span><span>Link</span><span>Upload</span></div>
+
+  <div class="summary">
+    <div class="orb"><span class="only-phish">100</span><span class="only-safe">0</span></div>
+    <div><h2 class="only-phish">Phishing likely</h2><h2 class="only-safe">Looks genuine</h2>
+      <p class="only-phish">It pretends to be SBI and sends you somewhere SBI doesn't own. Don't click, reply or share codes.</p>
+      <p class="only-safe">“Do not share” is a warning, not a request, and there's nothing to act on.</p>
+      <small>Confidence high · 4 of 4 checks · 23 ms on this computer</small></div>
+  </div>
+
+  <div class="tl">
+    <div class="step only-phish ok"><h3>1 · Sender <em>no sender to check</em></h3><p>It arrived as an SMS, so the wording and links carry the evidence.</p></div>
+    <div class="step only-phish hit"><h3>2 · Link <em>+39.0</em></h3><p><span class="tag">Proven</span>The link goes to <mark>sbi-kyc.xyz</mark>, which isn't one of SBI's domains, and the message asks for details through it.</p></div>
+    <div class="step only-phish hit"><h3>3 · Wording <em>+18.3</em></h3><p><span class="tag">Pattern</span><mark>URGENT</mark>, <mark>KYC is pending</mark>, <mark>account will be blocked</mark>: pressure to act before you think.</p></div>
+    <div class="step only-phish hit"><h3>4 · Models <em>+38.7</em></h3><p><span class="tag m">Model</span>The URL model and the text model both rate it 100% phishing.</p></div>
+    <div class="step only-phish"><h3>5 · In plain words <em>local AI</em></h3><p>“It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.”</p></div>
+    <div class="step only-safe ok"><h3>1 · Link <em>none</em></h3><p>No link to open.</p></div>
+    <div class="step only-safe ok"><h3>2 · Wording <em>+0</em></h3><p>“Do not share it with anyone” is a warning, not a request.</p></div>
+    <div class="step only-safe ok"><h3>3 · Models <em>+0</em></h3><p>Both models agree it's an ordinary alert.</p></div>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

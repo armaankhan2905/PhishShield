@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 8 · Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Concept 8, Ledger. The scams pretend to be banks, so the answer looks like a trustworthy bank
+   statement: champagne paper, deep teal ink, a ruled ledger where every finding is a line item
+   and the score is the closing balance. Electric orange is the highlighter pen, nothing else. */
+:root {
+  --paper: #f6efdf; --paper2: #efe4cb; --gold: #b99556; --gold-lt: #e8d6ad; --teal: #0d4446; --teal-2: #1d6a68; --teal-lt: #d3e8e4;
+  --ink: #102a2b; --muted: #5f6b66; --rule: #d9c9a3; --orange: #ff5f1f;
+  --display: "Fraunces", Georgia, serif; --body: "Source Sans 3", "Segoe UI", sans-serif; --mono: "IBM Plex Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--teal); color: var(--ink); font: 16px/1.55 var(--body); min-height: 100vh; }
+.top { background: var(--teal); color: var(--paper); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); }
+header { display: flex; align-items: center; gap: 26px; padding: 18px 0; flex-wrap: wrap; }
+.brand { font: 700 24px var(--display); color: var(--gold-lt); }
+.brand small { font: 500 12px var(--mono); color: #9cc1bc; margin-left: 8px; letter-spacing: .08em; }
+nav { display: flex; gap: 22px; flex: 1; flex-wrap: wrap; }
+nav a { color: #b9d3cf; text-decoration: none; font-weight: 600; font-size: 15px; }
+nav a.on { color: #fff; box-shadow: 0 2px 0 var(--gold); }
+.sheet { background: var(--paper); border-radius: 6px 6px 0 0; margin-top: 10px; padding: 40px 48px 60px; box-shadow: 0 -10px 40px #0004; min-height: 80vh;
+         background-image: linear-gradient(90deg, transparent 56px, #b9955633 56px, #b9955633 57px, transparent 57px); }
+@media (max-width: 700px) { .sheet { padding: 28px 20px 40px; background-image: none; } }
+.head { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; border-bottom: 3px double var(--gold); padding-bottom: 18px; }
+h1 { font: 700 40px/1.1 var(--display); color: var(--teal); margin: 0; }
+.head p { margin: 6px 0 0; color: var(--muted); }
+.stamp { text-align: right; font: 500 12px var(--mono); color: var(--muted); line-height: 1.8; }
+.stamp b { color: var(--teal); }
+.cols { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 40px; margin-top: 28px; }
+@media (max-width: 920px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.lbl { font: 700 12px var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); margin: 0 0 10px; }
+textarea { width: 100%; min-height: 150px; background: #fffaf0; border: 1px solid var(--rule); border-radius: 4px; padding: 14px; font: 16px/1.6 var(--body); color: var(--ink); resize: vertical; }
+.btn { margin-top: 12px; font: 700 15px var(--body); background: var(--teal); color: var(--paper); border: 0; border-radius: 4px; padding: 12px 22px; cursor: pointer; }
+.kinds { margin-top: 12px; font: 500 13px var(--mono); color: var(--muted); }
+.kinds b { color: var(--teal); text-decoration: underline; text-decoration-color: var(--gold); }
+.balance { margin-top: 30px; background: var(--teal); color: var(--paper); border-radius: 6px; padding: 22px; }
+.balance small { font: 500 12px var(--mono); letter-spacing: .12em; color: #a9cdc8; text-transform: uppercase; }
+.balance b { display: block; font: 700 64px/1 var(--display); color: var(--word); margin: 6px 0; }
+.balance p { margin: 0; color: var(--gold-lt); font-weight: 600; font-size: 18px; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th { font: 700 12px var(--body); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); text-align: left; border-bottom: 2px solid var(--teal); padding: 8px 6px; }
+td { border-bottom: 1px solid var(--rule); padding: 11px 6px; vertical-align: top; }
+td.n { text-align: right; font: 500 14px var(--mono); white-space: nowrap; }
+td.k { font: 600 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--teal-2); white-space: nowrap; }
+tr.total td { border-top: 2px solid var(--teal); border-bottom: 3px double var(--teal); font-weight: 700; }
+tr.total td.n { font-size: 16px; color: var(--word2); }
+.msg { margin-top: 26px; font: 18px/1.85 var(--body); padding: 16px 18px; background: #fffaf0; border: 1px dashed var(--rule); }
+mark { background: linear-gradient(transparent 12%, #ff5f1fcc 12%, #ff5f1fcc 92%, transparent 92%); color: #1c0d04; padding: 0 2px; }
+.note { margin-top: 20px; font: italic 500 18px/1.55 var(--display); color: var(--teal); border-left: 3px solid var(--gold); padding-left: 16px; }
+.note small { display: block; font: 500 12px var(--mono); font-style: normal; color: var(--muted); margin-top: 6px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; background: var(--paper); border: 2px solid var(--teal); border-radius: 6px; overflow: hidden; z-index: 5; }
+.toggle button { font: 700 13px var(--body); background: none; border: 0; padding: 7px 14px; cursor: pointer; color: var(--teal); }
+.toggle button.on { background: var(--teal); color: var(--paper); }
+body[data-state="phishing"] { --word: var(--orange); --word2: var(--orange); } body[data-state="safe"] { --word: #9fe0d4; --word2: var(--teal-2); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+</style>
+</head>
+<body data-state="phishing">
+<div class="top"><div class="wrap"><header><div class="brand">PhishShield<small>MESSAGE STATEMENT</small></div>
+  <nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></header></div></div>
+<div class="wrap">
+  <div class="sheet">
+    <div class="head"><div><h1>Statement for one message</h1><p>Every point of the score is listed with its reason.</p></div>
+      <div class="stamp">REF <b>92555A57</b><br>CHECKED <b>on this computer</b> · 23 ms<br>CONFIDENCE <b>high</b> · 4 of 4 checks</div></div>
+    <div class="cols">
+      <div>
+        <p class="lbl">Message received</p>
+        <textarea class="only-phish" aria-label="Message">URGENT: Dear customer, your SBI KYC is pending and your account will be blocked today. Verify at http://sbi-kyc.xyz/login</textarea>
+        <textarea class="only-safe" aria-label="Message">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</textarea>
+        <button class="btn">Check message</button>
+        <p class="kinds"><b>SMS</b> · Email · Link · Upload file</p>
+        <div class="balance"><small>Closing risk balance</small><b class="only-phish">100 / 100</b><b class="only-safe">0 / 100</b>
+          <p class="only-phish">Phishing likely. Don't click, reply or share codes.</p><p class="only-safe">No phishing signs found.</p></div>
+      </div>
+      <div>
+        <p class="lbl">Line items</p>
+        <table class="only-phish">
+          <tr><th>Type</th><th>Finding</th><th style="text-align:right">Points</th></tr>
+          <tr><td class="k">Proven</td><td>Link imitates SBI: sbi-kyc.xyz isn't one of SBI's domains</td><td class="n">+19.5</td></tr>
+          <tr><td class="k">Proven</td><td>Asks for details, but the link goes to sbi-kyc.xyz</td><td class="n">+19.5</td></tr>
+          <tr><td class="k">Model</td><td>Text model: wording 100% likely phishing</td><td class="n">+19.5</td></tr>
+          <tr><td class="k">Model</td><td>URL model: link 100% likely phishing</td><td class="n">+19.2</td></tr>
+          <tr><td class="k">Pattern</td><td>Threatens to block your account</td><td class="n">+4.3</td></tr>
+          <tr><td class="k">Pattern</td><td>Says your KYC is pending · and 5 more patterns</td><td class="n">+18.3</td></tr>
+          <tr class="total"><td></td><td>Risk score</td><td class="n">100</td></tr>
+        </table>
+        <table class="only-safe"><tr><th>Type</th><th>Finding</th><th style="text-align:right">Points</th></tr>
+          <tr><td class="k">None</td><td>“Do not share” is a warning, not a request. No link, number or payment.</td><td class="n">0</td></tr>
+          <tr class="total"><td></td><td>Risk score</td><td class="n">0</td></tr></table>
+        <div class="msg only-phish"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></div>
+        <p class="note only-phish">“It pretends to be SBI, but the link goes to sbi-kyc.xyz, which SBI doesn't own. Don't click; check in the YONO app.”<small>Written by a local AI model from the line items only</small></p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

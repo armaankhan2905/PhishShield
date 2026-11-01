@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 49 · Gauge Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Concept 49, Gauge Report. A big score gauge from 41 anchors a summary panel on the left (with
+   confidence, checks and time beneath it), and 45's numbered report fills the right. The input sits
+   in a slim bar above both. Instrument Sans. Mint Paper colours; coral only on what's flagged. */
+:root { --ink: #0b2b26; --g2: #163832; --g3: #235347; --sage: #8eb69b; --mint: #daf1de; --paper: #eaf6ec; --card: #f6fbf6; --line: #c4dcc9; --muted: #4f6b5f; --hot: #c8553a; --hot-bg: #f6c9b8;
+        --font: "Instrument Sans", "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 var(--font); min-height: 100vh; }
+.top { background: var(--ink); color: var(--mint); }
+.bar { max-width: 1120px; margin: 0 auto; padding: 14px max(20px, env(safe-area-inset-left)); display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.brand { font: 700 20px var(--font); } nav { display: flex; gap: 22px; margin-left: auto; flex-wrap: wrap; } nav a { color: var(--sage); text-decoration: none; font-size: 15px; } nav a.on { color: var(--mint); font-weight: 600; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 26px max(20px, env(safe-area-inset-left)) 70px; }
+.ask { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+.ask textarea { min-height: 46px; height: 50px; resize: vertical; border: 0; background: none; font: 15.5px/1.6 var(--font); color: var(--ink); padding: 6px 10px; } .ask textarea:focus { outline: none; }
+.ask button { font: 600 15px var(--font); background: var(--g3); color: var(--mint); border: 0; border-radius: 10px; padding: 0 24px; cursor: pointer; }
+.grid { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 18px; margin-top: 18px; align-items: start; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.sum { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; text-align: center; position: sticky; top: 16px; }
+.sum svg { width: 230px; max-width: 100%; display: block; margin: 0 auto; }
+.sum path { fill: none; stroke-width: 14; stroke-linecap: round; } .sum .tr { stroke: var(--mint); }
+.sum .val { stroke: var(--tone); stroke-dasharray: 220; stroke-dashoffset: var(--off); animation: g 1.1s ease-out both; } @keyframes g { from { stroke-dashoffset: 220; } }
+.sum text { font: 700 40px var(--font); fill: var(--tone); }
+.sum h2 { font: 700 26px/1.2 var(--font); margin: 6px 0 2px; color: var(--tone); } .sum > p { margin: 0; color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 18px; }
+.stats div { background: var(--paper); border-radius: 12px; padding: 10px 6px; }
+.stats small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--g3); } .stats b { font-size: 17px; }
+.sheet { background: var(--card); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+.sheet > h3 { margin: 0; padding: 16px 24px; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--g3); border-bottom: 1px dashed var(--line); }
+.secs { list-style: none; counter-reset: s; margin: 0; padding: 4px 24px 8px; }
+.secs li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.secs li:last-child { border-bottom: 0; }
+.secs li::before { content: counter(s, decimal-leading-zero); font: 700 14px var(--font); color: var(--sage); padding-top: 2px; }
+.secs h4 { font: 600 16.5px var(--font); margin: 0 0 2px; } .secs p { margin: 0; color: var(--muted); } .secs em { font-style: normal; font-weight: 700; color: var(--hot); }
+.msg { margin: 8px 0 0; padding: 12px 14px; background: var(--paper); border-radius: 12px; color: var(--ink) !important; font-size: 16.5px; line-height: 1.8; }
+mark { background: linear-gradient(transparent 55%, var(--hot-bg) 55%); color: var(--ink); padding: 0 2px; }
+.todo { margin: 0 24px 24px; padding: 16px 18px; border-radius: 14px; background: var(--ink); color: var(--mint); }
+.todo b { display: block; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--sage); margin-bottom: 2px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 4px; z-index: 5; }
+.toggle button { font: 600 13px var(--font); background: none; border: 0; color: var(--muted); padding: 6px 12px; border-radius: 7px; cursor: pointer; } .toggle button.on { background: var(--ink); color: var(--mint); }
+body[data-state="phishing"] { --tone: var(--hot); --off: 0; } body[data-state="safe"] { --tone: var(--g3); --off: 216; }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+@media (prefers-reduced-motion: reduce) { .sum .val { animation: none; } }
+</style>
+</head>
+<body data-state="phishing">
+<div class="top"><div class="bar"><div class="brand">PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></div></div>
+<div class="wrap">
+  <div class="ask">
+    <textarea class="only-phish" aria-label="Message">URGENT: Dear customer, your SBI KYC is pending and your account will be blocked today. Verify at http://sbi-kyc.xyz/login</textarea>
+    <textarea class="only-safe" aria-label="Message">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</textarea>
+    <button>Check</button></div>
+  <div class="grid">
+    <aside class="sum">
+      <svg viewBox="0 0 170 100" aria-hidden="true"><path class="tr" d="M15 90 A70 70 0 0 1 155 90"/><path class="val" d="M15 90 A70 70 0 0 1 155 90"/><text x="85" y="86" text-anchor="middle"><tspan class="only-phish">100</tspan><tspan class="only-safe">0</tspan></text></svg>
+      <h2 class="only-phish">Phishing likely</h2><h2 class="only-safe">Looks genuine</h2>
+      <p class="only-phish">Don't click, reply or share any code.</p><p class="only-safe">Nothing to act on.</p>
+      <div class="stats"><div><small>Confidence</small><b>High</b></div><div><small>Checks</small><b>4 of 4</b></div><div><small>Time</small><b>23 ms</b></div></div>
+    </aside>
+    <article class="sheet"><h3>The report</h3>
+      <ol class="secs only-phish">
+        <li><div><h4>What it claims</h4><p>To be SBI, asking you to “verify” a pending KYC.</p>
+          <p class="msg"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></p></div><span></span></li>
+        <li><div><h4>Where the link really goes</h4><p>sbi-kyc.xyz, which isn't one of SBI's domains, and it asks for your details there.</p></div><em>+39.0</em></li>
+        <li><div><h4>The wording</h4><p>A threat to block your account, plus urgency.</p></div><em>+4.3</em></li>
+        <li><div><h4>The models</h4><p>The text model and the URL model both rate it 100% phishing.</p></div><em>+38.7</em></li>
+      </ol>
+      <ol class="secs only-safe"><li><div><h4>What it is</h4><p>An HDFC OTP alert for a ₹500 Amazon payment. “Do not share” is a warning, not a request, and there's no link.</p></div><span></span></li></ol>
+      <div class="todo only-phish"><b>What to do</b>It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.</div>
+    </article>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

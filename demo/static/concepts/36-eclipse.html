@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 36 · Eclipse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap">
+<style>
+/* Concept 36, Eclipse. Near-black, a centred headline and a planet whose rim glows like a sunrise
+   behind the result. The glow brightens as you scroll down into the result. The rim burns orange
+   for phishing and turns a cool mint when the message is safe. */
+:root { --bg: #050506; --card: #0d0d10; --line: #ffffff14; --text: #f2f2f4; --soft: #c9c9cf; --muted: #8b8b94; --orange: #ff6a1f; --mint: #6fe3c1;
+        --font: "Inter Tight", "Segoe UI", sans-serif; --s: 0; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--font); min-height: 100vh; overflow-x: hidden; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); position: relative; }
+header { display: flex; align-items: center; gap: 22px; padding: 18px 0; flex-wrap: wrap; position: relative; z-index: 2; }
+.brand { font: 700 18px var(--font); letter-spacing: .02em; } .brand i { color: var(--glow); font-style: normal; }
+nav { display: flex; gap: 22px; margin: 0 auto; flex-wrap: wrap; } nav a { color: var(--muted); text-decoration: none; font-size: 14px; } nav a.on { color: var(--text); }
+.cta { font: 600 13px var(--font); color: #fff; background: var(--orange); border-radius: 999px; padding: 7px 14px; }
+.hero { text-align: center; padding: 56px 0 0; position: relative; z-index: 2; }
+.badge { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; color: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 4px 6px 4px 4px; background: #ffffff08; }
+.badge b { font-weight: 600; color: #fff; background: var(--orange); border-radius: 999px; padding: 2px 10px; }
+h1 { font: 600 clamp(36px, 5.4vw, 60px)/1.08 var(--font); letter-spacing: -.03em; margin: 18px auto 12px; max-width: 16ch; }
+.lede { color: var(--muted); max-width: 52ch; margin: 0 auto 26px; }
+.ask { display: flex; gap: 8px; max-width: 700px; margin: 0 auto; background: #ffffff0a; border: 1px solid var(--line); border-radius: 14px; padding: 6px; backdrop-filter: blur(10px); }
+.ask input { flex: 1; min-width: 0; background: none; border: 0; color: var(--text); font: 15px var(--font); padding: 10px 14px; } .ask input:focus { outline: none; }
+.ask button { font: 600 14px var(--font); background: var(--orange); color: #fff; border: 0; border-radius: 10px; padding: 0 22px; cursor: pointer; box-shadow: 0 6px 24px #ff6a1f55; }
+.horizon { position: relative; height: 300px; margin-top: 30px; }
+.planet { position: absolute; left: 50%; top: 120px; width: 1500px; height: 1500px; margin-left: -750px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 0%, #1a1a1e, #060607 40%);
+  box-shadow: 0 -2px 0 var(--glow), 0 -18px calc(50px + 50px * var(--s)) color-mix(in srgb, var(--glow) calc(50% + 40% * var(--s)), transparent),
+              inset 0 26px 60px color-mix(in srgb, var(--glow) 30%, transparent); transition: box-shadow .3s; }
+.horizon::before { content: ""; position: absolute; left: 50%; top: 40px; width: 900px; height: 260px; margin-left: -450px; border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--glow) calc(30% + 30% * var(--s)), transparent), transparent); filter: blur(30px); }
+.result { position: relative; z-index: 2; margin: -150px auto 80px; max-width: 900px; background: #0d0d10e6; border: 1px solid var(--line); border-radius: 22px; padding: 26px;
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--glow) 60%, transparent), 0 40px 80px #000a; backdrop-filter: blur(12px); }
+.top { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.score { font: 700 54px/1 var(--font); letter-spacing: -.04em; color: var(--glow); text-shadow: 0 0 30px color-mix(in srgb, var(--glow) 60%, transparent); }
+.top h2 { font: 600 26px/1.15 var(--font); margin: 0 0 2px; letter-spacing: -.02em; }
+.top p { margin: 0; color: var(--soft); } .top small { color: var(--muted); }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; margin-top: 20px; }
+@media (max-width: 760px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+h3 { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.msg { font-size: 16px; line-height: 1.85; margin: 0; color: var(--soft); }
+mark { background: none; color: #ff9a5c; border-bottom: 1.5px solid var(--orange); }
+.ai { margin: 16px 0 0; color: var(--text); } .ai small { display: block; color: var(--muted); font-size: 13px; }
+.ev { list-style: none; margin: 0; padding: 0; }
+.ev li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; padding: 9px 0; border-bottom: 1px solid var(--line); color: var(--soft); }
+.ev small { grid-column: 1 / -1; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.ev em { font-style: normal; color: var(--muted); }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: #111114; border: 1px solid var(--line); border-radius: 999px; padding: 4px; z-index: 5; }
+.toggle button { font: 600 13px var(--font); background: none; border: 0; color: var(--muted); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+.toggle button.on { background: #fff; color: #000; }
+body[data-state="phishing"] { --glow: var(--orange); } body[data-state="safe"] { --glow: var(--mint); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+</style>
+</head>
+<body data-state="phishing">
+<div class="wrap">
+  <header><div class="brand">PHISH<i>SHIELD</i></div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav><span class="cta">Get the extension</span></header>
+  <section class="hero">
+    <span class="badge"><b>Local AI</b>Runs on this computer · v0.5</span>
+    <h1>Know a scam before you tap the link.</h1>
+    <p class="lede">Paste a text, email or link. PhishShield checks it in milliseconds and tells you exactly why.</p>
+    <div class="ask"><input aria-label="Message" value="URGENT: Dear customer, your SBI KYC is pending… Verify at http://sbi-kyc.xyz/login"><button>Check</button></div>
+  </section>
+  <div class="horizon" aria-hidden="true"><div class="planet"></div></div>
+  <section class="result">
+    <div class="top"><div class="score"><span class="only-phish">100</span><span class="only-safe">0</span></div>
+      <div><h2 class="only-phish">Phishing likely</h2><h2 class="only-safe">Looks genuine</h2>
+        <p class="only-phish">Don't click, reply or share any code.</p><p class="only-safe">“Do not share” is a warning, not a request.</p>
+        <small>Confidence high · 4 of 4 checks · 23 ms</small></div></div>
+    <div class="cols only-phish">
+      <div><h3>The message</h3>
+        <p class="msg"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></p>
+        <p class="ai">“It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.”<small>Local AI · from the findings only</small></p></div>
+      <div><h3>Why</h3><ul class="ev">
+        <li><small>Proven</small><span>sbi-kyc.xyz isn't one of SBI's domains</span><em>+19.5</em></li>
+        <li><small>Proven</small><span>Asks for details through that link</span><em>+19.5</em></li>
+        <li><small>Model</small><span>Wording reads 100% like phishing</span><em>+19.5</em></li>
+        <li><small>Pattern</small><span>Threatens to block your account</span><em>+4.3</em></li></ul></div>
+    </div>
+  </section>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+const setS = () => document.documentElement.style.setProperty("--s", Math.min(1, scrollY / 400).toFixed(3));
+addEventListener("scroll", setS, { passive: true }); setS();
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

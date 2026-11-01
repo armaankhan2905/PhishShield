@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 40 · Spotlight Stage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Concept 40, Spotlight Stage. A dark stage with a single cone of warm light falling from the top
+   onto the result card, with fine film grain. The light follows the pointer slightly. Warm light
+   for phishing, cool light for safe. Calm and minimal everywhere else. */
+:root { --bg: #060607; --card: #0f0f12; --line: #ffffff12; --text: #f1f1f3; --soft: #c5c5cc; --muted: #86868f; --orange: #ff6a1f; --mint: #6fe3c1;
+        --font: "Instrument Sans", "Segoe UI", sans-serif; --x: 50%; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 var(--font); min-height: 100vh; overflow-x: hidden; }
+.cone { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: conic-gradient(from 0deg at var(--x) -12%, transparent 160deg, color-mix(in srgb, var(--glow) 22%, transparent) 168deg, color-mix(in srgb, var(--glow) 38%, transparent) 180deg, color-mix(in srgb, var(--glow) 22%, transparent) 192deg, transparent 200deg);
+  -webkit-mask: linear-gradient(#000 30%, transparent 95%); mask: linear-gradient(#000 30%, transparent 95%);
+  filter: blur(22px); transition: background .4s; }
+.grain { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.wrap { max-width: 900px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)) 70px; position: relative; z-index: 1; }
+header { display: flex; align-items: center; gap: 22px; padding: 18px 0; flex-wrap: wrap; }
+.brand { font: 700 18px var(--font); }
+nav { display: flex; gap: 20px; margin-left: auto; flex-wrap: wrap; } nav a { color: var(--muted); text-decoration: none; font-size: 14px; } nav a.on { color: var(--text); }
+h1 { font: 600 clamp(32px, 4.6vw, 50px)/1.08 var(--font); letter-spacing: -.03em; text-align: center; margin: 46px auto 10px; max-width: 18ch; }
+.lede { text-align: center; color: var(--muted); margin: 0 0 24px; }
+.ask { display: flex; gap: 8px; max-width: 680px; margin: 0 auto; background: #ffffff0a; border: 1px solid var(--line); border-radius: 999px; padding: 6px; }
+.ask input { flex: 1; min-width: 0; background: none; border: 0; color: var(--text); font: 15px var(--font); padding: 10px 16px; } .ask input:focus { outline: none; }
+.ask button { font: 600 14px var(--font); background: #fff; color: #000; border: 0; border-radius: 999px; padding: 0 22px; cursor: pointer; }
+.stage { margin-top: 60px; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 26px; position: relative;
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--glow) 50%, transparent), 0 50px 120px -40px color-mix(in srgb, var(--glow) 40%, transparent); }
+.stage::before { content: ""; position: absolute; left: 10%; right: 10%; top: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--glow), transparent); }
+.top { text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.top b { display: block; font: 700 72px/1 var(--font); letter-spacing: -.05em; color: var(--glow); text-shadow: 0 0 40px color-mix(in srgb, var(--glow) 55%, transparent); }
+.top h2 { font: 600 26px/1.2 var(--font); margin: 8px 0 2px; } .top p { margin: 0; color: var(--soft); } .top small { color: var(--muted); }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; margin-top: 20px; }
+@media (max-width: 720px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+h3 { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.msg { font-size: 16px; line-height: 1.85; margin: 0; color: var(--soft); }
+mark { background: none; color: #ff9a5c; border-bottom: 1.5px solid var(--orange); }
+.ai { margin: 16px 0 0; color: var(--text); } .ai small { display: block; color: var(--muted); font-size: 13px; }
+.ev { list-style: none; margin: 0; padding: 0; }
+.ev li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; padding: 9px 0; border-bottom: 1px solid var(--line); color: var(--soft); }
+.ev li:last-child { border-bottom: 0; }
+.ev small { grid-column: 1 / -1; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); } .ev em { font-style: normal; color: var(--muted); }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: #111114; border: 1px solid var(--line); border-radius: 999px; padding: 4px; z-index: 5; }
+.toggle button { font: 600 13px var(--font); background: none; border: 0; color: var(--muted); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+.toggle button.on { background: #fff; color: #000; }
+body[data-state="phishing"] { --glow: var(--orange); } body[data-state="safe"] { --glow: var(--mint); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+</style>
+</head>
+<body data-state="phishing">
+<div class="cone" aria-hidden="true"></div><div class="grain" aria-hidden="true"></div>
+<div class="wrap">
+  <header><div class="brand">PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></header>
+  <h1>Put any message under the light.</h1>
+  <p class="lede">Paste a text, email or link. It's checked on this computer, and every finding is explained.</p>
+  <div class="ask"><input aria-label="Message" value="URGENT: Dear customer, your SBI KYC is pending… Verify at http://sbi-kyc.xyz/login"><button>Check</button></div>
+  <section class="stage">
+    <div class="top"><b><span class="only-phish">100</span><span class="only-safe">0</span></b>
+      <h2 class="only-phish">Phishing likely</h2><h2 class="only-safe">Looks genuine</h2>
+      <p class="only-phish">Don't click, reply or share any code.</p><p class="only-safe">“Do not share” is a warning, not a request.</p>
+      <small>Confidence high · 4 of 4 checks · 23 ms</small></div>
+    <div class="cols only-phish">
+      <div><h3>The message</h3>
+        <p class="msg"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></p>
+        <p class="ai">“It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.”<small>Local AI · from the findings only</small></p></div>
+      <div><h3>Why</h3><ul class="ev">
+        <li><small>Proven</small><span>sbi-kyc.xyz isn't one of SBI's domains</span><em>+19.5</em></li>
+        <li><small>Proven</small><span>Asks for details through that link</span><em>+19.5</em></li>
+        <li><small>Model</small><span>Wording reads 100% like phishing</span><em>+19.5</em></li>
+        <li><small>Pattern</small><span>Threatens to block your account</span><em>+4.3</em></li></ul></div>
+    </div>
+  </section>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  addEventListener("pointermove", (e) => document.documentElement.style.setProperty("--x", (40 + 20 * e.clientX / innerWidth).toFixed(1) + "%"));
+}
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

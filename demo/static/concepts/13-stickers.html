@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 13 · Sticker Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Concept 13, Sticker Board. Playful neo-brutalism: thick ink outlines, hard offset shadows,
+   chunky cards in soft mint and butter, and findings slapped on as stickers. Hints of the
+   brief: mint-teal and butter-gold fills, an electric-orange sticker for the scam verdict. */
+:root {
+  --bg: #fbf6ec; --ink: #121212; --mint: #9fe3d3; --mint-dk: #2b8c7a; --butter: #ffe08a; --lilac: #d7ccff; --orange: #ff5f1f; --white: #fffdf8;
+  --display: "Bricolage Grotesque", "Segoe UI", sans-serif; --mono: "Space Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg) radial-gradient(#12121214 1.2px, transparent 1.2px) 0 0 / 22px 22px; color: var(--ink); font: 16px/1.5 var(--display); min-height: 100vh; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); }
+.b { border: 3px solid var(--ink); border-radius: 18px; box-shadow: 6px 6px 0 var(--ink); }
+header { display: flex; align-items: center; gap: 16px; margin-top: 18px; padding: 10px 14px; background: var(--white); flex-wrap: wrap; }
+.brand { font: 800 22px var(--display); display: flex; align-items: center; gap: 8px; }
+.brand i { width: 30px; height: 30px; border: 3px solid var(--ink); border-radius: 9px; background: var(--mint); display: grid; place-items: center; font-style: normal; font-size: 16px; }
+nav { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
+nav a { font: 700 14px var(--display); color: var(--ink); text-decoration: none; padding: 6px 12px; border-radius: 10px; border: 2px solid transparent; }
+nav a.on { background: var(--butter); border-color: var(--ink); }
+.status { font: 700 12px var(--mono); background: var(--mint); border: 2px solid var(--ink); border-radius: 999px; padding: 4px 10px; }
+h1 { font: 800 clamp(40px, 6vw, 72px)/0.98 var(--display); letter-spacing: -.03em; margin: 34px 0 20px; max-width: 15ch; }
+h1 span { background: var(--butter); border: 3px solid var(--ink); border-radius: 14px; padding: 0 10px; box-shadow: 4px 4px 0 var(--ink); display: inline-block; transform: rotate(-1.5deg); }
+.grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 26px; align-items: start; padding-bottom: 70px; }
+@media (max-width: 940px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.input { background: var(--white); padding: 18px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.tabs span { font: 700 13px var(--mono); border: 2px solid var(--ink); border-radius: 10px; padding: 5px 10px; background: var(--white); }
+.tabs span.on { background: var(--lilac); }
+textarea { width: 100%; min-height: 150px; border: 3px solid var(--ink); border-radius: 12px; padding: 12px; font: 16px/1.55 var(--display); resize: vertical; background: #fff; }
+.btn { margin-top: 12px; font: 800 18px var(--display); background: var(--mint); border: 3px solid var(--ink); border-radius: 14px; padding: 10px 22px; box-shadow: 4px 4px 0 var(--ink); cursor: pointer; }
+.btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.samples { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+.samples span { font: 700 13px var(--mono); border: 2px dashed var(--ink); border-radius: 999px; padding: 4px 10px; }
+.result { background: var(--white); padding: 22px; position: relative; }
+.verdict { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.score { width: 132px; height: 132px; border: 3px solid var(--ink); border-radius: 50%; background: var(--tone); display: grid; place-items: center; box-shadow: 5px 5px 0 var(--ink);
+         font: 800 46px var(--display); color: var(--on-tone); transform: rotate(-6deg); animation: slap .5s cubic-bezier(.2,1.6,.4,1) both; }
+@keyframes slap { from { transform: rotate(-20deg) scale(1.6); opacity: 0; } }
+.verdict h2 { font: 800 40px/1 var(--display); margin: 0 0 6px; letter-spacing: -.02em; }
+.verdict p { margin: 0; font-size: 17px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.meta span { font: 700 12px var(--mono); border: 2px solid var(--ink); border-radius: 8px; padding: 2px 8px; background: var(--mint); }
+.msg { margin-top: 20px; border: 3px solid var(--ink); border-radius: 14px; padding: 14px 16px; background: #fff; font-size: 19px; line-height: 1.7; }
+mark { background: var(--orange); color: #fff; border: 2px solid var(--ink); border-radius: 8px; padding: 0 5px; font-weight: 700; }
+.stickers { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
+.st { border: 3px solid var(--ink); border-radius: 16px; padding: 12px 14px; max-width: 250px; box-shadow: 4px 4px 0 var(--ink); }
+.st:nth-child(1) { background: var(--butter); transform: rotate(-2deg); } .st:nth-child(2) { background: var(--mint); transform: rotate(1.5deg); }
+.st:nth-child(3) { background: var(--lilac); transform: rotate(-1deg); } .st:nth-child(4) { background: var(--white); transform: rotate(2deg); }
+.st b { font: 700 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; display: flex; justify-content: space-between; }
+.st p { margin: 4px 0 0; font-weight: 600; }
+.ai { margin-top: 22px; border: 3px solid var(--ink); border-radius: 16px; background: var(--ink); color: var(--white); padding: 14px 16px; }
+.ai b { color: var(--butter); font: 700 12px var(--mono); text-transform: uppercase; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--white); border: 3px solid var(--ink); border-radius: 14px; padding: 4px; box-shadow: 4px 4px 0 var(--ink); z-index: 5; }
+.toggle button { font: 800 14px var(--display); background: none; border: 0; padding: 6px 12px; border-radius: 9px; cursor: pointer; }
+.toggle button.on { background: var(--butter); }
+body[data-state="phishing"] { --tone: var(--orange); --on-tone: #fff; } body[data-state="safe"] { --tone: var(--mint); --on-tone: var(--ink); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+@media (prefers-reduced-motion: reduce) { .score { animation: none; } }
+</style>
+</head>
+<body data-state="phishing">
+<div class="wrap">
+  <header class="b"><div class="brand"><i>✓</i>PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav><span class="status">models ready</span></header>
+  <h1>Scam or <span>not?</span> Ask first.</h1>
+  <div class="grid">
+    <section class="b input">
+      <div class="tabs"><span class="on">SMS</span><span>Email</span><span>Link</span><span>File</span></div>
+      <textarea class="only-phish" aria-label="Message">URGENT: Dear customer, your SBI KYC is pending and your account will be blocked today. Verify at http://sbi-kyc.xyz/login</textarea>
+      <textarea class="only-safe" aria-label="Message">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</textarea>
+      <button class="btn">Check it →</button>
+      <div class="samples"><span>sbi kyc</span><span>lottery fee</span><span>fake paypal</span><span>bank otp</span></div>
+    </section>
+    <section class="b result">
+      <div class="verdict"><div class="score"><span class="only-phish">100</span><span class="only-safe">0</span></div>
+        <div><h2 class="only-phish">Nope. It's a scam.</h2><h2 class="only-safe">All good!</h2>
+          <p class="only-phish">Don't click, reply or share any code.</p><p class="only-safe">A real OTP alert. Nothing to act on.</p>
+          <div class="meta"><span>confidence high</span><span>4/4 checks</span><span>23 ms</span></div></div></div>
+      <div class="msg only-phish"><mark>URGENT</mark>: Dear customer, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. Verify at <mark>http://sbi-kyc.xyz/login</mark></div>
+      <div class="stickers only-phish">
+        <div class="st"><b><span>Proven</span><span>+19.5</span></b><p>sbi-kyc.xyz isn't SBI's website</p></div>
+        <div class="st"><b><span>Proven</span><span>+19.5</span></b><p>Asks for details through that link</p></div>
+        <div class="st"><b><span>AI model</span><span>+19.5</span></b><p>The wording reads 100% like phishing</p></div>
+        <div class="st"><b><span>Pressure</span><span>+4.3</span></b><p>Threatens to block your account</p></div>
+      </div>
+      <div class="stickers only-safe"><div class="st"><b><span>Noted</span><span>+0</span></b><p>“Do not share” is a warning, not a request</p></div></div>
+      <div class="ai only-phish"><b>In plain words</b><br>It pretends to be SBI to rush you into clicking. Check in the YONO app instead.</div>
+    </section>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+  const s = document.querySelector(".score"); s.style.animation = "none"; s.offsetWidth; s.style.animation = "";
+}));
+</script>
+</body>
+</html>

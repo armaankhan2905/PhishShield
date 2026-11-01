@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 43 · Mint Sidebar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Concept 43, Mint Sidebar. An app layout: a deep green sidebar for the pages and server status,
+   the input across the top of the main area, and the result in tabs (Summary, Message, Links) so
+   only one thing is on screen at a time. Manrope throughout. */
+:root { --ink: #0b2b26; --g2: #163832; --g3: #235347; --sage: #8eb69b; --mint: #daf1de; --paper: #eaf6ec; --card: #f6fbf6; --line: #c4dcc9; --muted: #4f6b5f; --hot: #c8553a; --hot-bg: #f6c9b8;
+        --font: "Manrope", "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 15.5px/1.6 var(--font); min-height: 100vh; display: grid; grid-template-columns: 230px minmax(0, 1fr); }
+@media (max-width: 820px) { body { grid-template-columns: minmax(0, 1fr); } .side { position: static; height: auto; } }
+.side { background: var(--ink); color: var(--mint); padding: 22px 16px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 4px; }
+.brand { font: 800 20px var(--font); padding: 0 10px 20px; }
+.side a { color: var(--sage); text-decoration: none; font-weight: 600; font-size: 14.5px; padding: 9px 12px; border-radius: 10px; }
+.side a.on { background: var(--g2); color: var(--mint); }
+.st { margin-top: auto; padding: 12px; border-radius: 12px; background: var(--g2); font-size: 12.5px; color: var(--sage); }
+.st b { display: block; color: var(--mint); font-size: 13px; }
+main { padding: 28px clamp(20px, 4vw, 44px) 70px; max-width: 980px; }
+h1 { font: 800 28px/1.2 var(--font); margin: 0 0 4px; letter-spacing: -.02em; } .sub { color: var(--muted); margin: 0 0 18px; }
+.ask { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.ask textarea { width: 100%; min-height: 80px; resize: vertical; border: 0; background: none; font: 16px/1.6 var(--font); color: var(--ink); } .ask textarea:focus { outline: none; }
+.ask .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.kinds { display: flex; gap: 6px; } .kinds span { font-size: 13px; font-weight: 600; padding: 4px 12px; border-radius: 8px; background: var(--mint); color: var(--muted); } .kinds span.on { background: var(--ink); color: var(--mint); }
+.ask button { font: 700 14px var(--font); background: var(--g3); color: var(--mint); border: 0; border-radius: 10px; padding: 9px 20px; cursor: pointer; }
+.res { margin-top: 22px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.head { display: flex; align-items: center; gap: 18px; padding: 20px 22px; border-bottom: 1px solid var(--line); flex-wrap: wrap; border-left: 6px solid var(--tone); }
+.head b { font: 800 44px/1 var(--font); color: var(--tone); letter-spacing: -.03em; }
+.head h2 { font: 800 22px/1.2 var(--font); margin: 0; color: var(--tone); } .head p { margin: 0; color: var(--muted); font-size: 14px; }
+.rtabs { display: flex; gap: 2px; padding: 0 16px; border-bottom: 1px solid var(--line); background: #fff8; }
+.rtabs button { font: 700 14px var(--font); background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: 12px 10px; cursor: pointer; }
+.rtabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--g3); }
+.pane { padding: 18px 22px; } .pane[hidden] { display: none; }
+.ev { list-style: none; margin: 0; padding: 0; }
+.ev li { display: grid; grid-template-columns: 84px minmax(0, 1fr) auto; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.ev li:first-child { border-top: 0; }
+.ev i { font-style: normal; font-size: 12px; font-weight: 700; color: var(--g3); } .ev em { font-style: normal; color: var(--muted); font-weight: 600; }
+.ai { margin: 14px 0 0; padding: 14px 16px; border-radius: 12px; background: var(--mint); } .ai small { display: block; color: var(--muted); font-size: 12.5px; }
+.msg { font-size: 18px; line-height: 1.85; margin: 0; }
+mark { background: linear-gradient(transparent 55%, var(--hot-bg) 55%); color: var(--ink); padding: 0 2px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; } th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); } th { font-size: 12px; color: var(--g3); text-transform: uppercase; letter-spacing: .08em; }
+.risky { color: var(--hot); font-weight: 700; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 4px; z-index: 5; }
+.toggle button { font: 700 13px var(--font); background: none; border: 0; color: var(--muted); padding: 6px 12px; border-radius: 7px; cursor: pointer; } .toggle button.on { background: var(--ink); color: var(--mint); }
+body[data-state="phishing"] { --tone: var(--hot); } body[data-state="safe"] { --tone: var(--g3); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+</style>
+</head>
+<body data-state="phishing">
+<aside class="side"><div class="brand">PhishShield</div><a class="on">Check a message</a><a>Results</a><a>How it works</a><a>Get the extension</a>
+  <div class="st"><b>Running on this computer</b>Models ready · Local AI on</div></aside>
+<main>
+  <h1>Check a message</h1><p class="sub">Paste a text, email or link. Nothing leaves this computer.</p>
+  <div class="ask">
+    <textarea class="only-phish" aria-label="Message">URGENT: Dear customer, your SBI KYC is pending and your account will be blocked today. Verify at http://sbi-kyc.xyz/login</textarea>
+    <textarea class="only-safe" aria-label="Message">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</textarea>
+    <div class="row"><div class="kinds"><span class="on">SMS</span><span>Email</span><span>Link</span><span>File</span></div><button>Check</button></div>
+  </div>
+  <section class="res">
+    <div class="head"><b><span class="only-phish">100</span><span class="only-safe">0</span></b>
+      <div><h2 class="only-phish">Phishing likely · don't click, reply or share codes</h2><h2 class="only-safe">Looks genuine · nothing to act on</h2>
+        <p>Confidence high · 4 of 4 checks · 23 ms</p></div></div>
+    <div class="rtabs" role="tablist"><button role="tab" aria-selected="true" data-p="sum">Summary</button><button role="tab" aria-selected="false" data-p="msg">Message</button><button role="tab" aria-selected="false" data-p="links">Links</button></div>
+    <div class="pane" id="p-sum">
+      <ul class="ev only-phish">
+        <li><i>Proven</i><span>sbi-kyc.xyz isn't one of SBI's domains</span><em>+19.5</em></li>
+        <li><i>Proven</i><span>Asks for details through that link</span><em>+19.5</em></li>
+        <li><i>Model</i><span>Wording reads 100% like phishing</span><em>+19.5</em></li>
+        <li><i>Pattern</i><span>Threatens to block your account</span><em>+4.3</em></li></ul>
+      <ul class="ev only-safe"><li><i>Noted</i><span>“Do not share” is a warning, not a request</span><em>+0</em></li></ul>
+      <p class="ai only-phish">“It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.”<small>Local AI · from the findings only</small></p>
+    </div>
+    <div class="pane" id="p-msg" hidden>
+      <p class="msg only-phish"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></p>
+      <p class="msg only-safe">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</p></div>
+    <div class="pane" id="p-links" hidden>
+      <table class="only-phish"><tr><th>Link</th><th>Risk</th><th>URL model</th></tr><tr><td>http://sbi-kyc.xyz/login</td><td class="risky">Risky</td><td>100%</td></tr></table>
+      <p class="only-safe">No links in this message.</p></div>
+  </section>
+</main>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".rtabs button").forEach((t) => t.addEventListener("click", () => {
+  document.querySelectorAll(".rtabs button").forEach((x) => { const on = x === t; x.setAttribute("aria-selected", on); document.getElementById("p-" + x.dataset.p).hidden = !on; });
+}));
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

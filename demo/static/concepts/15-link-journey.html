@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 15 · Link Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Concept 15, Link Journey. Shows where the message really takes you. A map of the journey:
+   who it claims to be → what it asks → where the link actually goes, with the gap between
+   the claim and reality drawn as a broken path. Cool mist and slate; teal for the honest path,
+   a gold "claimed" badge, and an electric-orange break where the trick happens. */
+:root {
+  --mist: #eef3f2; --card: #ffffff; --slate: #1e2a32; --muted: #5f6e76; --line: #d6e0de; --teal: #148c82; --teal-lt: #d6efeb; --gold: #b8893a; --gold-lt: #f6ead2;
+  --orange: #ff5f1f; --orange-lt: #ffe6dc;
+  --font: "Lexend", "Segoe UI", sans-serif; --mono: "IBM Plex Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--mist); color: var(--slate); font: 15px/1.55 var(--font); min-height: 100vh; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); }
+header { display: flex; align-items: center; gap: 20px; padding: 18px 0; flex-wrap: wrap; }
+.brand { font: 700 20px var(--font); display: flex; gap: 8px; align-items: center; }
+.brand i { width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--teal); position: relative; }
+.brand i::after { content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: var(--teal); }
+nav { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; } nav a { color: var(--muted); text-decoration: none; font-weight: 500; padding: 6px 12px; border-radius: 10px; }
+nav a.on { background: var(--card); color: var(--slate); box-shadow: 0 2px 10px #1e2a3214; }
+.intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px; align-items: end; margin: 24px 0 24px; }
+@media (max-width: 900px) { .intro { grid-template-columns: minmax(0, 1fr); } }
+h1 { font: 700 44px/1.08 var(--font); letter-spacing: -.02em; margin: 0; }
+h1 span { color: var(--teal); }
+.ask { display: flex; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+.ask input { flex: 1; min-width: 0; border: 0; font: 15px var(--font); padding: 10px 12px; background: none; } .ask input:focus { outline: none; }
+.ask button { font: 600 15px var(--font); background: var(--slate); color: #fff; border: 0; border-radius: 11px; padding: 0 20px; cursor: pointer; }
+.verdictbar { display: flex; align-items: center; gap: 16px; background: var(--card); border: 1px solid var(--line); border-left: 8px solid var(--tone); border-radius: 16px;
+              padding: 14px 18px; margin-bottom: 18px; flex-wrap: wrap; }
+.verdictbar b { font: 700 40px/1 var(--font); color: var(--tone); }
+.verdictbar h2 { font: 700 22px var(--font); margin: 0; }
+.verdictbar p { margin: 0; color: var(--muted); }
+.verdictbar .meta { margin-left: auto; font: 500 12px var(--mono); color: var(--muted); text-align: right; }
+.map { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 26px; position: relative; overflow: hidden;
+       background-image: radial-gradient(#1e2a3212 1px, transparent 1px); background-size: 18px 18px; }
+.nodes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; position: relative; z-index: 1; }
+@media (max-width: 900px) { .nodes { grid-template-columns: minmax(0, 1fr); } }
+.node { background: #fff; border: 2px solid var(--line); border-radius: 18px; padding: 16px; position: relative; }
+.node small { font: 600 11px var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.node h3 { font: 700 18px/1.2 var(--font); margin: 4px 0 6px; }
+.node p { margin: 0; font-size: 14px; color: var(--muted); }
+.node .badge { display: inline-block; margin-top: 10px; font: 600 12px var(--font); padding: 3px 10px; border-radius: 999px; }
+.claim { border-color: var(--gold); } .claim .badge { background: var(--gold-lt); color: var(--gold); }
+.ask2 .badge { background: var(--teal-lt); color: var(--teal); }
+.real { border-color: var(--tone); box-shadow: 0 0 0 6px var(--tone-lt); }
+.real .badge { background: var(--tone-lt); color: var(--tone); }
+.real code { display: block; font: 500 14px var(--mono); color: var(--tone); margin-top: 4px; overflow-wrap: anywhere; }
+svg.paths { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.break { position: absolute; z-index: 2; left: 62.5%; top: 18px; transform: translateX(-50%); background: var(--orange); color: #fff; font: 700 12px var(--font); padding: 4px 10px; border-radius: 999px;
+         box-shadow: 0 6px 16px #ff5f1f55; white-space: nowrap; }
+@media (max-width: 900px) { svg.paths, .break { display: none; } }
+.below { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 18px; margin: 18px 0 70px; }
+@media (max-width: 900px) { .below { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; }
+.panel h3 { font: 600 12px var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.msg { font-size: 18px; line-height: 1.75; }
+mark { background: var(--orange-lt); color: #9c2e05; border-bottom: 2px solid var(--orange); padding: 0 2px; }
+.ev div { display: grid; grid-template-columns: 80px minmax(0, 1fr) 50px; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.ev i { font: 600 11px var(--font); font-style: normal; letter-spacing: .08em; text-transform: uppercase; color: var(--teal); }
+.ev em { font: 500 12px var(--mono); font-style: normal; text-align: right; }
+.ai { margin-top: 12px; font-size: 14px; } .ai small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 4px; box-shadow: 0 8px 24px #1e2a3222; z-index: 5; }
+.toggle button { font: 600 13px var(--font); background: none; border: 0; padding: 7px 14px; border-radius: 9px; cursor: pointer; color: var(--muted); }
+.toggle button.on { background: var(--slate); color: #fff; }
+body[data-state="phishing"] { --tone: var(--orange); --tone-lt: var(--orange-lt); } body[data-state="safe"] { --tone: var(--teal); --tone-lt: var(--teal-lt); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+</style>
+</head>
+<body data-state="phishing">
+<div class="wrap">
+  <header><div class="brand"><i></i>PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></header>
+  <div class="intro">
+    <h1>See where a message <span>really</span> takes you.</h1>
+    <div class="ask"><input aria-label="Message" value="URGENT: Dear customer, your SBI KYC is pending… sbi-kyc.xyz/login"><button>Trace it</button></div>
+  </div>
+  <div class="verdictbar"><b class="only-phish">100</b><b class="only-safe">0</b>
+    <div><h2 class="only-phish">Phishing likely: the link doesn't go where it claims</h2><h2 class="only-safe">Looks genuine: nothing leads anywhere</h2>
+      <p class="only-phish">Don't click, reply or share codes.</p><p class="only-safe">“Do not share” is a warning, and there's no link.</p></div>
+    <div class="meta">confidence high<br>4 of 4 checks · 23 ms</div></div>
+  <div class="map">
+    <svg class="paths only-phish" viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M200 100 C 240 100, 260 100, 290 100" stroke="#148c82" stroke-width="3" fill="none"/>
+      <path d="M450 100 C 490 100, 510 100, 540 100" stroke="#148c82" stroke-width="3" fill="none"/>
+      <path d="M700 100 C 720 100, 730 60, 745 60" stroke="#ff5f1f" stroke-width="3" stroke-dasharray="7 7" fill="none"/>
+    </svg>
+    <div class="break only-phish">✕ the claim and the link don't match</div>
+    <div class="nodes only-phish">
+      <div class="node claim"><small>1 · Claims to be</small><h3>SBI</h3><p>“Dear customer, your SBI KYC is pending”</p><span class="badge">claimed</span></div>
+      <div class="node ask2"><small>2 · Wants you to</small><h3>Verify your KYC</h3><p>today, or your account “will be blocked”</p><span class="badge">pressure</span></div>
+      <div class="node"><small>3 · SBI's real sites</small><h3>onlinesbi.sbi</h3><p>sbi.co.in · the YONO app</p><span class="badge" style="background:var(--teal-lt);color:var(--teal)">official</span></div>
+      <div class="node real"><small>4 · Link actually goes to</small><h3>Not SBI</h3><code>sbi-kyc.xyz/login</code><span class="badge">imitation · +19.5</span></div>
+    </div>
+    <div class="nodes only-safe" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+      <div class="node"><small>1 · From</small><h3>HDFC Bank</h3><p>An OTP alert for a ₹500 Amazon payment</p><span class="badge" style="background:var(--teal-lt);color:var(--teal)">consistent</span></div>
+      <div class="node"><small>2 · Wants you to</small><h3>Nothing</h3><p>It warns you not to share the code</p><span class="badge" style="background:var(--teal-lt);color:var(--teal)">no request</span></div>
+      <div class="node real"><small>3 · Links</small><h3>None</h3><p>Nowhere to be taken</p><span class="badge">safe</span></div>
+    </div>
+  </div>
+  <div class="below only-phish">
+    <div class="panel"><h3>The message</h3><p class="msg"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></p>
+      <p class="ai">It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.<small>Local AI · from the findings only</small></p></div>
+    <div class="panel ev"><h3>All findings</h3>
+      <div><i>Proven</i><span>sbi-kyc.xyz isn't an SBI domain</span><em>+19.5</em></div>
+      <div><i>Proven</i><span>Asks for details via that link</span><em>+19.5</em></div>
+      <div><i>Model</i><span>Wording 100% likely phishing</span><em>+19.5</em></div>
+      <div><i>Model</i><span>Link 100% likely phishing</span><em>+19.2</em></div>
+      <div><i>Pattern</i><span>Threat and urgency</span><em>+7.2</em></div></div>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

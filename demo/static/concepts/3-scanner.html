@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 3 · Scanner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Concept 3, Scanner: a bright, clinical X-ray of the message. A scan line passes over the
+   text, each finding is annotated in the margin and tied to the exact words it's about,
+   and the score sits on a semicircular gauge with the 30 / 70 lines marked. */
+:root {
+  --bg: #eef2f7; --card: #ffffff; --ink: #0f1a2b; --muted: #5e6b80; --line: #dbe2ec; --blue: #1f5bff; --blue-soft: #e5edff;
+  --danger: #e5402f; --danger-soft: #fdebe8; --warn: #e39100; --safe: #10a36b; --safe-soft: #e3f6ee;
+  --display: "Sora", "Segoe UI", sans-serif; --body: "Manrope", "Segoe UI", sans-serif; --mono: "JetBrains Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); }
+header { display: flex; align-items: center; gap: 20px; padding: 16px 0; flex-wrap: wrap; }
+.brand { display: flex; gap: 10px; align-items: center; font: 800 20px var(--display); }
+.brand i { width: 30px; height: 30px; border-radius: 9px; background: conic-gradient(from 210deg, var(--blue), #7aa2ff, var(--blue)); }
+nav { flex: 1; display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px; width: fit-content; max-width: max-content; }
+nav a { font: 600 13px var(--body); color: var(--muted); padding: 6px 14px; border-radius: 999px; text-decoration: none; }
+nav a.on { background: var(--ink); color: #fff; }
+.pills { display: flex; gap: 6px; margin-left: auto; }
+.pills span { font: 600 12px var(--body); padding: 5px 10px; border-radius: 999px; background: var(--safe-soft); color: var(--safe); }
+.hero { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin: 26px 0 18px; flex-wrap: wrap; }
+h1 { font: 800 42px/1.08 var(--display); letter-spacing: -.02em; margin: 0; max-width: 16ch; }
+.input { display: flex; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 8px; box-shadow: 0 12px 30px #0f1a2b0f; flex: 1; min-width: 0; max-width: 640px; }
+.input input { flex: 1; min-width: 0; border: 0; font: 15px var(--body); padding: 10px 12px; background: none; color: var(--ink); }
+.input input:focus { outline: none; }
+.btn { font: 700 14px var(--display); color: #fff; background: var(--blue); border: 0; border-radius: 11px; padding: 0 20px; cursor: pointer; }
+.board { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+@media (max-width: 980px) { .board { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px; box-shadow: 0 12px 30px #0f1a2b0a; min-width: 0; }
+.scan { position: relative; overflow: hidden; }
+.scan .head { display: flex; justify-content: space-between; font: 600 12px var(--body); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
+.specimen { position: relative; font: 22px/1.9 var(--body); font-weight: 500; padding: 8px 0; }
+.specimen .hl { background: var(--soft); border-bottom: 2px solid var(--tone); border-radius: 3px; padding: 1px 3px; position: relative; }
+.specimen .hl sup { font: 700 11px var(--mono); color: #fff; background: var(--tone); border-radius: 999px; padding: 1px 6px; margin-left: 2px; vertical-align: 6px; }
+.beam { position: absolute; left: 0; right: 0; height: 70px; top: -70px; background: linear-gradient(180deg, transparent, #1f5bff22, transparent);
+        border-bottom: 2px solid #1f5bff88; animation: beam 2.8s ease-in-out 1 both; pointer-events: none; }
+@keyframes beam { to { top: 100%; } }
+.notes { margin-top: 22px; display: grid; gap: 10px; }
+.n { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px 14px; border-radius: 12px; background: var(--bg); }
+.n b { font: 700 12px var(--mono); color: #fff; background: var(--tone); width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; }
+.n.model b { background: var(--blue); } .n.pattern b { background: var(--muted); }
+.n small { display: block; font: 700 11px var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.n em { font: 700 13px var(--mono); color: var(--ink); font-style: normal; }
+.gauge { text-align: center; }
+.gauge svg { width: 100%; max-width: 280px; }
+.gauge .num { font: 800 64px/1 var(--display); color: var(--tone); margin-top: -64px; }
+.gauge .lbl { font: 600 13px var(--body); color: var(--muted); }
+.verdict { margin-top: 16px; padding: 14px; border-radius: 14px; background: var(--soft); color: var(--tone); font: 800 22px var(--display); text-align: center; }
+.facts { margin-top: 16px; display: grid; gap: 8px; font-size: 14px; }
+.facts div { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+.facts span:last-child { font-weight: 700; }
+.ai { margin-top: 16px; padding: 14px; border-radius: 14px; background: var(--blue-soft); font-size: 14px; }
+.ai small { display: block; color: var(--blue); font-weight: 700; margin-top: 6px; font-size: 12px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); padding: 4px; border-radius: 999px; box-shadow: 0 8px 24px #0f1a2b22; z-index: 5; }
+.toggle button { font: 700 13px var(--body); background: none; border: 0; padding: 6px 14px; border-radius: 999px; cursor: pointer; color: var(--muted); }
+.toggle button.on { background: var(--ink); color: #fff; }
+body[data-state="phishing"] { --tone: var(--danger); --soft: var(--danger-soft); } body[data-state="safe"] { --tone: var(--safe); --soft: var(--safe-soft); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+@media (prefers-reduced-motion: reduce) { .beam { display: none; } }
+</style>
+</head>
+<body data-state="phishing">
+<div class="wrap">
+  <header><div class="brand"><i></i>PhishShield</div>
+    <nav><a class="on">Scan</a><a>Results</a><a>How it works</a><a>Extension</a></nav>
+    <div class="pills"><span>Models ready</span><span>Local AI</span></div></header>
+  <div class="hero">
+    <h1>See exactly why a message is risky.</h1>
+    <div class="input"><input value="URGENT: Dear customer, your SBI KYC is pending… sbi-kyc.xyz/login" aria-label="Message"><button class="btn">Scan</button></div>
+  </div>
+  <div class="board">
+    <section class="card scan">
+      <div class="beam" aria-hidden="true"></div>
+      <div class="head"><span>Specimen · SMS</span><span>Scanned in 23 ms on this computer</span></div>
+      <div class="specimen only-phish"><span class="hl">URGENT<sup>5</sup></span>: Dear customer, your SBI <span class="hl">KYC is pending<sup>6</sup></span> and your <span class="hl">account will be blocked<sup>5</sup></span> today. Verify at <span class="hl">http://sbi-kyc.xyz/login<sup>1</sup><sup>2</sup><sup>4</sup></span></div>
+      <div class="specimen only-safe">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</div>
+      <div class="notes only-phish">
+        <div class="n"><b>1</b><div><small>Proven</small>Link imitates SBI: sbi-kyc.xyz isn't one of SBI's domains</div><em>+19.5</em></div>
+        <div class="n"><b>2</b><div><small>Proven</small>Asks for details, but the link goes to sbi-kyc.xyz</div><em>+19.5</em></div>
+        <div class="n model"><b>3</b><div><small>Model</small>Text model rates the wording 100% likely phishing</div><em>+19.5</em></div>
+        <div class="n model"><b>4</b><div><small>Model</small>URL model rates the link 100% likely phishing</div><em>+19.2</em></div>
+        <div class="n pattern"><b>5</b><div><small>Pattern</small>Urgency and a threat to block your account</div><em>+7.2</em></div>
+        <div class="n pattern"><b>6</b><div><small>Pattern</small>Says your KYC is pending</div><em>+3.5</em></div>
+      </div>
+      <div class="notes only-safe"><div class="n pattern" style="background:var(--safe-soft)"><b style="background:var(--safe)">✓</b><div><small>No findings</small>“Do not share” is a warning, not a request, and there's no link, number or payment to act on.</div><em>+0</em></div></div>
+    </section>
+    <aside class="card gauge">
+      <svg viewBox="0 0 200 110" aria-label="Risk gauge">
+        <path d="M14 100 A86 86 0 0 1 186 100" fill="none" stroke="#dbe2ec" stroke-width="14" stroke-linecap="round"/>
+        <path d="M14 100 A86 86 0 0 1 42 37" fill="none" stroke="#10a36b" stroke-width="14" stroke-linecap="round" opacity=".45"/>
+        <path d="M44 35 A86 86 0 0 1 152 32" fill="none" stroke="#e39100" stroke-width="14" opacity=".45"/>
+        <path d="M154 34 A86 86 0 0 1 186 100" fill="none" stroke="#e5402f" stroke-width="14" stroke-linecap="round" opacity=".45"/>
+        <line class="only-phish" x1="100" y1="100" x2="182" y2="98" stroke="#0f1a2b" stroke-width="4" stroke-linecap="round"/>
+        <line class="only-safe" x1="100" y1="100" x2="18" y2="98" stroke="#0f1a2b" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="7" fill="#0f1a2b"/>
+      </svg>
+      <div class="num" style="margin-top:4px"><span class="only-phish">100</span><span class="only-safe">0</span></div>
+      <div class="lbl">risk score · safe below 30 · phishing from 70</div>
+      <div class="verdict"><span class="only-phish">Phishing likely</span><span class="only-safe">No phishing signs</span></div>
+      <div class="facts"><div><span>Confidence</span><span>High</span></div><div><span>Checks run</span><span>4 of 4</span></div><div><span>Links found</span><span class="only-phish">1 risky</span><span class="only-safe">0</span></div></div>
+      <div class="ai only-phish">It pretends to be SBI, but the link goes to sbi-kyc.xyz, which SBI doesn't own. What to do: don't click; check in the YONO app.<small>Local AI · from these findings only</small></div>
+    </aside>
+  </div>
+  <p style="height:60px"></p>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+  const beam = document.querySelector(".beam"); beam.style.animation = "none"; beam.offsetWidth; beam.style.animation = "";
+}));
+</script>
+</body>
+</html>

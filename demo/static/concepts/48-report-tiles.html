@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 48 · Report Tiles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+/* Concept 48, Report Tiles. The report from 45 drawn as 41's tiles: a wide header tile with the
+   verdict badge and score bar, three small stat tiles, then each numbered section is its own tile
+   in a two-column grid, with "What to do" spanning the full width. Albert Sans. */
+:root { --ink: #0b2b26; --g2: #163832; --g3: #235347; --sage: #8eb69b; --mint: #daf1de; --paper: #eaf6ec; --card: #f6fbf6; --line: #c4dcc9; --muted: #4f6b5f; --hot: #c8553a; --hot-bg: #f6c9b8; --hot-lt: #fbe4dc;
+        --font: "Albert Sans", "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 var(--font); min-height: 100vh; }
+.top { background: var(--ink); color: var(--mint); }
+.bar { max-width: 1100px; margin: 0 auto; padding: 14px max(20px, env(safe-area-inset-left)); display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.brand { font: 800 20px var(--font); } nav { display: flex; gap: 22px; flex: 1; flex-wrap: wrap; } nav a { color: var(--sage); text-decoration: none; font-size: 15px; font-weight: 500; } nav a.on { color: var(--mint); }
+.status { font-size: 13px; color: var(--sage); }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 28px max(20px, env(safe-area-inset-left)) 70px; }
+.ask { display: flex; gap: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+.ask input { flex: 1; min-width: 0; background: none; border: 0; color: var(--ink); font: 15.5px var(--font); padding: 10px 12px; } .ask input:focus { outline: none; }
+.ask button { font: 700 15px var(--font); background: var(--g3); color: var(--mint); border: 0; border-radius: 10px; padding: 0 24px; cursor: pointer; }
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+@media (max-width: 860px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.t { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+.t small { display: block; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--g3); }
+.t b.v { display: block; font: 800 24px/1.3 var(--font); margin-top: 2px; }
+.head { grid-column: span 4; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 20px; align-items: center; border-top: 4px solid var(--tone); }
+@media (max-width: 860px) { .head { grid-column: 1 / -1; } }
+.badge { grid-row: span 2; font: 800 14px var(--font); text-transform: uppercase; letter-spacing: .08em; color: var(--tone); background: var(--tone-bg); border-radius: 14px; padding: 10px 16px; text-align: center; line-height: 1.1; }
+.badge b { display: block; font-size: 36px; letter-spacing: -.03em; }
+.head h2 { font: 800 26px/1.2 var(--font); margin: 0; letter-spacing: -.02em; } .head p { margin: 0; color: var(--muted); }
+.scale { grid-column: 1 / -1; margin-top: 12px; height: 8px; border-radius: 8px; background: var(--mint); overflow: hidden; } .scale i { display: block; height: 100%; width: var(--pct); background: var(--tone); border-radius: 8px; }
+.sec { grid-column: span 2; position: relative; padding-left: 58px; }
+@media (max-width: 860px) { .sec { grid-column: 1 / -1; } }
+.sec::before { content: attr(data-n); position: absolute; left: 18px; top: 16px; font: 800 15px var(--font); color: var(--sage); }
+.sec h3 { font: 700 16.5px var(--font); margin: 0 0 2px; display: flex; justify-content: space-between; gap: 10px; } .sec h3 em { font-style: normal; color: var(--hot); }
+.sec p { margin: 0; color: var(--muted); }
+.msg { margin: 8px 0 0; padding: 12px 14px; background: var(--paper); border-radius: 12px; color: var(--ink) !important; font-size: 16.5px; line-height: 1.8; }
+mark { background: linear-gradient(transparent 55%, var(--hot-bg) 55%); color: var(--ink); padding: 0 2px; }
+.todo { grid-column: 1 / -1; background: var(--ink); color: var(--mint); border-color: var(--ink); display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.todo small { color: var(--sage); } .todo p { margin: 0; font-size: 17px; flex: 1; min-width: 240px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 4px; z-index: 5; }
+.toggle button { font: 700 13px var(--font); background: none; border: 0; color: var(--muted); padding: 6px 12px; border-radius: 7px; cursor: pointer; } .toggle button.on { background: var(--ink); color: var(--mint); }
+body[data-state="phishing"] { --tone: var(--hot); --tone-bg: var(--hot-lt); --pct: 100%; } body[data-state="safe"] { --tone: var(--g3); --tone-bg: var(--mint); --pct: 3%; }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+</style>
+</head>
+<body data-state="phishing">
+<div class="top"><div class="bar"><div class="brand">PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav><span class="status">● Models ready</span></div></div>
+<div class="wrap">
+  <div class="ask"><input aria-label="Message" value="URGENT: Dear customer, your SBI KYC is pending… Verify at http://sbi-kyc.xyz/login"><button>Check</button></div>
+  <div class="grid">
+    <div class="t head"><div class="badge"><b><span class="only-phish">100</span><span class="only-safe">0</span></b><span class="only-phish">Scam</span><span class="only-safe">Safe</span></div>
+      <h2 class="only-phish">Phishing likely. Don't click, reply or share any code.</h2><h2 class="only-safe">Looks genuine. Nothing to act on.</h2>
+      <p>Checked on this computer · every point below comes with a reason</p><div class="scale"><i></i></div></div>
+    <div class="t"><small>Confidence</small><b class="v">High</b></div>
+    <div class="t"><small>Checks</small><b class="v">4 of 4</b></div>
+    <div class="t"><small>Time</small><b class="v">23 ms</b></div>
+    <div class="t"><small>Links</small><b class="v"><span class="only-phish">1 risky</span><span class="only-safe">None</span></b></div>
+    <div class="t sec only-phish" data-n="01"><h3>What it claims</h3><p>To be SBI, asking you to “verify” a pending KYC.</p>
+      <p class="msg"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></p></div>
+    <div class="t sec only-phish" data-n="02"><h3>Where the link really goes <em>+39.0</em></h3><p>sbi-kyc.xyz, which isn't one of SBI's domains, and it asks for your details there.</p></div>
+    <div class="t sec only-phish" data-n="03"><h3>The wording <em>+4.3</em></h3><p>A threat to block your account, plus urgency.</p></div>
+    <div class="t sec only-phish" data-n="04"><h3>The models <em>+38.7</em></h3><p>The text model and the URL model both rate it 100% phishing.</p></div>
+    <div class="t sec only-safe" data-n="01" style="grid-column:1/-1"><h3>What it is</h3><p>An HDFC OTP alert for a ₹500 Amazon payment. “Do not share” is a warning, not a request, and there's no link.</p></div>
+    <div class="t todo only-phish"><small>WHAT TO DO</small><p>It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.</p></div>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 4 · Phone Guard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap">
+<style>
+/* Concept 4, Phone Guard: the message is shown where people actually meet it, in a phone's
+   SMS thread. PhishShield answers like a guardian that slides up over the conversation,
+   with the evidence as swipeable cards beside it. Warm, friendly, aimed at everyday users. */
+:root {
+  --bg: #f3efe9; --bg2: #e7f0ff; --card: #ffffff; --ink: #1d2433; --muted: #5d6779; --line: #e3e6ec;
+  --brand: #3554f5; --danger: #e8483a; --danger-soft: #ffe8e4; --safe: #12a06a; --safe-soft: #dff6ea; --bubble: #e9ecf2;
+  --display: "Rubik", "Segoe UI", sans-serif; --body: "Nunito Sans", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); font: 16px/1.55 var(--body); min-height: 100vh;
+       background: radial-gradient(800px 500px at 85% 10%, var(--bg2), transparent 60%), var(--bg); }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); }
+header { display: flex; align-items: center; gap: 22px; padding: 18px 0; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font: 800 22px var(--display); }
+.brand i { width: 34px; height: 34px; border-radius: 12px; background: var(--brand); display: grid; place-items: center; color: #fff; font: 800 18px var(--display); font-style: normal; }
+nav { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
+nav a { font: 600 15px var(--body); color: var(--muted); padding: 7px 14px; border-radius: 12px; text-decoration: none; }
+nav a.on { background: var(--card); color: var(--ink); box-shadow: 0 4px 14px #1d243314; }
+.stage { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 48px; align-items: center; padding: 24px 0 40px; }
+@media (max-width: 980px) { .stage { grid-template-columns: minmax(0, 1fr); justify-items: center; } }
+.phone { width: 360px; max-width: 100%; height: 700px; background: #0f1320; border-radius: 48px; padding: 14px; box-shadow: 0 40px 80px #1d243340, inset 0 0 0 2px #2a3044; position: relative; }
+.screen { background: #fbfbfd; border-radius: 36px; height: 100%; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+.notch { width: 110px; height: 26px; background: #0f1320; border-radius: 0 0 16px 16px; margin: 0 auto; }
+.thread { padding: 10px 16px; display: flex; flex-direction: column; gap: 10px; }
+.from { text-align: center; font: 700 15px var(--display); margin: 6px 0 4px; }
+.from small { display: block; font: 600 12px var(--body); color: var(--muted); }
+.bubble { background: var(--bubble); border-radius: 20px 20px 20px 6px; padding: 12px 14px; font-size: 15px; max-width: 92%; }
+.bubble mark { background: #ffd84d; color: inherit; border-radius: 4px; padding: 0 2px; }
+.bubble a { color: var(--brand); }
+.time { font-size: 12px; color: var(--muted); }
+.sheet { position: absolute; left: 10px; right: 10px; bottom: 10px; background: var(--card); border-radius: 26px; padding: 18px; box-shadow: 0 -10px 40px #1d24332e;
+         animation: up .6s cubic-bezier(.2,1.2,.4,1) both .4s; border-top: 6px solid var(--tone); }
+@keyframes up { from { transform: translateY(110%); } }
+.sheet .grab { width: 40px; height: 4px; border-radius: 4px; background: var(--line); margin: -6px auto 12px; }
+.sheet .t { display: flex; align-items: center; gap: 12px; }
+.sheet .ring { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; font: 800 20px var(--display); color: var(--tone);
+               background: conic-gradient(var(--tone) calc(var(--pct) * 1%), var(--line) 0); position: relative; flex: none; }
+.sheet .ring::before { content: ""; position: absolute; inset: 6px; background: #fff; border-radius: 50%; }
+.sheet .ring span { position: relative; }
+.sheet h2 { font: 800 21px/1.15 var(--display); margin: 0; color: var(--tone); }
+.sheet p { margin: 8px 0 12px; font-size: 14px; color: var(--muted); }
+.acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.acts button { font: 700 14px var(--display); border-radius: 14px; padding: 11px; border: 0; cursor: pointer; }
+.acts .a { background: var(--tone); color: #fff; } .acts .b { background: var(--bubble); color: var(--ink); }
+.side h1 { font: 800 46px/1.08 var(--display); letter-spacing: -.02em; margin: 0 0 12px; }
+.side .lede { font-size: 18px; color: var(--muted); max-width: 46ch; margin: 0 0 22px; }
+.paste { display: flex; gap: 8px; background: var(--card); border-radius: 18px; padding: 8px; box-shadow: 0 10px 30px #1d243314; max-width: 560px; }
+.paste input { flex: 1; min-width: 0; border: 0; font: 15px var(--body); padding: 10px 12px; background: none; }
+.paste input:focus { outline: none; }
+.paste button { font: 700 15px var(--display); background: var(--brand); color: #fff; border: 0; border-radius: 13px; padding: 0 20px; cursor: pointer; }
+.cards { display: flex; gap: 14px; overflow-x: auto; padding: 22px 2px 14px; scroll-snap-type: x mandatory; }
+.c { flex: 0 0 240px; scroll-snap-align: start; background: var(--card); border-radius: 22px; padding: 18px; box-shadow: 0 10px 26px #1d243314; position: relative; }
+.c .k { display: inline-block; font: 700 12px var(--display); padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
+.c.proven .k { background: var(--danger-soft); color: var(--danger); } .c.model .k { background: #e6ebff; color: var(--brand); } .c.pattern .k { background: var(--bubble); color: var(--muted); }
+.c p { margin: 0; font-size: 15px; } .c em { position: absolute; top: 18px; right: 18px; font: 700 13px var(--display); color: var(--muted); font-style: normal; }
+.ai { max-width: 620px; background: var(--card); border-radius: 22px; padding: 16px 18px; display: flex; gap: 12px; box-shadow: 0 10px 26px #1d243314; }
+.ai i { flex: none; width: 36px; height: 36px; border-radius: 12px; background: #e6ebff; display: grid; place-items: center; font: 800 13px var(--display); color: var(--brand); font-style: normal; }
+.ai small { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--card); padding: 4px; border-radius: 14px; box-shadow: 0 8px 24px #1d243333; z-index: 5; }
+.toggle button { font: 700 13px var(--display); background: none; border: 0; padding: 7px 14px; border-radius: 10px; cursor: pointer; color: var(--muted); }
+.toggle button.on { background: var(--ink); color: #fff; }
+body[data-state="phishing"] { --tone: var(--danger); --pct: 100; } body[data-state="safe"] { --tone: var(--safe); --pct: 0; }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+@media (prefers-reduced-motion: reduce) { .sheet { animation: none; } }
+</style>
+</head>
+<body data-state="phishing">
+<div class="wrap">
+  <header><div class="brand"><i>P</i>PhishShield</div><nav><a class="on">Check a message</a><a>How safe is it?</a><a>How it works</a><a>Get the extension</a></nav></header>
+  <div class="stage">
+    <div class="phone" aria-label="Phone preview of the message">
+      <div class="screen"><div class="notch"></div>
+        <div class="thread">
+          <div class="from only-phish">VM-SBIINB<small>Text message · today 10:42</small></div>
+          <div class="from only-safe">HDFCBK<small>Text message · today 10:42</small></div>
+          <div class="bubble only-phish"><mark>URGENT</mark>: Dear customer, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. Verify at <a>http://sbi-kyc.xyz/login</a></div>
+          <div class="bubble only-safe">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</div>
+          <span class="time">10:42</span>
+        </div>
+        <div class="sheet"><div class="grab"></div>
+          <div class="t"><div class="ring"><span class="only-phish">100</span><span class="only-safe">0</span></div>
+            <div><h2 class="only-phish">This is a scam</h2><h2 class="only-safe">Looks genuine</h2>
+              <span class="time">PhishShield · checked on this computer in 23 ms</span></div></div>
+          <p class="only-phish">It pretends to be SBI, but the link goes to sbi-kyc.xyz. SBI will never ask you to verify KYC through a link.</p>
+          <p class="only-safe">A normal OTP alert. It warns you not to share the code and asks for nothing.</p>
+          <div class="acts only-phish"><button class="a">Don't open link</button><button class="b">See why</button></div>
+          <div class="acts only-safe"><button class="a">Got it</button><button class="b">See details</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="side">
+      <h1>Got a strange message?<br>Ask PhishShield.</h1>
+      <p class="lede">Paste any SMS, email or link. You'll see in seconds whether it's a scam, and exactly what gave it away.</p>
+      <div class="paste"><input value="URGENT: Dear customer, your SBI KYC is pending…" aria-label="Message"><button>Check</button></div>
+      <div class="cards only-phish">
+        <div class="c proven"><span class="k">Proven</span><em>+19.5</em><p>sbi-kyc.xyz isn't one of SBI's websites</p></div>
+        <div class="c proven"><span class="k">Proven</span><em>+19.5</em><p>Asks for your details through that link</p></div>
+        <div class="c model"><span class="k">AI model</span><em>+19.5</em><p>The wording reads 100% like phishing</p></div>
+        <div class="c pattern"><span class="k">Pressure</span><em>+4.3</em><p>Threatens to block your account today</p></div>
+      </div>
+      <div class="ai only-phish"><i>AI</i><div>“The message pretends to be from SBI to rush you into clicking. Don't click; open the YONO app instead.”<small>Written by a local AI model from the evidence only</small></div></div>
+    </div>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+  const s = document.querySelector(".sheet"); s.style.animation = "none"; s.offsetWidth; s.style.animation = "";
+}));
+</script>
+</body>
+</html>

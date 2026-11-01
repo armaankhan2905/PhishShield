@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 33 · Stacked Pills</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap">
+<style>
+/* Concept 33, Stacked Pills. Borrows the palette card itself: the checks are stacked, overlapping
+   pills that step from the darkest green to pale mint, each one naming what it found. They slide
+   in one after another. The verdict is the last, palest pill. Coral marks only what's flagged. */
+:root {
+  --g0: #051f20; --g1: #0b2b26; --g2: #163832; --g3: #235347; --sage: #8eb69b; --mint: #daf1de; --text: #d6e9da; --muted: #86a392; --hot: #ff8a65; --hot-dk: #c4502f;
+  --font: "Sora", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: linear-gradient(180deg, #0b2b26, var(--g0) 70%); background-color: var(--g0); color: var(--text); font: 15px/1.6 var(--font); min-height: 100vh; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)) 70px; }
+header { display: flex; align-items: center; gap: 22px; padding: 20px 0; flex-wrap: wrap; }
+.brand { font: 700 19px var(--font); color: var(--mint); }
+nav { display: flex; gap: 20px; margin-left: auto; flex-wrap: wrap; } nav a { color: var(--muted); text-decoration: none; font-size: 14px; } nav a.on { color: var(--mint); }
+.grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 40px; align-items: start; margin-top: 30px; }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+h1 { font: 700 clamp(30px, 4vw, 42px)/1.12 var(--font); margin: 0 0 12px; color: var(--mint); letter-spacing: -.02em; }
+.sub { color: var(--muted); margin: 0 0 18px; }
+.ask { background: var(--g1); border: 1px solid var(--g3); border-radius: 22px; padding: 14px; }
+.ask textarea { width: 100%; min-height: 96px; resize: vertical; background: none; border: 0; color: var(--text); font: 16px/1.6 var(--font); } .ask textarea:focus { outline: none; }
+.ask .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ask span { font-size: 12px; color: var(--muted); }
+.ask button { font: 600 14px var(--font); background: var(--mint); color: var(--g1); border: 0; border-radius: 999px; padding: 9px 22px; cursor: pointer; }
+.msg { margin: 22px 0 0; font-size: 16px; line-height: 1.85; }
+.msg h3, .ai h3 { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--sage); margin: 0 0 6px; }
+mark { background: none; color: var(--hot); border-bottom: 1.5px solid var(--hot); }
+.ai { margin: 18px 0 0; padding: 14px 16px; border-radius: 18px; background: var(--g1); }
+.ai p { margin: 0; } .ai small { color: var(--muted); font-size: 12px; }
+.stack { display: grid; }
+.pill { position: relative; border-radius: 999px; padding: 18px 28px 30px; margin-top: -18px; box-shadow: 0 -10px 24px #0005; animation: slide .5s cubic-bezier(.2,.8,.2,1) both;
+        display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: baseline; }
+.pill:first-child { margin-top: 0; }
+.pill:nth-child(2) { animation-delay: .08s } .pill:nth-child(3) { animation-delay: .16s } .pill:nth-child(4) { animation-delay: .24s } .pill:nth-child(5) { animation-delay: .32s }
+@keyframes slide { from { opacity: 0; transform: translateY(-16px); } }
+.pill small { grid-column: 1 / -1; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+.pill b { font-weight: 500; } .pill em { font-style: normal; font-size: 13px; opacity: .8; }
+.p1 { background: var(--g0); border: 1px solid var(--g2); color: var(--text); }
+.p2 { background: var(--g1); color: var(--text); }
+.p3 { background: var(--g2); color: var(--text); }
+.p4 { background: var(--g3); color: var(--mint); }
+.p5 { background: var(--sage); color: var(--g0); }
+.final { background: var(--mint); color: var(--g1); padding: 26px 30px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.final b.n { font: 700 46px/1 var(--font); color: var(--tone); }
+.final h2 { font: 700 24px/1.15 var(--font); margin: 0; color: var(--tone); }
+.final p { margin: 0; font-size: 14px; color: var(--g3); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--hot); margin-right: 6px; vertical-align: 1px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--g1); border: 1px solid var(--g3); border-radius: 999px; padding: 4px; z-index: 5; }
+.toggle button { font: 600 13px var(--font); background: none; border: 0; color: var(--muted); padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+.toggle button.on { background: var(--mint); color: var(--g1); }
+body[data-state="phishing"] { --tone: var(--hot-dk); } body[data-state="safe"] { --tone: var(--g3); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+body[data-state="safe"] .dot { background: var(--sage); }
+@media (prefers-reduced-motion: reduce) { .pill { animation: none; } }
+</style>
+</head>
+<body data-state="phishing">
+<div class="wrap">
+  <header><div class="brand">PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></header>
+  <div class="grid">
+    <div>
+      <h1>Every check, layer by layer.</h1>
+      <p class="sub">Paste a message. Each check adds its layer, and the last one is the answer.</p>
+      <div class="ask">
+        <textarea class="only-phish" aria-label="Message">URGENT: Dear customer, your SBI KYC is pending and your account will be blocked today. Verify at http://sbi-kyc.xyz/login</textarea>
+        <textarea class="only-safe" aria-label="Message">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</textarea>
+        <div class="row"><span>SMS · Email · Link · File</span><button>Check</button></div>
+      </div>
+      <div class="msg only-phish"><h3>Flagged in the message</h3><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></div>
+      <div class="ai only-phish"><h3>In plain words</h3><p>“It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.”</p><small>Local AI · from the findings only</small></div>
+    </div>
+    <div class="stack">
+      <div class="pill p1"><small>Rules</small><b><span class="dot"></span><span class="only-phish">The link imitates SBI</span><span class="only-safe">Nothing requested</span></b><em class="only-phish">+19.5</em><em class="only-safe">+0</em></div>
+      <div class="pill p2"><small>Sender &amp; links</small><b><span class="dot"></span><span class="only-phish">Asks for details on that link</span><span class="only-safe">No link</span></b><em class="only-phish">+19.5</em><em class="only-safe">+0</em></div>
+      <div class="pill p3"><small>Text model</small><b><span class="dot"></span><span class="only-phish">Wording 100% likely phishing</span><span class="only-safe">Wording 2% likely phishing</span></b><em class="only-phish">+19.5</em><em class="only-safe">+0</em></div>
+      <div class="pill p4"><small>Patterns</small><b><span class="dot"></span><span class="only-phish">Threat and urgency</span><span class="only-safe">“Do not share” is a warning</span></b><em class="only-phish">+4.3</em><em class="only-safe">+0</em></div>
+      <div class="pill final"><b class="n"><span class="only-phish">100</span><span class="only-safe">0</span></b>
+        <div><h2 class="only-phish">Phishing likely</h2><h2 class="only-safe">Looks genuine</h2>
+          <p class="only-phish">Don't click, reply or share any code · confidence high · 23 ms</p><p class="only-safe">Nothing to act on · confidence high · 18 ms</p></div></div>
+    </div>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

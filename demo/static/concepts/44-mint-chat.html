@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 44 · Mint Chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap">
+<style>
+/* Concept 44, Mint Chat. A conversation: the message you received appears as an incoming bubble,
+   and PhishShield answers in its own bubbles (verdict, reasons, advice), the way you'd ask a friend
+   "is this real?". Lexend, designed for easy reading, throughout. */
+:root { --ink: #0b2b26; --g2: #163832; --g3: #235347; --sage: #8eb69b; --mint: #daf1de; --paper: #eaf6ec; --card: #f6fbf6; --line: #c4dcc9; --muted: #4f6b5f; --hot: #c8553a; --hot-bg: #f6c9b8; --hot-lt: #fbe4dc;
+        --font: "Lexend", "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 300 16px/1.65 var(--font); min-height: 100vh; }
+.top { background: var(--ink); color: var(--mint); }
+.bar { max-width: 1000px; margin: 0 auto; padding: 14px max(20px, env(safe-area-inset-left)); display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.brand { font: 600 20px var(--font); } nav { display: flex; gap: 22px; margin-left: auto; flex-wrap: wrap; } nav a { color: var(--sage); text-decoration: none; font-size: 14px; font-weight: 400; } nav a.on { color: var(--mint); }
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)) 160px; }
+h1 { font: 600 30px/1.2 var(--font); margin: 34px 0 4px; } .sub { color: var(--muted); margin: 0 0 26px; }
+.day { text-align: center; font-size: 12px; color: var(--muted); margin: 6px 0 14px; }
+.who { font-size: 12px; font-weight: 500; color: var(--muted); margin: 0 0 4px 6px; }
+.in { max-width: 82%; }
+.bubble { border-radius: 20px; padding: 14px 16px; }
+.in .bubble { background: var(--card); border: 1px solid var(--line); border-bottom-left-radius: 6px; font-size: 17px; }
+mark { background: linear-gradient(transparent 55%, var(--hot-bg) 55%); color: var(--ink); padding: 0 2px; }
+.out { display: grid; gap: 6px; justify-items: end; margin-top: 22px; }
+.out .who { margin: 0 6px 0 0; }
+.out .bubble { max-width: 82%; background: var(--g3); color: var(--mint); border-bottom-right-radius: 6px; }
+.out .bubble.v { background: var(--tone-bg); color: var(--ink); border: 1px solid var(--tone-line); display: flex; gap: 14px; align-items: center; }
+.v b { font: 700 34px/1 var(--font); color: var(--tone); }
+.v h2 { font: 600 20px/1.2 var(--font); margin: 0; color: var(--tone); } .v p { margin: 0; font-size: 13px; color: var(--muted); }
+.out ul { margin: 6px 0 0; padding-left: 18px; } .out li { margin: 2px 0; } .out li em { font-style: normal; color: var(--sage); font-size: 13px; }
+.out small { display: block; color: var(--sage); font-size: 12px; margin-top: 4px; }
+.compose { position: fixed; left: 0; right: 0; bottom: 0; background: linear-gradient(transparent, var(--paper) 30%); padding: 24px 0 18px; }
+.compose .in2 { max-width: 760px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); display: flex; gap: 8px; }
+.compose input { flex: 1; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 12px 18px; font: 15px var(--font); color: var(--ink); }
+.compose button { font: 600 15px var(--font); background: var(--ink); color: var(--mint); border: 0; border-radius: 999px; padding: 0 22px; cursor: pointer; }
+.toggle { position: fixed; right: 16px; top: 70px; display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px; z-index: 5; }
+.toggle button { font: 500 13px var(--font); background: none; border: 0; color: var(--muted); padding: 6px 14px; border-radius: 999px; cursor: pointer; } .toggle button.on { background: var(--ink); color: var(--mint); }
+body[data-state="phishing"] { --tone: var(--hot); --tone-bg: var(--hot-lt); --tone-line: #f0bfae; } body[data-state="safe"] { --tone: var(--g3); --tone-bg: var(--mint); --tone-line: var(--line); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+</style>
+</head>
+<body data-state="phishing">
+<div class="top"><div class="bar"><div class="brand">PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></div></div>
+<div class="wrap">
+  <h1>Got a message? Ask about it.</h1>
+  <p class="sub">Paste it below like you'd forward it to a friend. PhishShield answers right here, on this computer.</p>
+  <p class="day">Today · checked in 23 ms</p>
+  <div class="in"><p class="who">You received</p>
+    <div class="bubble only-phish"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></div>
+    <div class="bubble only-safe">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</div></div>
+  <div class="out"><p class="who">PhishShield</p>
+    <div class="bubble v"><b><span class="only-phish">100</span><span class="only-safe">0</span></b>
+      <div><h2 class="only-phish">This is phishing.</h2><h2 class="only-safe">This looks genuine.</h2><p>Confidence high · 4 of 4 checks</p></div></div>
+    <div class="bubble only-phish">Here's why:
+      <ul><li>The link goes to sbi-kyc.xyz, which isn't SBI's <em>+19.5</em></li><li>It asks for your details through that link <em>+19.5</em></li>
+        <li>The wording reads 100% like phishing <em>+19.5</em></li><li>It threatens to block your account <em>+4.3</em></li></ul></div>
+    <div class="bubble only-phish">Don't click, reply or share any code. If you're worried, check in the YONO app.<small>Local AI · from the findings only</small></div>
+    <div class="bubble only-safe">It's an ordinary OTP alert. “Do not share it with anyone” is a warning, not a request, and there's no link. Nothing to do.</div>
+  </div>
+</div>
+<div class="compose"><div class="in2"><input aria-label="Message" placeholder="Paste a message, email or link…"><button>Ask</button></div></div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

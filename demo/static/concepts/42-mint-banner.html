@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 42 · Mint Banner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+/* Concept 42, Mint Banner. One centred column. The verdict is a wide banner that takes the colour
+   of the answer (soft coral for a scam, mint for safe), and the reasons are a checklist with a
+   small icon per finding. Outfit, a round geometric sans, throughout. */
+:root { --ink: #0b2b26; --g2: #163832; --g3: #235347; --sage: #8eb69b; --mint: #daf1de; --paper: #eaf6ec; --card: #f6fbf6; --line: #c4dcc9; --muted: #4f6b5f; --hot: #c8553a; --hot-bg: #f6c9b8; --hot-lt: #fbe4dc;
+        --font: "Outfit", "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16.5px/1.6 var(--font); min-height: 100vh; }
+.top { background: var(--ink); color: var(--mint); }
+.bar { max-width: 1100px; margin: 0 auto; padding: 14px max(20px, env(safe-area-inset-left)); display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.brand { font: 700 21px var(--font); }
+nav { display: flex; gap: 22px; margin-left: auto; flex-wrap: wrap; } nav a { color: var(--sage); text-decoration: none; font-size: 15px; } nav a.on { color: var(--mint); font-weight: 600; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)) 70px; }
+h1 { font: 700 40px/1.15 var(--font); text-align: center; margin: 40px 0 6px; letter-spacing: -.01em; }
+.sub { text-align: center; color: var(--muted); margin: 0 0 24px; }
+.ask { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 16px; box-shadow: 0 10px 30px #0b2b260d; }
+.tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; } .tabs span { font-size: 14px; padding: 4px 14px; border-radius: 999px; color: var(--muted); } .tabs span.on { background: var(--mint); color: var(--ink); font-weight: 600; }
+textarea { width: 100%; min-height: 100px; resize: vertical; border: 0; font: 17px/1.6 var(--font); color: var(--ink); background: none; } textarea:focus { outline: none; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-top: 1px solid var(--line); padding-top: 12px; flex-wrap: wrap; }
+.row span { font-size: 14px; color: var(--muted); }
+.row button { font: 600 15px var(--font); background: var(--g3); color: var(--mint); border: 0; border-radius: 999px; padding: 10px 26px; cursor: pointer; }
+.banner { margin-top: 26px; border-radius: 20px; padding: 22px 24px; display: flex; align-items: center; gap: 20px; background: var(--tone-bg); border: 1px solid var(--tone-line); flex-wrap: wrap; }
+.banner .n { width: 78px; height: 78px; border-radius: 50%; background: var(--card); display: grid; place-items: center; font: 700 28px var(--font); color: var(--tone); flex: none; border: 2px solid var(--tone); }
+.banner h2 { font: 700 28px/1.15 var(--font); margin: 0 0 2px; color: var(--tone); }
+.banner p { margin: 0; } .banner small { color: var(--muted); font-size: 14px; }
+.list { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 8px; }
+.list li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; }
+.list li::before { content: "!"; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: var(--hot); background: var(--hot-lt); }
+.list li.p::before { content: "✓"; color: var(--g3); background: var(--mint); }
+.list small { display: block; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.list em { font-style: normal; color: var(--muted); font-weight: 600; }
+.sec { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--g3); margin: 26px 0 8px; }
+.msg { margin: 0; padding: 16px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; font-size: 18px; line-height: 1.85; }
+mark { background: linear-gradient(transparent 55%, var(--hot-bg) 55%); color: var(--ink); padding: 0 2px; }
+.ai { margin: 14px 0 0; padding: 16px 18px; border-radius: 16px; background: var(--ink); color: var(--mint); font-size: 17px; } .ai small { display: block; color: var(--sage); font-size: 13px; margin-top: 4px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px; z-index: 5; }
+.toggle button { font: 600 13px var(--font); background: none; border: 0; color: var(--muted); padding: 6px 14px; border-radius: 999px; cursor: pointer; } .toggle button.on { background: var(--ink); color: var(--mint); }
+body[data-state="phishing"] { --tone: var(--hot); --tone-bg: var(--hot-lt); --tone-line: #f0bfae; } body[data-state="safe"] { --tone: var(--g3); --tone-bg: var(--mint); --tone-line: var(--line); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+</style>
+</head>
+<body data-state="phishing">
+<div class="top"><div class="bar"><div class="brand">PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></div></div>
+<div class="wrap">
+  <h1>Is this message genuine?</h1>
+  <p class="sub">Paste a text, email or link. Nothing leaves this computer.</p>
+  <div class="ask">
+    <div class="tabs"><span class="on">SMS</span><span>Email</span><span>Link</span><span>File</span></div>
+    <textarea class="only-phish" aria-label="Message">URGENT: Dear customer, your SBI KYC is pending and your account will be blocked today. Verify at http://sbi-kyc.xyz/login</textarea>
+    <textarea class="only-safe" aria-label="Message">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</textarea>
+    <div class="row"><span>Try: SBI KYC · Lottery fee · Bank OTP</span><button>Check message</button></div>
+  </div>
+  <div class="banner"><div class="n"><span class="only-phish">100</span><span class="only-safe">0</span></div>
+    <div><h2 class="only-phish">Phishing likely</h2><h2 class="only-safe">Looks genuine</h2>
+      <p class="only-phish">Don't click, reply or share any code.</p><p class="only-safe">A real OTP alert. Nothing to act on.</p>
+      <small>Confidence high · 4 of 4 checks · 23 ms</small></div></div>
+  <ul class="list only-phish">
+    <li><span><small>Proven</small>sbi-kyc.xyz isn't one of SBI's domains</span><em>+19.5</em></li>
+    <li><span><small>Proven</small>Asks for details through that link</span><em>+19.5</em></li>
+    <li><span><small>Model</small>Wording reads 100% like phishing</span><em>+19.5</em></li>
+    <li><span><small>Pattern</small>Threatens to block your account</span><em>+4.3</em></li>
+  </ul>
+  <ul class="list only-safe"><li class="p"><span><small>Noted</small>“Do not share” is a warning, not a request</span><em>+0</em></li><li class="p"><span><small>Links</small>No link to open</span><em>+0</em></li></ul>
+  <div class="only-phish">
+    <p class="sec">Flagged in the message</p>
+    <p class="msg"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></p>
+    <p class="ai">“It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.”<small>Local AI · from the findings only</small></p>
+  </div>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

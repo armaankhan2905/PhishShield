@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 41 · Mint Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+/* Concept 41, Mint Dashboard. Mint Paper colours, laid out like a tidy dashboard: the input on top,
+   then a row of tiles (a half-circle score gauge, confidence, checks, time), then the message and
+   the reasons side by side. Plus Jakarta Sans throughout. Coral only on what's flagged. */
+:root { --ink: #0b2b26; --g2: #163832; --g3: #235347; --sage: #8eb69b; --mint: #daf1de; --paper: #eaf6ec; --card: #f6fbf6; --line: #c4dcc9; --muted: #4f6b5f; --hot: #c8553a; --hot-bg: #f6c9b8;
+        --font: "Plus Jakarta Sans", "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 15.5px/1.6 var(--font); min-height: 100vh; }
+.top { background: var(--ink); color: var(--mint); }
+.wrap { max-width: 1140px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); }
+header { display: flex; align-items: center; gap: 24px; padding: 14px 0; flex-wrap: wrap; }
+.brand { font: 800 19px var(--font); display: flex; align-items: center; gap: 8px; } .brand i { width: 22px; height: 22px; border-radius: 7px; background: var(--sage); }
+nav { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; } nav a { color: var(--sage); text-decoration: none; font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 8px; } nav a.on { background: var(--g2); color: var(--mint); }
+.status { font-size: 13px; color: var(--sage); }
+main.wrap { padding-top: 30px; padding-bottom: 70px; }
+h1 { font: 800 30px/1.2 var(--font); margin: 0 0 14px; letter-spacing: -.02em; }
+.ask { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+@media (max-width: 700px) { .ask { grid-template-columns: minmax(0, 1fr); } }
+.ask select { font: 600 14px var(--font); color: var(--ink); background: var(--mint); border: 0; border-radius: 10px; padding: 10px 12px; }
+.ask input { min-width: 0; background: none; border: 0; color: var(--ink); font: 15px var(--font); padding: 10px 6px; } .ask input:focus { outline: none; }
+.ask button { font: 700 14px var(--font); background: var(--g3); color: var(--mint); border: 0; border-radius: 10px; padding: 11px 22px; cursor: pointer; }
+.tiles { display: grid; grid-template-columns: 1.6fr repeat(3, 1fr); gap: 14px; margin-top: 18px; }
+@media (max-width: 860px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+.tile small { display: block; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--g3); }
+.tile b { display: block; font: 800 26px/1.3 var(--font); margin-top: 4px; } .tile span { font-size: 13px; color: var(--muted); }
+.gauge { display: flex; gap: 18px; align-items: center; grid-row: span 1; }
+@media (max-width: 860px) { .gauge { grid-column: 1 / -1; } }
+.gauge svg { width: 130px; flex: none; }
+.gauge path { fill: none; stroke-width: 12; stroke-linecap: round; } .gauge .tr { stroke: var(--mint); }
+.gauge .val { stroke: var(--tone); stroke-dasharray: 157; stroke-dashoffset: var(--off); animation: g 1s ease-out both; }
+@keyframes g { from { stroke-dashoffset: 157; } }
+.gauge text { font: 800 26px var(--font); fill: var(--tone); }
+.gauge h2 { font: 800 22px/1.2 var(--font); margin: 0; color: var(--tone); } .gauge p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-top: 14px; }
+@media (max-width: 860px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; }
+.panel h3 { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--g3); margin: 0 0 10px; }
+.msg { font-size: 17px; line-height: 1.85; margin: 0; }
+mark { background: linear-gradient(transparent 55%, var(--hot-bg) 55%); color: var(--ink); padding: 0 2px; }
+.ai { margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--mint); } .ai small { display: block; color: var(--muted); font-size: 12.5px; }
+.ev { list-style: none; margin: 0; padding: 0; }
+.ev li { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid var(--line); }
+.ev li:first-child { border-top: 0; }
+.ev i { font-style: normal; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--g3); background: var(--mint); border-radius: 6px; padding: 2px 7px; justify-self: start; }
+.ev em { font-style: normal; color: var(--muted); font-weight: 600; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 4px; z-index: 5; }
+.toggle button { font: 700 13px var(--font); background: none; border: 0; color: var(--muted); padding: 6px 12px; border-radius: 7px; cursor: pointer; } .toggle button.on { background: var(--ink); color: var(--mint); }
+body[data-state="phishing"] { --tone: var(--hot); --off: 0; } body[data-state="safe"] { --tone: var(--g3); --off: 155; }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+@media (prefers-reduced-motion: reduce) { .gauge .val { animation: none; } }
+</style>
+</head>
+<body data-state="phishing">
+<div class="top"><div class="wrap"><header><div class="brand"><i></i>PhishShield</div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav><span class="status">● Models ready · local AI</span></header></div></div>
+<main class="wrap">
+  <h1>Check a message</h1>
+  <div class="ask"><select aria-label="Kind"><option>SMS</option><option>Email</option><option>Link</option><option>File</option></select>
+    <input aria-label="Message" value="URGENT: Dear customer, your SBI KYC is pending… Verify at http://sbi-kyc.xyz/login"><button>Check</button></div>
+  <div class="tiles">
+    <div class="tile gauge"><svg viewBox="0 0 120 70" aria-hidden="true"><path class="tr" d="M10 62 A50 50 0 0 1 110 62"/><path class="val" d="M10 62 A50 50 0 0 1 110 62"/><text x="60" y="60" text-anchor="middle"><tspan class="only-phish">100</tspan><tspan class="only-safe">0</tspan></text></svg>
+      <div><h2 class="only-phish">Phishing likely</h2><h2 class="only-safe">Looks genuine</h2><p class="only-phish">Don't click, reply or share any code.</p><p class="only-safe">Nothing to act on.</p></div></div>
+    <div class="tile"><small>Confidence</small><b>High</b><span>all checks agree</span></div>
+    <div class="tile"><small>Checks</small><b>4 of 4</b><span>rules · sender · 2 models</span></div>
+    <div class="tile"><small>Time</small><b>23 ms</b><span>on this computer</span></div>
+  </div>
+  <div class="cols only-phish">
+    <section class="panel"><h3>Flagged in the message</h3>
+      <p class="msg"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></p>
+      <p class="ai">“It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.”<small>Local AI · from the findings only</small></p></section>
+    <section class="panel"><h3>Why</h3><ul class="ev">
+      <li><i>Proven</i><span>sbi-kyc.xyz isn't one of SBI's domains</span><em>+19.5</em></li>
+      <li><i>Proven</i><span>Asks for details through that link</span><em>+19.5</em></li>
+      <li><i>Model</i><span>Wording reads 100% like phishing</span><em>+19.5</em></li>
+      <li><i>Pattern</i><span>Threatens to block your account</span><em>+4.3</em></li></ul></section>
+  </div>
+</main>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

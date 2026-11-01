@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Pick a look</title>
+<style>
+:root { --bg: #f4f5f7; --card: #fff; --ink: #15191f; --muted: #5d6573; --line: #dde1e7; --accent: #2a55e5; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root { --bg: #0f1216; --card: #171b21; --ink: #e8ebf0; --muted: #9aa3b1; --line: #2a303a; --accent: #8aa6ff; color-scheme: dark; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 "Segoe UI", system-ui, sans-serif; }
+main { max-width: 1240px; margin: 0 auto; padding: 32px max(20px, env(safe-area-inset-left)) 60px; }
+h1 { font-size: 30px; margin: 0 0 6px; } .lede { color: var(--muted); margin: 0 0 24px; max-width: 70ch; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 20px; }
+a.card { display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; color: inherit; text-decoration: none; }
+a.card:hover, a.card:focus-visible { border-color: var(--accent); outline: none; box-shadow: 0 10px 30px #0002; }
+a.card img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; display: block; border-bottom: 1px solid var(--line); }
+.body { padding: 14px 16px 16px; }
+.body b { font-size: 17px; } .body b span { color: var(--muted); font-weight: 600; margin-right: 6px; }
+.body p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pick a look for PhishShield</h1>
+  <p class="lede">Every concept shows the same result: an SBI KYC scam scored 100. Open one, and use the switch in the bottom-right corner to see the <b>safe</b> look too.</p>
+
+  <h2 style="margin:28px 0 4px">New: Dashboard × Report (41 + 45)</h2>
+  <p class="lede" style="margin-bottom:16px">Each combines 41's at-a-glance tiles (score, confidence, checks, time) with 45's numbered report and "What to do" box, in Mint Paper colours.</p>
+  <div class="grid" style="margin-bottom:40px">
+    <a class="card" href="46-dash-report.html"><img src="thumbs/46-dash-report.png" alt="Input bar and tile row above a numbered report"><div class="body"><b><span>46</span>Dashboard Report · Plus Jakarta Sans</b>
+      <p>41 on top, 45 below: the input bar and tile row with the gauge, then the numbered report ending in "What to do".</p></div></a>
+    <a class="card" href="47-report-stats.html"><img src="thumbs/47-report-stats.png" alt="Left column with input, gauge and stat tiles; report sheet on the right"><div class="body"><b><span>47</span>Report with Stats · Bricolage Grotesque</b>
+      <p>45's two columns, with 41's gauge and stat tiles stacked under the input on the left and the report sheet on the right.</p></div></a>
+    <a class="card" href="48-report-tiles.html"><img src="thumbs/48-report-tiles.png" alt="Verdict header tile, stat tiles, and report sections as tiles"><div class="body"><b><span>48</span>Report Tiles · Albert Sans</b>
+      <p>The report drawn as tiles: a wide verdict header with badge and score bar, four stat tiles, each numbered section its own tile, and a full-width "What to do".</p></div></a>
+    <a class="card" href="49-gauge-report.html"><img src="thumbs/49-gauge-report.png" alt="Large gauge summary panel beside the numbered report"><div class="body"><b><span>49</span>Gauge Report · Instrument Sans</b>
+      <p>A big score gauge anchors a summary panel on the left with the stats beneath it; the numbered report fills the right.</p></div></a>
+    <a class="card" href="50-report-steps.html"><img src="thumbs/50-report-steps.png" alt="Tile row above a vertical path of numbered steps"><div class="body"><b><span>50</span>Report Steps · DM Sans</b>
+      <p>The tile row on top, then the report as a vertical path of steps; a dot turns coral where a step found something, ending in "What to do".</p></div></a>
+  </div>
+
+  <h2 style="margin:0 0 4px">Mint Paper colours, new layouts and fonts</h2>
+  <p class="lede" style="margin-bottom:16px">The same pale mint, forest green and soft coral as concept 32, with five different layouts and five easy-to-read sans-serif fonts instead of the narrow serif.</p>
+  <div class="grid" style="margin-bottom:40px">
+    <a class="card" href="41-mint-dashboard.html"><img src="thumbs/41-mint-dashboard.png" alt="Mint dashboard with a half-circle score gauge and stat tiles"><div class="body"><b><span>41</span>Mint Dashboard · Plus Jakarta Sans</b>
+      <p>A tidy dashboard: one input bar, then tiles for a half-circle score gauge, confidence, checks and time, then the message and reasons side by side.</p></div></a>
+    <a class="card" href="42-mint-banner.html"><img src="thumbs/42-mint-banner.png" alt="Centred column with a coral verdict banner and a checklist of reasons"><div class="body"><b><span>42</span>Mint Banner · Outfit</b>
+      <p>One centred column. The verdict is a wide banner in the answer's colour, and the reasons are a checklist with an icon per finding.</p></div></a>
+    <a class="card" href="43-mint-sidebar.html"><img src="thumbs/43-mint-sidebar.png" alt="App layout with a deep green sidebar and tabbed result"><div class="body"><b><span>43</span>Mint Sidebar · Manrope</b>
+      <p>An app layout with a deep green sidebar. The result has tabs (Summary, Message, Links) so only one thing is on screen at a time.</p></div></a>
+    <a class="card" href="44-mint-chat.html"><img src="thumbs/44-mint-chat.png" alt="Chat layout with the message as an incoming bubble and PhishShield replying"><div class="body"><b><span>44</span>Mint Chat · Lexend</b>
+      <p>A conversation: the message you got is an incoming bubble, and PhishShield replies with the verdict, the reasons and what to do.</p></div></a>
+    <a class="card" href="45-mint-report.html"><img src="thumbs/45-mint-report.png" alt="One-page report with a SCAM badge, score bar and numbered sections"><div class="body"><b><span>45</span>Mint Report · Bricolage Grotesque</b>
+      <p>A clean one-page report: a verdict badge and score bar, then numbered sections (what it claims, where the link goes, wording, models) and what to do.</p></div></a>
+  </div>
+
+  <h2 style="margin:0 0 4px">Glow on black (from the Pinterest reference)</h2>
+  <p class="lede" style="margin-bottom:16px">Near-black SaaS style with sunrise lighting and glowing edges. The light burns orange for a scam and turns a cool mint when a message is safe.</p>
+  <div class="grid" style="margin-bottom:40px">
+    <a class="card" href="36-eclipse.html"><img src="thumbs/36-eclipse.png" alt="Black page with a glowing orange planet horizon behind the result card"><div class="body"><b><span>36</span>Eclipse</b>
+      <p>Centred headline and a planet whose rim glows like a sunrise behind the result card. The glow brightens as you scroll down.</p></div></a>
+    <a class="card" href="37-light-sweep.html"><img src="thumbs/37-light-sweep.png" alt="Dark cards that light up with a warm edge as they scroll into view"><div class="body"><b><span>37</span>Light Sweep</b>
+      <p>Each part of the result waits in the dark; as it scrolls into view a band of light sweeps across its top edge and it lifts into place.</p></div></a>
+    <a class="card" href="38-ember-console.html"><img src="thumbs/38-ember-console.png" alt="Dark app window with a sidebar on an ember glow"><div class="body"><b><span>38</span>Ember Console</b>
+      <p>The floating product dashboard made real: an app window with a sidebar, a lit verdict card, score bars and a dock of the four checks.</p></div></a>
+    <a class="card" href="39-halo.html"><img src="thumbs/39-halo.png" alt="Dark orb with a bright orange halo showing the score"><div class="body"><b><span>39</span>Halo</b>
+      <p>The score is a dark planet with a breathing halo whose brightness follows the risk: a full orange corona for a scam, a faint rim when safe.</p></div></a>
+    <a class="card" href="40-spotlight-stage.html"><img src="thumbs/40-spotlight-stage.png" alt="Dark stage with a warm beam of light falling onto the result"><div class="body"><b><span>40</span>Spotlight Stage</b>
+      <p>One warm beam of light falls from above onto the result, with fine film grain. The beam follows your pointer slightly.</p></div></a>
+  </div>
+
+  <h2 style="margin:0 0 4px">Forest greens</h2>
+  <p class="lede" style="margin-bottom:16px">#051F20 · #0B2B26 · #163832 · #235347 · #8EB69B · #DAF1DE. Greens carry everything; one soft coral accent appears only on the phishing verdict and flagged words, so a safe result stays all green.</p>
+  <div class="grid" style="margin-bottom:40px">
+    <a class="card" href="31-forest-quiet.html"><img src="thumbs/31-forest-quiet.png" alt="Single centred column on deep forest green with a coral score ring"><div class="body"><b><span>31</span>Forest Quiet</b>
+      <p>The calm single column of Quiet Deco, in forest greens: sage labels, mint headings and a score ring that draws itself in.</p></div></a>
+    <a class="card" href="32-mint-paper.html"><img src="thumbs/32-mint-paper.png" alt="Pale mint page with a deep green header and white cards"><div class="body"><b><span>32</span>Mint Paper</b>
+      <p>The palette in daylight: pale mint page, forest-green ink and header, an elegant serif, and a soft coral highlighter on flagged words.</p></div></a>
+    <a class="card" href="33-stacked-pills.html"><img src="thumbs/33-stacked-pills.png" alt="Stacked overlapping pills from dark green to pale mint, ending in the verdict"><div class="body"><b><span>33</span>Stacked Pills</b>
+      <p>Echoes the palette card: each check is an overlapping pill stepping from darkest green to mint, sliding in one by one, with the verdict as the last pill.</p></div></a>
+    <a class="card" href="34-canopy.html"><img src="thumbs/34-canopy.png" alt="Page fading from pale mint at the top to deep forest green below"><div class="body"><b><span>34</span>Canopy</b>
+      <p>The palette's own fade: pale mint at the top sinking into deep forest, like light through trees. The answer sits on dark frosted panels.</p></div></a>
+    <a class="card" href="35-sage-split.html"><img src="thumbs/35-sage-split.png" alt="Split page: deep green input side and pale mint answer side"><div class="body"><b><span>35</span>Sage Split</b>
+      <p>Paste on the deep forest side and the answer appears on the pale mint side, with a sage seam between and a warm serif verdict.</p></div></a>
+  </div>
+
+  <h2 style="margin:0 0 4px">Dusk Glass, easy on the eyes</h2>
+  <p class="lede" style="margin-bottom:16px">Softer versions of concept 21: warm off-white text instead of bright cream, no bright filled discs or pills, gentler font weights, more line spacing and quiet mauve tints for flagged words.</p>
+  <div class="grid" style="margin-bottom:40px">
+    <a class="card" href="26-soft-dusk.html"><img src="thumbs/26-soft-dusk.png" alt="Dusk Glass with a dim score ring and soft mauve tints"><div class="body"><b><span>26</span>Soft Dusk</b>
+      <p>The closest to Dusk Glass, with the glare removed: the peach disc becomes a thin ring, buttons are outlined, and the text is softer.</p></div></a>
+    <a class="card" href="27-dusk-reader.html"><img src="thumbs/27-dusk-reader.png" alt="Single reading column with a book serif and dotted underlines"><div class="body"><b><span>27</span>Dusk Reader</b>
+      <p>Built for reading: one narrow column and a calm book-style serif, with the explanation written out as a sentence before the details.</p></div></a>
+    <a class="card" href="28-twilight-panels.html"><img src="thumbs/28-twilight-panels.png" alt="Violet-grey page with a verdict side column and stacked panels"><div class="body"><b><span>28</span>Twilight Panels</b>
+      <p>A softer violet-grey instead of near-black. The verdict waits in a side column while the message, reasons and summary stack on the right.</p></div></a>
+    <a class="card" href="29-plum-night.html"><img src="thumbs/29-plum-night.png" alt="Deep plum night mode with a thin half-circle gauge"><div class="body"><b><span>29</span>Plum Night</b>
+      <p>A true night mode: dimmed warm text, outlines instead of filled shapes, and a thin half-circle gauge that fills slowly.</p></div></a>
+    <a class="card" href="30-velvet.html"><img src="thumbs/30-velvet.png" alt="Soft rounded cards on a muted violet background with a gently moving score shape"><div class="body"><b><span>30</span>Velvet</b>
+      <p>Soft and rounded, with a faint grain, a gently shifting score shape, and reasons that open one at a time so it never feels busy.</p></div></a>
+  </div>
+
+  <h2 style="margin:0 0 4px">Violet Dusk</h2>
+  <p class="lede" style="margin-bottom:16px">Deep violet <b>#502D55</b>, mauve <b>#935073</b>, peach <b>#F6DBC0</b> and cream <b>#F8F4E9</b>. Mauve carries the flagged words and the phishing verdict; a safe result stays violet and cream.</p>
+  <div class="grid" style="margin-bottom:40px">
+    <a class="card" href="21-dusk-glass.html"><img src="thumbs/21-dusk-glass.png" alt="Dusky violet page with glass panels and a peach score disc"><div class="body"><b><span>21</span>Dusk Glass</b>
+      <p>A dusky violet room with soft glass panels, a pill-shaped search bar and the score in a peach disc. Flagged words are lifted out in mauve.</p></div></a>
+    <a class="card" href="22-cream-letter.html"><img src="thumbs/22-cream-letter.png" alt="Cream page with violet serif headings and a peach verdict card"><div class="body"><b><span>22</span>Cream Letter</b>
+      <p>Warm and calm: cream page, violet serif headings, a peach verdict card, mauve wavy underlines and numbered reasons.</p></div></a>
+    <a class="card" href="23-dusk-scale.html"><img src="thumbs/23-dusk-scale.png" alt="Deep violet page with a cream-to-violet gradient risk scale"><div class="body"><b><span>23</span>Dusk Scale</b>
+      <p>The palette's own gradient becomes the risk scale, from Genuine to Phishing. A marker slides along it to the score when the result arrives.</p></div></a>
+    <a class="card" href="24-four-checks.html"><img src="thumbs/24-four-checks.png" alt="Cream page with four overlapping palette circles for the four checks"><div class="body"><b><span>24</span>Four Checks</b>
+      <p>The overlapping swatch circles become the four checks (rules, sender, link model, text model), popping in one by one with a mark on each that flagged it.</p></div></a>
+    <a class="card" href="25-dusk-split.html"><img src="thumbs/25-dusk-split.png" alt="Split page: violet input side and cream answer side with a sunset seam"><div class="body"><b><span>25</span>Dusk Split</b>
+      <p>Paste on the deep violet side and the answer appears on the cream side, with a mauve-to-peach seam between them and a big serif verdict.</p></div></a>
+  </div>
+
+  <h2 style="margin:0 0 4px">Simpler takes on Art Deco Night</h2>
+  <p class="lede" style="margin-bottom:16px">The same teal, champagne gold and Marcellus headings as concept 6, without the corner brackets, sunburst medal and spaced-out capitals. Each keeps one small interesting touch.</p>
+  <div class="grid" style="margin-bottom:40px">
+    <a class="card" href="16-quiet-deco.html"><img src="thumbs/16-quiet-deco.png" alt="Single centred column on deep teal with a thin orange score ring"><div class="body"><b><span>16</span>Quiet Deco</b>
+      <p>One centred column, plain gold hairlines, and a thin score ring that draws itself in when the result arrives.</p></div></a>
+    <a class="card" href="17-ivory-teal.html"><img src="thumbs/17-ivory-teal.png" alt="Ivory page with a deep teal header and white cards"><div class="body"><b><span>17</span>Ivory &amp; Teal</b>
+      <p>The same palette in daylight: ivory page, teal ink and header, gold labels. Flagged words get an orange highlighter that sweeps in.</p></div></a>
+    <a class="card" href="18-split-linked.html"><img src="thumbs/18-split-linked.png" alt="Deep teal page with the message and the reasons side by side"><div class="body"><b><span>18</span>Linked Evidence</b>
+      <p>Message and reasons side by side. Point at a finding and the words it's about light up in the message, and the other way round.</p></div></a>
+    <a class="card" href="19-gold-meter.html"><img src="thumbs/19-gold-meter.png" alt="Deep teal page with a long Safe-to-Phishing meter filled orange"><div class="body"><b><span>19</span>Gold Meter</b>
+      <p>The score is a long Safe → Suspicious → Phishing meter that fills on arrival, and each finding shows a small bar for how much it added.</p></div></a>
+    <a class="card" href="20-soft-cards.html"><img src="thumbs/20-soft-cards.png" alt="Deep teal page with soft rounded cards for the verdict and each finding"><div class="body"><b><span>20</span>Soft Cards</b>
+      <p>Rounded, softly lit cards with a gold edge. A summary card on top, and each finding is a small card you can open for the detail.</p></div></a>
+  </div>
+
+  <h2 style="margin:0 0 4px">Hints of gold, teal and orange</h2>
+  <p class="lede" style="margin-bottom:16px">Freer palettes, each its own personality. Teal and gold appear as accents, and orange still marks only what's flagged.</p>
+  <div class="grid" style="margin-bottom:40px">
+    <a class="card" href="11-aurora.html"><img src="thumbs/11-aurora.png" alt="Midnight navy page with a teal and violet aurora, a score orb and a vertical timeline"><div class="body"><b><span>11</span>Aurora Timeline</b>
+      <p>A midnight sky with a slowly drifting aurora. The result unfolds as a timeline of how PhishShield decided, step by step, on a gold thread.</p></div></a>
+    <a class="card" href="12-gazette.html"><img src="thumbs/12-gazette.png" alt="Newspaper front page with a masthead and a banner headline about the scam"><div class="body"><b><span>12</span>Gazette</b>
+      <p>The verdict as front-page news: masthead, banner headline, the message quoted with orange highlighter, and a "By the numbers" box.</p></div></a>
+    <a class="card" href="13-stickers.html"><img src="thumbs/13-stickers.png" alt="Neo-brutalist board with thick outlines, mint and butter cards and an orange score sticker"><div class="body"><b><span>13</span>Sticker Board</b>
+      <p>Playful neo-brutalism: ink outlines, hard shadows, mint and butter cards. The score slaps on as a sticker and findings are stuck on at angles.</p></div></a>
+    <a class="card" href="14-holo-card.html"><img src="thumbs/14-holo-card.png" alt="Dark stage with a holographic verdict card showing rating 100"><div class="body"><b><span>14</span>Holo Card</b>
+      <p>Every check deals a collectible card with a holographic foil that tilts with your pointer. Click it to flip and read the evidence.</p></div></a>
+    <a class="card" href="15-link-journey.html"><img src="thumbs/15-link-journey.png" alt="Light map of the journey from claimed sender to where the link really goes"><div class="body"><b><span>15</span>Link Journey</b>
+      <p>Maps where the message really takes you: who it claims to be, what it asks, and the broken path to the domain the link actually opens.</p></div></a>
+  </div>
+
+  <h2 style="margin:0 0 4px">Champagne gold · teal · electric orange</h2>
+  <p class="lede" style="margin-bottom:16px">Teal and champagne gold carry the whole interface. <b style="color:#ff5f1f">Electric orange</b> appears only where something is highlighted: flagged words, the risky link and the phishing verdict. A safe result shows no orange at all.</p>
+  <div class="grid" style="margin-bottom:40px">
+    <a class="card" href="6-art-deco.html"><img src="thumbs/6-art-deco.png" alt="Deep teal art deco layout with gold frames and a gold medallion score"><div class="body"><b><span>6</span>Art Deco Night</b>
+      <p>Deep teal with fine champagne-gold frames, fan motifs and a medallion score. Elegant and premium; orange underlines mark the flagged words.</p></div></a>
+    <a class="card" href="7-teal-glass.html"><img src="thumbs/7-teal-glass.png" alt="Frosted glass panels over a teal and champagne gradient with an orange score ring"><div class="body"><b><span>7</span>Teal Glass</b>
+      <p>Frosted glass panels over a soft teal-to-champagne glow. Modern and calm; the score ring and flagged words light up orange.</p></div></a>
+    <a class="card" href="8-ledger.html"><img src="thumbs/8-ledger.png" alt="Champagne bank-statement page with teal ink and a ledger of findings"><div class="body"><b><span>8</span>Ledger</b>
+      <p>Scams pretend to be banks, so the answer reads like a trustworthy bank statement: every finding is a line item, the score is the closing balance, orange is the highlighter pen.</p></div></a>
+    <a class="card" href="9-spotlight.html"><img src="thumbs/9-spotlight.png" alt="Split screen: the message on a dark teal stage, the verdict on a champagne title card"><div class="body"><b><span>9</span>Spotlight</b>
+      <p>Cinematic split screen: the message on a dark teal stage under a spotlight that follows your pointer, the verdict on a champagne title card.</p></div></a>
+    <a class="card" href="10-bento.html"><img src="thumbs/10-bento.png" alt="Dark teal grid of tiles with a large orange 100 and gold details"><div class="body"><b><span>10</span>Bento</b>
+      <p>The whole result on one screen as tiles: score, verdict, checks, message, evidence, AI note and links. Dense, dashboard-like, very scannable.</p></div></a>
+  </div>
+
+  <h2 style="margin:0 0 12px">First set</h2>
+  <div class="grid">
+    <a class="card" href="1-signal-lab.html"><img src="thumbs/1-signal-lab.png" alt="Dark security console with a radar showing 100 and a signal log"><div class="body"><b><span>1</span>Signal Lab</b>
+      <p>A calm security console. A radar sweeps while checking and settles on the score; evidence reads like an intercept log. Dark, amber signal.</p></div></a>
+    <a class="card" href="2-case-file.html"><img src="thumbs/2-case-file.png" alt="Investigator's case file with a red PHISHING stamp and evidence tags"><div class="body"><b><span>2</span>Case File</b>
+      <p>Every check is an investigation. The message is Exhibit A with marker highlights, evidence on tags, and a rubber stamp thumps down the verdict.</p></div></a>
+    <a class="card" href="3-scanner.html"><img src="thumbs/3-scanner.png" alt="Bright clinical scan with numbered annotations and a semicircle gauge"><div class="body"><b><span>3</span>Scanner</b>
+      <p>A bright, clinical X-ray. A scan line passes over the message, each finding is numbered on the exact words, and a gauge shows the score.</p></div></a>
+    <a class="card" href="4-phone-guard.html"><img src="thumbs/4-phone-guard.png" alt="Phone showing the SMS with a red This is a scam sheet sliding up"><div class="body"><b><span>4</span>Phone Guard</b>
+      <p>The message appears in a phone's SMS thread and PhishShield slides up like a guardian. Friendly, warm, built for everyday users.</p></div></a>
+    <a class="card" href="5-poster.html"><img src="thumbs/5-poster.png" alt="Full-width red field with a huge 100 and THIS IS PHISHING"><div class="body"><b><span>5</span>Poster</b>
+      <p>The verdict is the headline: a full-width colour field, a giant score and verdict, then the reasons as a numbered argument.</p></div></a>
+  </div>
+</main>
+</body>
+</html>

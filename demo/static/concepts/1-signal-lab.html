@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 1 · Signal Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Concept 1, Signal Lab: a calm security-operations console. Deep ink, one phosphor-amber
+   signal colour, a radar that sweeps while checking and settles on the verdict.
+   Evidence reads like an intercept log, strongest first. */
+:root {
+  --ink: #0b1220; --panel: #111a2c; --panel2: #16223a; --line: #23314d; --text: #dfe6f3; --muted: #8a98b3;
+  --amber: #ffb547; --amber-dim: #6b4a1a; --danger: #ff6b5a; --safe: #4fd1a5; --blue: #7aa7ff;
+  --display: "Chakra Petch", "Segoe UI", sans-serif; --body: "IBM Plex Sans", "Segoe UI", sans-serif; --mono: "IBM Plex Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(1200px 600px at 75% -10%, #18284a 0%, var(--ink) 60%); color: var(--text); font: 15px/1.55 var(--body); min-height: 100vh; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)); }
+header { display: flex; align-items: center; gap: 24px; padding: 18px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 20px var(--display); letter-spacing: .04em; text-transform: uppercase; }
+.brand i { width: 26px; height: 26px; border: 2px solid var(--amber); border-radius: 50%; position: relative; }
+.brand i::after { content: ""; position: absolute; inset: 6px; background: var(--amber); border-radius: 50%; }
+nav { display: flex; gap: 4px; flex: 1; }
+nav a { color: var(--muted); text-decoration: none; font: 500 13px var(--mono); text-transform: uppercase; letter-spacing: .08em; padding: 6px 12px; border-radius: 4px; }
+nav a.on { color: var(--amber); background: #ffb5471a; }
+.sys { font: 12px var(--mono); color: var(--muted); display: flex; gap: 14px; }
+.sys b { color: var(--safe); font-weight: 500; }
+h1 { font: 700 40px/1.1 var(--display); letter-spacing: .01em; margin: 34px 0 6px; text-transform: uppercase; }
+.lede { color: var(--muted); margin: 0 0 26px; }
+.grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 22px; align-items: start; }
+@media (max-width: 960px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: linear-gradient(180deg, var(--panel), #0f1727); border: 1px solid var(--line); border-radius: 10px; padding: 20px; position: relative; }
+.label { font: 500 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.tabs { display: flex; gap: 2px; margin-bottom: 14px; }
+.tabs span { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 7px 12px; border: 1px solid var(--line); color: var(--muted); }
+.tabs span.on { color: var(--ink); background: var(--amber); border-color: var(--amber); }
+textarea { width: 100%; min-height: 150px; resize: vertical; background: #0a111e; color: var(--text); border: 1px solid var(--line); border-radius: 6px;
+           padding: 12px; font: 14px/1.6 var(--mono); }
+.btn { margin-top: 12px; font: 700 14px var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--ink); background: var(--amber);
+       border: 0; border-radius: 6px; padding: 11px 22px; cursor: pointer; box-shadow: 0 0 24px #ffb54755; }
+.chips { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { font: 12px var(--mono); padding: 4px 10px; border: 1px dashed var(--line); border-radius: 4px; color: var(--muted); cursor: pointer; }
+
+/* verdict console */
+.console { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 22px; align-items: center; }
+@media (max-width: 560px) { .console { grid-template-columns: minmax(0, 1fr); } }
+.radar { width: 210px; height: 210px; border-radius: 50%; position: relative; border: 1px solid var(--amber-dim);
+         background: repeating-radial-gradient(circle, transparent 0 34px, #ffb54722 34px 35px), radial-gradient(circle, #1a2540 0%, #0b1220 70%); overflow: hidden; }
+.radar::before { content: ""; position: absolute; inset: 0; background: conic-gradient(from 0deg, #ffb54700 0deg, #ffb54755 50deg, #ffb54700 60deg); animation: sweep 2.6s linear infinite; }
+.radar::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: #ffb54722; }
+.radar .score { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+.radar .score b { display: block; font: 700 64px/1 var(--display); color: var(--tone); text-shadow: 0 0 24px var(--tone); }
+.radar .score small { font: 11px var(--mono); letter-spacing: .14em; color: var(--muted); }
+.blip { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--tone); box-shadow: 0 0 12px var(--tone); animation: blink 1.6s infinite; }
+@keyframes sweep { to { transform: rotate(360deg); } }
+@keyframes blink { 50% { opacity: .25; } }
+.verdict small { font: 500 12px var(--mono); letter-spacing: .16em; color: var(--muted); }
+.verdict h2 { font: 700 44px/1.05 var(--display); text-transform: uppercase; margin: 4px 0 8px; color: var(--tone); }
+.verdict p { margin: 0 0 12px; color: var(--text); }
+.checks { display: flex; flex-wrap: wrap; gap: 6px; }
+.checks span { font: 12px var(--mono); padding: 3px 9px; border-radius: 3px; background: #4fd1a51a; color: var(--safe); }
+.checks span::before { content: "● "; }
+.log { margin-top: 22px; border-top: 1px solid var(--line); }
+.log li { list-style: none; display: grid; grid-template-columns: 88px minmax(0, 1fr) 60px; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line);
+          animation: in .5s both; }
+.log li:nth-child(2) { animation-delay: .08s } .log li:nth-child(3) { animation-delay: .16s } .log li:nth-child(4) { animation-delay: .24s } .log li:nth-child(5) { animation-delay: .32s }
+@keyframes in { from { opacity: 0; transform: translateX(-8px); } }
+.log ul { margin: 0; padding: 0; }
+.tag { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; height: fit-content; text-align: center; }
+.tag.proven { background: #ff6b5a26; color: var(--danger); } .tag.model { background: #7aa7ff22; color: var(--blue); } .tag.pattern { background: #8a98b322; color: var(--muted); }
+.pts { font: 13px var(--mono); color: var(--amber); text-align: right; }
+.msg { margin-top: 20px; background: #0a111e; border: 1px solid var(--line); border-radius: 6px; padding: 14px; font: 14px/1.7 var(--mono); }
+mark { background: #ffb54733; color: #ffe2b0; border-bottom: 1px solid var(--amber); padding: 0 2px; }
+.ai { margin-top: 18px; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
+.ai i { width: 34px; height: 34px; border-radius: 6px; background: var(--amber-dim); display: grid; place-items: center; font: 700 14px var(--display); color: var(--amber); font-style: normal; }
+.ai p { margin: 0; } .ai small { color: var(--muted); font: 12px var(--mono); }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--panel2); border: 1px solid var(--line); padding: 4px; border-radius: 6px; z-index: 5; }
+.toggle button { font: 500 12px var(--mono); background: none; color: var(--muted); border: 0; padding: 6px 10px; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: .08em; }
+.toggle button.on { background: var(--amber); color: var(--ink); }
+body[data-state="phishing"] { --tone: var(--danger); } body[data-state="safe"] { --tone: var(--safe); }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+@media (prefers-reduced-motion: reduce) { .radar::before, .blip, .log li { animation: none; } }
+</style>
+</head>
+<body data-state="phishing">
+<div class="wrap">
+  <header>
+    <div class="brand"><i></i>PhishShield</div>
+    <nav><a class="on">Scan</a><a>Results</a><a>How it works</a><a>Extension</a></nav>
+    <div class="sys"><span>RULES <b>ON</b></span><span>MODELS <b>2/2</b></span><span>LOCAL AI <b>ON</b></span></div>
+  </header>
+  <h1>Intercept a message</h1>
+  <p class="lede">Paste an SMS, email or link. Every signal is logged with its reason.</p>
+  <div class="grid">
+    <section class="panel">
+      <p class="label">Input</p>
+      <div class="tabs"><span class="on">SMS</span><span>Email</span><span>Link</span><span>File</span></div>
+      <textarea class="only-phish">URGENT: Dear customer, your SBI KYC is pending and your account will be blocked today. Verify at http://sbi-kyc.xyz/login</textarea>
+      <textarea class="only-safe">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</textarea>
+      <button class="btn">Run scan</button>
+      <div class="chips"><span>sbi-kyc sms</span><span>lottery fee</span><span>fake paypal</span><span>bank otp</span><span>kyc reminder</span></div>
+    </section>
+    <section class="panel">
+      <p class="label">Verdict</p>
+      <div class="console">
+        <div class="radar"><span class="blip only-phish" style="left:62%;top:28%"></span><span class="blip only-phish" style="left:30%;top:62%"></span>
+          <div class="score"><div><b class="only-phish">100</b><b class="only-safe">0</b><small>RISK / 100</small></div></div></div>
+        <div class="verdict">
+          <small>CONFIDENCE HIGH · 23 MS · ON THIS COMPUTER</small>
+          <h2 class="only-phish">Phishing likely</h2><h2 class="only-safe">No threat found</h2>
+          <p class="only-phish">Don't click links, reply, or share codes or details.</p>
+          <p class="only-safe">“Do not share” is a warning, not a request. Nothing to act on.</p>
+          <div class="checks"><span>Rules</span><span>Sender & links</span><span>URL model</span><span>Text model</span></div>
+        </div>
+      </div>
+      <div class="log only-phish"><p class="label" style="margin-top:16px">Signal log</p><ul>
+        <li><span class="tag proven">Proven</span><span>Link imitates SBI: sbi-kyc.xyz isn't one of SBI's domains</span><span class="pts">+19.5</span></li>
+        <li><span class="tag proven">Proven</span><span>Asks for details, but the link goes to sbi-kyc.xyz</span><span class="pts">+19.5</span></li>
+        <li><span class="tag model">Model</span><span>Text model: wording 100% likely phishing</span><span class="pts">+19.5</span></li>
+        <li><span class="tag model">Model</span><span>URL model: link 100% likely phishing</span><span class="pts">+19.2</span></li>
+        <li><span class="tag pattern">Pattern</span><span>Threatens to block your account</span><span class="pts">+4.3</span></li>
+      </ul></div>
+      <div class="msg only-phish"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></div>
+      <div class="ai only-phish"><i>AI</i><div><p>The message pretends to be from SBI, but its link goes to sbi-kyc.xyz, which SBI doesn't own. It threatens to block your account to rush you. What to do: don't click; check in the YONO app.</p>
+        <small>Local AI model · from the findings above only</small></div></div>
+    </section>
+  </div>
+  <p style="height:60px"></p>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>

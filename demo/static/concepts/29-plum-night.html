@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhishShield · Concept 29 · Plum Night</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Concept 29, Plum Night. A true night mode: deep plum, warm dimmed text and a thin half-circle
+   gauge that fills slowly. No filled chips at all; everything is drawn in outlines and soft
+   tints so nothing flares up on a dark screen. */
+:root {
+  --bg: #170f1b; --surface: #1f1624; --line: #2f2434; --text: #ddd1cd; --soft: #c4b6b4; --muted: #8f808d; --peach: #d8b99e; --mauve: #b67f98;
+  --font: "Manrope", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(60% 40% at 50% 0%, #2c1d31, transparent 70%), var(--bg); color: var(--text); font: 16px/1.7 var(--font); min-height: 100vh; }
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-left)) 70px; }
+header { display: flex; align-items: center; gap: 22px; padding: 20px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.brand { font: 700 18px var(--font); } .brand span { color: var(--peach); }
+nav { display: flex; gap: 20px; margin-left: auto; flex-wrap: wrap; } nav a { color: var(--muted); text-decoration: none; font-size: 14px; } nav a.on { color: var(--text); }
+.top { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 30px; align-items: center; margin: 34px 0 10px; }
+@media (max-width: 760px) { .top { grid-template-columns: minmax(0, 1fr); } }
+h1 { font: 600 clamp(28px, 4vw, 38px)/1.2 var(--font); margin: 0 0 16px; }
+.ask { border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; background: var(--surface); }
+.ask textarea { width: 100%; min-height: 74px; resize: vertical; background: none; border: 0; color: var(--soft); font: 16px/1.7 var(--font); } .ask textarea:focus { outline: none; }
+.ask .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ask span { font-size: 13px; color: var(--muted); }
+.ask button { font: 600 14px var(--font); background: none; color: var(--peach); border: 1px solid #d8b99e66; border-radius: 10px; padding: 7px 18px; cursor: pointer; }
+.gauge { text-align: center; }
+.gauge svg { width: 240px; max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.gauge path { fill: none; stroke-width: 8; stroke-linecap: round; }
+.gauge .track { stroke: var(--line); }
+.gauge .val { stroke: var(--tone); stroke-dasharray: 283; stroke-dashoffset: var(--off); animation: g 1.4s ease-out both; opacity: .9; }
+@keyframes g { from { stroke-dashoffset: 283; } }
+.gauge b { display: block; font: 600 40px/1 var(--font); color: var(--tone); margin-top: -46px; }
+.gauge h2 { font: 600 20px/1.2 var(--font); margin: 12px 0 2px; color: var(--tone); }
+.gauge p { margin: 0; font-size: 13px; color: var(--muted); }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 30px; margin-top: 30px; }
+@media (max-width: 760px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+h3 { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.msg { font-size: 17px; line-height: 1.95; color: var(--soft); margin: 0; }
+mark { background: none; color: #e3c0cf; text-decoration: underline 1.5px #b67f98aa; text-underline-offset: 4px; }
+.ev { list-style: none; margin: 0; padding: 0; }
+.ev li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 12px; padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--soft); }
+.ev small { grid-column: 1 / -1; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.ev em { font-style: normal; color: var(--muted); }
+.ai { margin: 22px 0 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; color: var(--text); }
+.ai small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+.toggle { position: fixed; right: 16px; bottom: 16px; display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px; z-index: 5; }
+.toggle button { font: 500 13px var(--font); background: none; border: 0; color: var(--muted); padding: 6px 12px; border-radius: 9px; cursor: pointer; }
+.toggle button.on { color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+body[data-state="phishing"] { --tone: var(--peach); --off: 0; } body[data-state="safe"] { --tone: #afc1b8; --off: 278; }
+body[data-state="safe"] .only-phish { display: none; } body[data-state="phishing"] .only-safe { display: none; }
+@media (prefers-reduced-motion: reduce) { .gauge .val { animation: none; } }
+</style>
+</head>
+<body data-state="phishing">
+<div class="wrap">
+  <header><div class="brand">Phish<span>Shield</span></div><nav><a class="on">Check</a><a>Results</a><a>How it works</a><a>Extension</a></nav></header>
+  <div class="top">
+    <div><h1>Is this message genuine?</h1>
+      <div class="ask">
+        <textarea class="only-phish" aria-label="Message">URGENT: Dear customer, your SBI KYC is pending and your account will be blocked today. Verify at http://sbi-kyc.xyz/login</textarea>
+        <textarea class="only-safe" aria-label="Message">123456 is your OTP for txn of Rs 500 at Amazon. Valid 5 mins. Do not share it with anyone -HDFC Bank</textarea>
+        <div class="row"><span>SMS · Email · Link · File</span><button>Check</button></div>
+      </div></div>
+    <div class="gauge">
+      <svg viewBox="0 0 220 120" aria-hidden="true"><path class="track" d="M20 110 A90 90 0 0 1 200 110"/><path class="val" d="M20 110 A90 90 0 0 1 200 110"/></svg>
+      <b><span class="only-phish">100</span><span class="only-safe">0</span></b>
+      <h2 class="only-phish">Phishing likely</h2><h2 class="only-safe">Looks genuine</h2>
+      <p>Confidence high · 4 of 4 checks · 23 ms</p>
+    </div>
+  </div>
+  <div class="cols only-phish">
+    <section><h3>The message</h3>
+      <p class="msg"><mark>URGENT</mark>: <mark>Dear customer</mark>, your SBI <mark>KYC is pending</mark> and your <mark>account will be blocked</mark> today. <mark>Verify at http://sbi-kyc.xyz/login</mark></p>
+      <p class="ai">“It pretends to be SBI to rush you into clicking. Don't click; check in the YONO app.”<small>Local AI · from the findings only</small></p></section>
+    <section><h3>Why</h3>
+      <ul class="ev">
+        <li><small>Proven</small><span>sbi-kyc.xyz isn't one of SBI's domains</span><em>+19.5</em></li>
+        <li><small>Proven</small><span>Asks for details through that link</span><em>+19.5</em></li>
+        <li><small>Model</small><span>Wording reads 100% like phishing</span><em>+19.5</em></li>
+        <li><small>Pattern</small><span>Threatens to block your account</span><em>+4.3</em></li>
+      </ul></section>
+  </div>
+  <p class="msg only-safe" style="margin-top:30px">“Do not share it with anyone” is a warning, not a request. There's no link and nothing to reply to.</p>
+</div>
+<div class="toggle" role="group" aria-label="Preview state"><button class="on" data-s="phishing">Phishing</button><button data-s="safe">Safe</button></div>
+<script>
+document.querySelectorAll(".toggle button").forEach((b) => b.addEventListener("click", () => {
+  document.body.dataset.state = b.dataset.s;
+  document.querySelectorAll(".toggle button").forEach((x) => x.classList.toggle("on", x === b));
+  const v = document.querySelector(".gauge .val"); v.style.animation = "none"; v.getBBox(); v.style.animation = "";
+}));
+</script>
+</body>
+</html>
