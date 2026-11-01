@@ -1,6 +1,6 @@
 # PhishShield
 
-**PECathon 2026 · Problem 02 · Phishing and scam detection**
+**Graviton 2026 · Team The Cupids · Problem 02 · Phishing and scam detection**
 
 PhishShield checks SMS messages, emails and links for phishing, and tells you
 **why**. It comes as a web app and a Chrome extension that warns you inside Gmail.

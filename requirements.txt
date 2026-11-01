@@ -1,4 +1,4 @@
-# PhishShield — PECathon 2026
+# PhishShield — The Cupids · Graviton 2026
 # Phishing and scam detection: web app + Chrome extension
 
 # Runtime / core
