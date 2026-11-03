@@ -50,7 +50,7 @@ The full comparison, data sources, limitations and disclosures are in the **[mod
 | **URL model:** gradient-boosted trees on 54 spelling features, never visits the link | Throwaway-looking links with no brand name |
 | **Text model:** TF-IDF + logistic regression, calibrated | Scam wording with no link at all |
 | **Evidence-gated score** | Proven evidence counts in full; patterns count once and are capped; missing checks lower confidence instead of looking safe |
-| **AI explanation:** `llama-3.3-70b-versatile` on Groq | Rewrites the findings in plain words from a redacted copy; answers that add anything are rejected |
+| **AI explanation:** `openai/gpt-oss-120b` on Groq | Rewrites the findings in plain words from a redacted copy; answers that add anything are rejected |
 
 More detail: the **How it works** page in the app.
 

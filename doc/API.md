@@ -193,7 +193,7 @@ Errors: `415` wrong type, `413` too large, `400` empty / unreadable, all with a
 Same body as `/api/analyze`. Returns a plain-English explanation:
 
 ```json
-{"explanation": "...", "source": "llm", "model": "llama-3.3-70b-versatile", "detail": "written by an AI model from the findings",
+{"explanation": "...", "source": "llm", "model": "openai/gpt-oss-120b", "detail": "written by an AI model from the findings",
  "ms": 3120, "verdict": "phishing", "score": 100}
 ```
 

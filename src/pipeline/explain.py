@@ -11,7 +11,7 @@ verdict, is empty or too long, is thrown away and the template is used instead.
 
 Disabled (template only) when GROQ_API_KEY isn't set, PHISHSHIELD_LLM=0, or
 Groq isn't reachable. Config: GROQ_API_KEY (free at https://console.groq.com/keys),
-PHISHSHIELD_LLM_MODEL (default llama-3.3-70b-versatile), GROQ_URL.
+PHISHSHIELD_LLM_MODEL (default openai/gpt-oss-120b), GROQ_URL.
 """
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ from src.detection import domains as D
 logger = logging.getLogger(__name__)
 
 GROQ_URL = os.environ.get("GROQ_URL", "https://api.groq.com/openai/v1")
-LLM_MODEL = os.environ.get("PHISHSHIELD_LLM_MODEL", "llama-3.3-70b-versatile")
+LLM_MODEL = os.environ.get("PHISHSHIELD_LLM_MODEL", "openai/gpt-oss-120b")
 TIMEOUT_S = 20
 MAX_CHARS = 700
 STATUS_TTL_S = 300
@@ -127,9 +127,12 @@ def llm(verdict: str, score: int, confidence: str, reasons: List[str], domains: 
             f"Message (personal data redacted):\n\"\"\"\n{sanitized[:2000]}\n\"\"\"")
     t0 = time.perf_counter()
     try:
-        r = requests.post(f"{GROQ_URL}/chat/completions", headers=_headers(), timeout=TIMEOUT_S, json={
-            "model": LLM_MODEL, "temperature": 0.1, "max_tokens": 300,
-            "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}]})
+        body = {"model": LLM_MODEL, "temperature": 0.1, "max_tokens": 1024,
+                "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}]}
+        if LLM_MODEL.startswith("openai/gpt-oss"):
+            # Reasoning models: keep the hidden reasoning short so the answer fits in max_tokens.
+            body.update(reasoning_effort="low", include_reasoning=False)
+        r = requests.post(f"{GROQ_URL}/chat/completions", headers=_headers(), timeout=TIMEOUT_S, json=body)
         r.raise_for_status()
         answer = (r.json()["choices"][0]["message"]["content"] or "").strip()
     except Exception as exc:  # noqa: BLE001 - log the failure kind only, never the prompt

@@ -276,7 +276,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
   - **How it works:** the checks, the privacy facts for the current mode, and what the labels mean.
   - It reuses the extension's result logic (`/shared/verdict.js`), so the web app and the Gmail banner always agree.
 - **AI explanations** (`src/pipeline/explain.py`, `POST /api/explain`):
-  - `llama-3.3-70b-versatile` on Groq (`GROQ_API_KEY`), called separately so `/api/analyze` stays fast.
+  - `openai/gpt-oss-120b` on Groq (`GROQ_API_KEY`), called separately so `/api/analyze` stays fast.
   - It sees only the reasons, their domains and the **sanitized** message.
   - Answers are rejected (template used instead) if they name another domain, contradict the verdict, skip the reasons or the "What to do" advice, or run long.
   - Never used for safe results or without a key.
