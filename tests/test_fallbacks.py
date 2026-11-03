@@ -113,6 +113,18 @@ def test_groq_answer_is_read_from_the_chat_completion(monkeypatch):
     assert out["source"] == "llm" and out["explanation"] == answer
 
 
+@pytest.mark.parametrize("domain,source", [("sbi‑kyc.xyz", "llm"), ("sby‑kyc.xyz", "template")])
+def test_unicode_hyphens_in_domains_are_checked_whole(monkeypatch, domain, source):
+    answer = f"It pretends to be SBI and the link goes to {domain}, which SBI doesn't own. What to do: don't click it."
+    class R:
+        def raise_for_status(self): pass
+        def json(self): return {"choices": [{"message": {"content": answer}}]}
+    monkeypatch.setattr(explain, "status", lambda: {"available": True, "model": "x"})
+    monkeypatch.setattr(explain.requests, "post", lambda *a, **k: R())
+    out = client.post("/api/explain", json={"text": PHISH}).json()
+    assert out["source"] == source
+
+
 def test_hosted_mode_is_reported(monkeypatch):
     monkeypatch.setenv("PHISHSHIELD_MODE", "hosted")
     assert client.get("/api/health").json()["mode"] == "hosted"

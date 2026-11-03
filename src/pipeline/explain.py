@@ -42,6 +42,7 @@ SYSTEM = (
 )
 
 _status_cache = {"at": 0.0, "value": None}
+_HYPHENS = str.maketrans({"‐": "-", "‑": "-"})
 
 
 def template(verdict: str, score: int, reasons: List[str], confidence: str, gate: Optional[str] = None) -> str:
@@ -134,7 +135,8 @@ def llm(verdict: str, score: int, confidence: str, reasons: List[str], domains: 
             body.update(reasoning_effort="low", include_reasoning=False)
         r = requests.post(f"{GROQ_URL}/chat/completions", headers=_headers(), timeout=TIMEOUT_S, json=body)
         r.raise_for_status()
-        answer = (r.json()["choices"][0]["message"]["content"] or "").strip()
+        # Unicode hyphens (gpt-oss writes "sbi‑kyc.xyz") would hide part of a domain from check_answer.
+        answer = (r.json()["choices"][0]["message"]["content"] or "").strip().translate(_HYPHENS)
     except Exception as exc:  # noqa: BLE001 - log the failure kind only, never the prompt
         logger.warning("LLM explanation failed: %s", type(exc).__name__)
         return {"source": "template", "detail": "the AI model didn't answer in time"}
