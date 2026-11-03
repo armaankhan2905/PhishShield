@@ -197,7 +197,6 @@ function render(result, text) {
                   text: (CHECK_NAMES[k] || k) + (v === "ran" ? "" : " · " + v) }))),
     h("div", { class: "scale", "aria-hidden": "true" }, h("i", { style: "width:" + score + "%" }))));
 
-  if (PS.hostedNote(result)) parts.push(h("p", { class: "notice", text: PS.hostedNote(result) }));
   if (result.file) parts.push(h("p", { class: "muted small fileinfo", text: "File: " + result.file.name + " (" + result.file.type +
     (result.file.pages ? ", " + result.file.pages + " pages" : "") +
     (result.file.attachments && result.file.attachments.length ? ", attachments not opened: " + result.file.attachments.join(", ") : "") +

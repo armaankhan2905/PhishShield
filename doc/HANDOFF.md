@@ -305,7 +305,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
   - the KYC reminder is green 29, with its notes labelled "not enough to flag".
 - **Uploaded HDFC `.eml`:** phishing 100, from 5 proven findings including link text vs real link and sender mismatch. The attachment was not opened and the hidden text was ignored.
 - **Errors:** PNG upload → clear "wrong type" message. Server offline → grey "Couldn't check this message".
-- **Hosted mode:** disclosure banner and the "Hosted demo" / "Template explanations" chips.
+- **Hosted mode:** no banner or mode chip; the How it works page says where messages are checked.
 - **Layout:** works in a desktop window and at 375 px phone width.
 
 ### For the demo (P6)

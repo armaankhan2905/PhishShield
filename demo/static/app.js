@@ -45,7 +45,7 @@ function renderHeader() {
     const chips = [];
     if (!s) chips.push(h("span", { class: "chip bad", text: "Server offline" }));
     else {
-      chips.push(h("span", { class: "chip " + (s.mode === "hosted" ? "off" : "ok"), text: s.mode === "hosted" ? "Hosted demo" : "Running on this computer" }));
+      if (s.mode !== "hosted") chips.push(h("span", { class: "chip ok", text: "Running on this computer" }));
       const ready = s.models.url === "loaded" && s.models.text === "loaded";
       chips.push(h("span", { class: "chip " + (ready ? "ok" : "off"), title: "URL model: " + s.models.url + ", text model: " + s.models.text,
                              text: ready ? "Models ready" : "Models " + s.models.url + "/" + s.models.text }));
@@ -53,12 +53,6 @@ function renderHeader() {
                              text: s.explainer.available ? "AI explanations" : "Template explanations" }));
     }
     status.replaceChildren(...chips);
-    const note = document.getElementById("hostedNote");
-    if (note && s && s.mode === "hosted") {
-      note.hidden = false;
-      note.textContent = "This is the hosted demo: messages you check here are sent to the PhishShield server for analysis. " +
-        "They aren't stored or logged; the AI explanation sees only a copy with personal data removed. For private use, run PhishShield on your own computer.";
-    }
   });
 }
 
