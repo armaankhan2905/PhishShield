@@ -9,6 +9,8 @@ import pytest
 def _models_off(monkeypatch, request):
     if "models_on" not in request.fixturenames:
         monkeypatch.setenv("PHISHSHIELD_MODELS", "0")
+    # Never call Groq from tests, even if the developer has a key set.
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
 
 
 @pytest.fixture

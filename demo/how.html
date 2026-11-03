@@ -51,7 +51,7 @@
       its links belong to the same organisation and it asks for nothing (no details, payment, login, call or app), the models count for
       a quarter: they tend to over-flag ordinary newsletters and sign-in emails. A check that didn't run lowers the confidence; it never
       counts as safety.</p></div></li>
-    <li><div><h3>Explain it</h3><p>A plain summary is built from the reasons. On your own computer, a local AI model (Ollama) can
+    <li><div><h3>Explain it</h3><p>A plain summary is built from the reasons. An AI model (on Groq) can
       rewrite it in plain words. It sees only the reasons and a copy of the message with personal data removed, and an answer that
       adds anything else is thrown away.</p></div></li>
   </ol>
@@ -84,7 +84,7 @@
       ? "On the PhishShield demo server: messages you check are sent over the internet to it."
       : "On this computer. Messages don't leave it.";
     document.getElementById("ai").textContent = !s ? "–" : s.explainer.available
-      ? "Local AI model on this computer (" + s.explainer.model + ")." : "Plain summaries only (" + s.explainer.detail + ").";
+      ? "An AI model on Groq (" + s.explainer.model + ") sees the findings and a copy of the message with personal data removed." : "Plain summaries only (" + s.explainer.detail + ").";
   });
 </script>
 </body>

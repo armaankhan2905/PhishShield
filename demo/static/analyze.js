@@ -141,14 +141,14 @@ async function explain(req, result) {
   const box = $("explainBox");
   if (!box) return;
   box.replaceChildren(h("p", null, h("span", { class: "spin", "aria-hidden": "true" }),
-    "Writing a plain-English explanation with the AI model on this computer…"));
+    "Writing a plain-English explanation with the AI model…"));
   try {
     const out = await post("/api/explain", req);
     if (!document.body.contains(box)) return;  // another message was checked meanwhile
     if (out.verdict !== result.verdict) throw new Error("verdict changed");
     box.replaceChildren(h("p", { text: out.explanation }),
       h("p", { class: "src", text: out.source === "llm"
-        ? "Written by a local AI model (" + out.model + ") from the findings above. It can't add new reasons."
+        ? "Written by an AI model on Groq (" + out.model + ") from the findings above and a redacted copy of the message. It can't add new reasons."
         : "Plain summary (" + (out.detail || "AI model not used") + ")." }));
   } catch (e) {
     box.replaceChildren(h("p", { text: result.explanation }), h("p", { class: "src", text: "Plain summary (the AI explanation failed)." }));

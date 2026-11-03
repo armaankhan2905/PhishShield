@@ -1,4 +1,4 @@
-"""Plain-English explanations: a local LLM (Ollama) grounded in the findings, or a template.
+"""Plain-English explanations: an LLM on Groq grounded in the findings, or a template.
 
 Owner: Ryan. The model only ever sees:
   - the verdict, score and confidence,
@@ -9,9 +9,9 @@ It is told to restate those reasons, not to add new ones, and its answer is
 checked: an answer that names a domain not in the findings, contradicts the
 verdict, is empty or too long, is thrown away and the template is used instead.
 
-Disabled (template only) when PHISHSHIELD_MODE=hosted, PHISHSHIELD_LLM=0, or
-Ollama isn't reachable. Config: OLLAMA_URL (default http://localhost:11434),
-PHISHSHIELD_LLM_MODEL (default qwen2.5:3b).
+Disabled (template only) when GROQ_API_KEY isn't set, PHISHSHIELD_LLM=0, or
+Groq isn't reachable. Config: GROQ_API_KEY (free at https://console.groq.com/keys),
+PHISHSHIELD_LLM_MODEL (default llama-3.3-70b-versatile), GROQ_URL.
 """
 from __future__ import annotations
 
@@ -27,11 +27,11 @@ from src.detection import domains as D
 
 logger = logging.getLogger(__name__)
 
-OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-LLM_MODEL = os.environ.get("PHISHSHIELD_LLM_MODEL", "qwen2.5:3b")
-TIMEOUT_S = 45
+GROQ_URL = os.environ.get("GROQ_URL", "https://api.groq.com/openai/v1")
+LLM_MODEL = os.environ.get("PHISHSHIELD_LLM_MODEL", "llama-3.3-70b-versatile")
+TIMEOUT_S = 20
 MAX_CHARS = 700
-STATUS_TTL_S = 30
+STATUS_TTL_S = 300
 
 SYSTEM = (
     "You explain the result of a phishing check to someone who is not technical. "
@@ -60,22 +60,30 @@ def template(verdict: str, score: int, reasons: List[str], confidence: str, gate
     return text
 
 
+def _headers() -> dict:
+    return {"Authorization": f"Bearer {os.environ.get('GROQ_API_KEY', '').strip()}"}
+
+
 def status() -> dict:
-    """Whether the local LLM can be used. Cached briefly so a missing Ollama doesn't slow every call."""
-    if os.environ.get("PHISHSHIELD_MODE", "local").lower() == "hosted":
-        return {"available": False, "detail": "hosted mode: explanations use the template"}
+    """Whether the LLM can be used. Cached so a missing key or outage doesn't slow every call."""
     if os.environ.get("PHISHSHIELD_LLM", "1") == "0":
         return {"available": False, "detail": "disabled (PHISHSHIELD_LLM=0)"}
+    if not os.environ.get("GROQ_API_KEY", "").strip():
+        return {"available": False, "detail": "GROQ_API_KEY isn't set"}
     now = time.monotonic()
     if _status_cache["value"] is not None and now - _status_cache["at"] < STATUS_TTL_S:
         return _status_cache["value"]
     try:
-        r = requests.get(f"{OLLAMA_URL}/api/tags", timeout=1.5)
-        names = [m.get("name") for m in r.json().get("models", [])]
-        value = ({"available": True, "model": LLM_MODEL, "detail": "Ollama on this computer"} if LLM_MODEL in names
-                 else {"available": False, "detail": f"Ollama is running but {LLM_MODEL} isn't pulled (ollama pull {LLM_MODEL})"})
+        r = requests.get(f"{GROQ_URL}/models", headers=_headers(), timeout=3)
+        if r.status_code in (401, 403):
+            value = {"available": False, "detail": "Groq rejected GROQ_API_KEY"}
+        else:
+            r.raise_for_status()
+            names = [m.get("id") for m in r.json().get("data", [])]
+            value = ({"available": True, "model": LLM_MODEL, "detail": "Groq"} if LLM_MODEL in names
+                     else {"available": False, "detail": f"Groq doesn't offer {LLM_MODEL} (set PHISHSHIELD_LLM_MODEL)"})
     except Exception:  # noqa: BLE001
-        value = {"available": False, "detail": "Ollama isn't running on this computer"}
+        value = {"available": False, "detail": "Groq isn't reachable"}
     _status_cache.update(at=now, value=value)
     return value
 
@@ -119,20 +127,20 @@ def llm(verdict: str, score: int, confidence: str, reasons: List[str], domains: 
             f"Message (personal data redacted):\n\"\"\"\n{sanitized[:2000]}\n\"\"\"")
     t0 = time.perf_counter()
     try:
-        r = requests.post(f"{OLLAMA_URL}/api/chat", timeout=TIMEOUT_S, json={
-            "model": LLM_MODEL, "stream": False, "options": {"temperature": 0.1, "num_ctx": 2048},
+        r = requests.post(f"{GROQ_URL}/chat/completions", headers=_headers(), timeout=TIMEOUT_S, json={
+            "model": LLM_MODEL, "temperature": 0.1, "max_tokens": 300,
             "messages": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}]})
         r.raise_for_status()
-        answer = r.json()["message"]["content"].strip()
+        answer = (r.json()["choices"][0]["message"]["content"] or "").strip()
     except Exception as exc:  # noqa: BLE001 - log the failure kind only, never the prompt
         logger.warning("LLM explanation failed: %s", type(exc).__name__)
-        return {"source": "template", "detail": "the local AI model didn't answer in time"}
+        return {"source": "template", "detail": "the AI model didn't answer in time"}
     problem = check_answer(answer, verdict, domains)
     if problem:
         logger.info("LLM explanation rejected: %s", problem.split(" (")[0])
         return {"source": "template", "detail": f"the AI answer was rejected ({problem})"}
     return {"text": answer, "source": "llm", "model": LLM_MODEL,
-            "detail": "written by a local AI model from the findings", "ms": round((time.perf_counter() - t0) * 1000)}
+            "detail": "written by an AI model from the findings", "ms": round((time.perf_counter() - t0) * 1000)}
 
 
 def domains_in(findings: List[dict]) -> List[str]:

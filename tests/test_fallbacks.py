@@ -47,8 +47,8 @@ def test_legit_message_with_missing_models_is_not_a_confident_safe():
 
 # --- explanation ------------------------------------------------------------------------
 
-def test_ollama_down_falls_back_to_template(monkeypatch):
-    monkeypatch.setattr(explain, "status", lambda: {"available": False, "detail": "Ollama isn't running on this computer"})
+def test_groq_down_falls_back_to_template(monkeypatch):
+    monkeypatch.setattr(explain, "status", lambda: {"available": False, "detail": "Groq isn't reachable"})
     out = client.post("/api/explain", json={"text": PHISH}).json()
     assert out["source"] == "template" and out["explanation"].startswith("Rated phishing")
 
@@ -85,9 +85,36 @@ def test_safe_results_never_use_the_llm(monkeypatch):
     assert out["source"] == "template" and not called
 
 
-def test_hosted_mode_never_uses_the_llm(monkeypatch):
+def test_no_groq_key_means_template_only(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    assert explain.status() == {"available": False, "detail": "GROQ_API_KEY isn't set"}
+
+
+def test_groq_status_checks_the_model_is_offered(monkeypatch):
+    class R:
+        status_code = 200
+        def raise_for_status(self): pass
+        def json(self): return {"data": [{"id": explain.LLM_MODEL}]}
+    monkeypatch.setenv("GROQ_API_KEY", "test")
+    monkeypatch.setitem(explain._status_cache, "value", None)
+    monkeypatch.setattr(explain.requests, "get", lambda *a, **k: R())
+    assert explain.status()["available"] is True
+
+
+def test_groq_answer_is_read_from_the_chat_completion(monkeypatch):
+    answer = ("It pretends to be SBI and the link goes to sbi-kyc.xyz, which SBI doesn't own, to collect your details. "
+              "What to do: don't click it.")
+    class R:
+        def raise_for_status(self): pass
+        def json(self): return {"choices": [{"message": {"content": answer}}]}
+    monkeypatch.setattr(explain, "status", lambda: {"available": True, "model": "x"})
+    monkeypatch.setattr(explain.requests, "post", lambda *a, **k: R())
+    out = client.post("/api/explain", json={"text": PHISH}).json()
+    assert out["source"] == "llm" and out["explanation"] == answer
+
+
+def test_hosted_mode_is_reported(monkeypatch):
     monkeypatch.setenv("PHISHSHIELD_MODE", "hosted")
-    assert explain.status()["available"] is False
     assert client.get("/api/health").json()["mode"] == "hosted"
 
 

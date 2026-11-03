@@ -10,5 +10,7 @@ services:
         value: 0.0.0.0
       - key: PHISHSHIELD_MODE
         value: hosted
+      - key: GROQ_API_KEY
+        sync: false  # set in the Render dashboard; without it, explanations use the template
       - key: PYTHON_VERSION
         value: 3.12.7

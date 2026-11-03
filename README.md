@@ -50,7 +50,7 @@ The full comparison, data sources, limitations and disclosures are in the **[mod
 | **URL model:** gradient-boosted trees on 54 spelling features, never visits the link | Throwaway-looking links with no brand name |
 | **Text model:** TF-IDF + logistic regression, calibrated | Scam wording with no link at all |
 | **Evidence-gated score** | Proven evidence counts in full; patterns count once and are capped; missing checks lower confidence instead of looking safe |
-| **Local AI explanation:** Ollama `qwen2.5:3b` | Rewrites the findings in plain words from a redacted copy; answers that add anything are rejected |
+| **AI explanation:** `llama-3.3-70b-versatile` on Groq | Rewrites the findings in plain words from a redacted copy; answers that add anything are rejected |
 
 More detail: the **How it works** page in the app.
 
@@ -66,7 +66,7 @@ python -m src.pipeline.demo            # http://localhost:8000
 - **Check a message:** paste a message, fill in an email, check a link, or upload a saved email (`.eml`), PDF or text file. Sample emails are in [demo/samples](demo/samples). Samples also open directly, e.g. `/?sample=sbi-kyc-sms`.
 - **Results:** every measured number, read from `data/eval.json`.
 - **How it works:** the checks and the privacy facts for the current mode.
-- **Plain-English AI explanations** (optional): install [Ollama](https://ollama.com), then `ollama pull qwen2.5:3b`. Without it, a summary built from the findings is shown.
+- **Plain-English AI explanations** (optional): get a free API key at [console.groq.com/keys](https://console.groq.com/keys) and put `GROQ_API_KEY=your-key` in a `.env` file in the repo root (or set it as an environment variable). Without it, a summary built from the findings is shown. Change the model with `PHISHSHIELD_LLM_MODEL`.
 - **Chrome extension:** open **Get the extension** in the app (http://localhost:8000/extension). It downloads the extension, walks through the four steps and confirms once it's installed. Details in [extension/README.md](extension/README.md).
 
 The trained models are in the repo (about 4 MB), so nothing needs training. To rebuild everything from public data:
@@ -93,12 +93,12 @@ node --test extension/test/*.test.js    # 5 tests: extension result logic
 | | Local (default) | Hosted demo (`PHISHSHIELD_MODE=hosted`) |
 |---|---|---|
 | Where messages are checked | This computer | The PhishShield server, and every page says so |
-| AI explanation | Ollama on this computer, redacted copy only | Template only |
+| AI explanation | Groq, redacted copy only (if `GROQ_API_KEY` is set) | Groq, redacted copy only (if `GROQ_API_KEY` is set) |
 | Stored or logged | Nothing (tested) | Nothing (tested) |
 
 Links are only read, never opened. Attachments are listed, never opened.
 
-**Hosted deploy:** [render.yaml](render.yaml) deploys the hosted mode (Render: **New → Blueprint** → this repo). It uses `requirements-demo.txt` only, with no torch, and runs in about 240 MB. Set `PHISHSHIELD_EXTENSION_IDS` to lock the API to your published extension.
+**Hosted deploy:** [render.yaml](render.yaml) deploys the hosted mode (Render: **New → Blueprint** → this repo). It uses `requirements-demo.txt` only, with no torch, and runs in about 240 MB. Set `GROQ_API_KEY` in the Render dashboard for AI explanations, and `PHISHSHIELD_EXTENSION_IDS` to lock the API to your published extension.
 
 ## How it fits together
 
@@ -118,7 +118,7 @@ SMS / email / link / .eml / Gmail page
  evidence-gated score ─► verdict · confidence · reasons (Proven / Pattern / Model)
         │
         ▼
- redact personal data ─► plain summary, or local AI explanation (checked before shown)
+ redact personal data ─► plain summary, or AI explanation (checked before shown)
 ```
 
 | Folder | What's there |
@@ -126,7 +126,7 @@ SMS / email / link / .eml / Gmail page
 | `src/detection/` | `engine.py` · `rules.py` · `anomaly.py` · `domains.py` · `brands.py` · `fuse.py` (scoring) |
 | `src/model/` | data download and preparation, URL and text model training, `predict.py` |
 | `src/eval/` | `phish_bench.py`: every reported number comes from here |
-| `src/pipeline/` | `demo.py` (server) · `analyze.py` · `explain.py` (local AI) · `files.py` (uploads) · `sanitize.py` |
+| `src/pipeline/` | `demo.py` (server) · `analyze.py` · `explain.py` (AI explanation) · `files.py` (uploads) · `sanitize.py` |
 | `demo/` | web app pages and sample emails |
 | `extension/` | Chrome extension (Manifest V3) |
 | `doc/` | [API](doc/API.md) · [model card](doc/MODEL_CARD.md) · [demo script](doc/DEMO_SCRIPT.md) · [Q&A](doc/QA.md) · [video script](doc/VIDEO_SCRIPT.md) · [submission checklist](doc/SUBMISSION.md) · [handover log](doc/HANDOFF.md) |
@@ -143,7 +143,7 @@ SMS / email / link / .eml / Gmail page
 
 | Member | Built | Relay phase led |
 |---|---|---|
-| Ryan | Foundation, server, web app, local-AI explanations, uploads, hosted mode | P1 Foundation, P5 Integration |
+| Ryan | Foundation, server, web app, AI explanations, uploads, hosted mode | P1 Foundation, P5 Integration |
 | Armaan | Rules, domain and brand checks, sender checks, evidence-gated scoring | P2 Core detection |
 | Govind | Datasets, URL and text models, calibration, evaluation | P3 Machine learning |
 | Atharva | Chrome extension, demo, video, submission | P4 Extension, P6 Demo |

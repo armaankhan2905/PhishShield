@@ -13,7 +13,7 @@
 | Suspicious links | Public Suffix List domain checks, look-alikes, shorteners, IP links, link-text vs real-link; URL model |
 | Impersonation | 37-brand registry: sender and link domain vs brand, display-name spoofing, look-alike characters |
 | Social-engineering patterns | Requests for OTP / PIN / payment / remote access, threats, prizes, urgency (warnings like "never share" are not flagged) |
-| AI: NLP | Text model (TF-IDF + logistic regression); local LLM explanations (Ollama) grounded in findings |
+| AI: NLP | Text model (TF-IDF + logistic regression); LLM explanations (Groq) grounded in findings |
 | AI: URL classification | URL model (gradient-boosted trees, 54 lexical features), calibrated |
 | AI: anomaly detection | Sender / reply-to / link-text mismatch checks, hidden HTML text, evidence-gated scoring |
 

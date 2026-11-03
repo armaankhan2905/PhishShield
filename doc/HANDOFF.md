@@ -247,7 +247,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
 - **Real Chrome-only paths:** the badge, options-page permission requests and the service worker's message passing only run inside real Chrome.
 
 ### Acceptance test for your handover to Atharva (P5 → P6, revised plan §10)
-- **Fallback matrix passes:** rules-only, no URL model, no text model, Ollama down, API down, unsupported file, malformed URL, empty / oversized input, HTML email.
+- **Fallback matrix passes:** rules-only, no URL model, no text model, Groq down, API down, unsupported file, malformed URL, empty / oversized input, HTML email.
 - Hosted disclosure visible; logs contain no message text.
 - Metrics shown in the UI match `data/eval.json`.
 
@@ -275,11 +275,11 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
   - **Results:** every number read from `data/eval.json` via `/api/eval`.
   - **How it works:** the checks, the privacy facts for the current mode, and what the labels mean.
   - It reuses the extension's result logic (`/shared/verdict.js`), so the web app and the Gmail banner always agree.
-- **Local AI explanations** (`src/pipeline/explain.py`, `POST /api/explain`):
-  - Ollama `qwen2.5:3b` on this computer, called separately so `/api/analyze` stays fast.
+- **AI explanations** (`src/pipeline/explain.py`, `POST /api/explain`):
+  - `llama-3.3-70b-versatile` on Groq (`GROQ_API_KEY`), called separately so `/api/analyze` stays fast.
   - It sees only the reasons, their domains and the **sanitized** message.
   - Answers are rejected (template used instead) if they name another domain, contradict the verdict, skip the reasons or the "What to do" advice, or run long.
-  - Never used for safe results or in hosted mode.
+  - Never used for safe results or without a key.
 - **Uploads** (`src/pipeline/files.py`, `POST /api/analyze/file`):
   - `.eml`: From / Reply-To / Subject are read, so the Reply-To check now works. HTML becomes text with scripts and hidden text dropped; link text vs real link is kept; attachments are listed, never opened.
   - PDF and `.txt` are supported too.
@@ -291,7 +291,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
   - `PHISHSHIELD_EXTENSION_IDS` can lock the API to the published extension.
 - **Removed:** the PrivacyLens features outside scope (document Q&A, `/api/rag*`, `/api/document`, `/api/pipeline`, the ask/training pages, old PII training and benchmark code). Old page URLs redirect.
 - **Tests:**
-  - **133 Python tests**, including the full fallback matrix: rules only, each model missing, Ollama down or erroring, bad AI answers, empty / oversized / malformed input, HTML email, unsupported and broken files, no message text in logs, removed endpoints;
+  - **133 Python tests**, including the full fallback matrix: rules only, each model missing, Groq down or erroring, bad AI answers, empty / oversized / malformed input, HTML email, unsupported and broken files, no message text in logs, removed endpoints;
   - **5 extension tests**.
 - **Final measurement:**
   - two runs give identical `metrics_sha256 = ca1d8651eeb44b87`;
@@ -309,7 +309,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
 - **Layout:** works in a desktop window and at 375 px phone width.
 
 ### For the demo (P6)
-- **Start:** `python -m src.pipeline.demo`, with Ollama running for AI explanations. The header chips should read "Running on this computer · Models ready · Local AI explanations".
+- **Start:** `python -m src.pipeline.demo`, with `GROQ_API_KEY` set for AI explanations. The header chips should read "Running on this computer · Models ready · AI explanations".
 - **Suggested order:**
   1. SBI KYC SMS: phishing, proven reasons and the AI explanation.
   2. Bank OTP alert: green.
@@ -319,7 +319,7 @@ The full table, the comparison with the old 35/30/35 formula and the caveats are
   6. Gmail with the extension.
   7. Results page.
   8. How it works → Privacy.
-- The AI explanation takes about 3–8 s and appears after the result. If Ollama is off, the template is used and the header says so.
+- The AI explanation takes about 1–2 s and appears after the result. Without a key or if Groq is down, the template is used and the header says so.
 
 ### Still not done (before the demo)
 - **The extension in real Chrome on real Gmail** (see the P4 notes).

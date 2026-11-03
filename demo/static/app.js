@@ -50,14 +50,14 @@ function renderHeader() {
       chips.push(h("span", { class: "chip " + (ready ? "ok" : "off"), title: "URL model: " + s.models.url + ", text model: " + s.models.text,
                              text: ready ? "Models ready" : "Models " + s.models.url + "/" + s.models.text }));
       chips.push(h("span", { class: "chip " + (s.explainer.available ? "ok" : "off"), title: s.explainer.detail,
-                             text: s.explainer.available ? "Local AI explanations" : "Template explanations" }));
+                             text: s.explainer.available ? "AI explanations" : "Template explanations" }));
     }
     status.replaceChildren(...chips);
     const note = document.getElementById("hostedNote");
     if (note && s && s.mode === "hosted") {
       note.hidden = false;
       note.textContent = "This is the hosted demo: messages you check here are sent to the PhishShield server for analysis. " +
-        "They aren't stored or logged. For private use, run PhishShield on your own computer.";
+        "They aren't stored or logged; the AI explanation sees only a copy with personal data removed. For private use, run PhishShield on your own computer.";
     }
   });
 }

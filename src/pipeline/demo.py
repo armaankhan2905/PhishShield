@@ -8,7 +8,7 @@ Endpoints:
   GET  /shared/*              extension/shared: result logic shared by the web app and the extension
   POST /api/analyze           message / URL / email -> score, verdict, findings (doc/API.md)
   POST /api/analyze/file      .eml / .pdf / .txt / image upload -> the same, plus the text that was analysed
-  POST /api/explain           same body as /api/analyze -> explanation from the local AI model, or the template
+  POST /api/explain           same body as /api/analyze -> explanation from the AI model (Groq), or the template
   POST /api/sanitize          {"text"} -> personal data redacted
   GET  /api/eval              data/eval.json and calibration summary, for the results page
   GET  /api/health            {"ok", "mode", "models", "explainer"}
@@ -17,7 +17,8 @@ Endpoints:
   GET  /download/phishshield-extension.zip   the extension, ready for "Load unpacked"
 
 Modes (PHISHSHIELD_MODE): "local" (default, the server runs on the user's machine) or
-"hosted" (messages arrive over the network: the UI says so, explanations use the template).
+"hosted" (messages arrive over the network: the UI says so).
+AI explanations need GROQ_API_KEY (environment or a .env file in the repo root); without it, the template.
 Nothing in this server stores or logs message text.
 
 Run (from repo root):
@@ -130,7 +131,7 @@ def health() -> dict:
 
 @app.on_event("startup")
 def _warm_up() -> None:
-    # Load the models and probe Ollama off the request path so the first analysis isn't slow.
+    # Load the models and probe Groq off the request path so the first analysis isn't slow.
     def run():
         for k in ("url", "text"):
             predict.status(k)
@@ -235,9 +236,20 @@ def download_extension() -> Response:
                     headers={"Content-Disposition": f'attachment; filename="{name}"'})
 
 
+def _load_dotenv() -> None:
+    """KEY=value lines from .env in the repo root (e.g. GROQ_API_KEY); real environment variables win."""
+    env = ROOT / ".env"
+    if env.is_file():
+        for line in env.read_text(encoding="utf-8").splitlines():
+            key, sep, value = line.partition("=")
+            if sep and key.strip() and not key.lstrip().startswith("#"):
+                os.environ.setdefault(key.strip(), value.strip().strip("'\""))
+
+
 def main() -> None:
     import uvicorn
 
+    _load_dotenv()
     host = os.environ.get("HOST", "127.0.0.1")
     port = int(os.environ.get("PORT", "8000"))
     if "--dev" in sys.argv:

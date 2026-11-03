@@ -193,18 +193,18 @@ Errors: `415` wrong type, `413` too large, `400` empty / unreadable, all with a
 Same body as `/api/analyze`. Returns a plain-English explanation:
 
 ```json
-{"explanation": "...", "source": "llm", "model": "qwen2.5:3b", "detail": "written by a local AI model from the findings",
+{"explanation": "...", "source": "llm", "model": "llama-3.3-70b-versatile", "detail": "written by an AI model from the findings",
  "ms": 3120, "verdict": "phishing", "score": 100}
 ```
 
-- **`source: "llm"`:** written by a local Ollama model from the findings only.
+- **`source: "llm"`:** written by an LLM on Groq from the findings only.
   The model sees the reasons, the domains they name and the **sanitized** message.
   An answer that names another domain, contradicts the verdict, skips the reasons
   or the "What to do" advice, or is too long is rejected.
 - **`source: "template"`:** the same text as `/api/analyze`'s `explanation`.
-  Always used in hosted mode, when Ollama isn't running, for safe results, or when an answer was rejected. `detail` says why.
+  Used when `GROQ_API_KEY` isn't set or Groq can't be reached, for safe results, or when an answer was rejected. `detail` says why.
 
-The local model takes seconds, which is why it's a separate call: `/api/analyze`
+The model takes a second or two, which is why it's a separate call: `/api/analyze`
 stays fast for the extension.
 
 ## Other endpoints
